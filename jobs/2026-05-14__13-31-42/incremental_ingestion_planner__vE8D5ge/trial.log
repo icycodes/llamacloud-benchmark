@@ -1,0 +1,161 @@
+Skipping image OS validation for hb__incremental_ingestion_planner: docker inspect returned 1
+Running command: apt-get update && apt-get install -y curl ripgrep
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Running command: echo incremental_ingestion_planner__vE8D5ge > /logs/artifacts/trial_id
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# LlamaCloud Incremental Ingestion Planner
+
+## Background
+A common production pattern with LlamaCloud is keeping a managed index in sync with a local directory: as files are added, modified, or removed on disk, the equivalent documents in the managed index must be inserted, refreshed, or deleted. Re-uploading every file on every run wastes credits and parsing time, so teams build a small "sync planner" that compares the previous synced state (file paths + content hashes) to the current state on disk and emits an action plan describing exactly which files to ADD, UPDATE, DELETE, or leave UNCHANGED.
+
+You must build a Python CLI that computes such a plan offline. The plan is keyed by `index_name` and `project_name` so it can later be applied with the `LlamaCloudIndex` SDK class (`from llama_index.indices.managed.llama_cloud import LlamaCloudIndex`). To prove the SDK is wired up correctly, the script MUST import that class at module top-level, but it MUST NOT instantiate it, and it MUST NOT make any network calls.
+
+## Requirements
+- Implement a Python CLI script `sync_planner.py` that imports `LlamaCloudIndex` from `llama_index.indices.managed.llama_cloud` at module top-level.
+- The CLI must accept the following arguments:
+  - `--input-dir` (required): absolute path to the local source directory to scan.
+  - `--previous-state` (required): absolute path to a JSON file describing the previously-synced state (schema documented below). The file may not exist on a first run.
+  - `--output` (required): absolute path of the JSON sync plan to write.
+  - `--index-name` (required): the LlamaCloud index name to record in the plan.
+  - `--project-name` (optional, default `Default`): the LlamaCloud project name to record in the plan.
+- The script must enumerate files in `--input-dir` non-recursively and include only files with one of these supported extensions (case-insensitive): `.pdf`, `.docx`, `.pptx`, `.txt`, `.md`, `.html`. All other files MUST be ignored entirely (they must NOT appear in the plan and must NOT trigger DELETE entries).
+- For each included file, compute:
+  - `file_name`: the basename of the file (e.g., `report.md`).
+  - `path`: the absolute path of the file.
+  - `size_bytes`: the integer file size in bytes.
+  - `sha256`: the lowercase hex SHA-256 digest of the file's full byte contents.
+- Compare the current scan against the previous state to classify each file_name:
+  - **ADD**: file_name appears in the current scan but is NOT present in the previous state.
+  - **UPDATE**: file_name appears in BOTH but the `sha256` differs.
+  - **UNCHANGED**: file_name appears in BOTH and the `sha256` matches.
+  - **DELETE**: file_name appears in the previous state but is NOT in the current scan.
+- The previous state JSON file has this exact schema (when it exists):
+  ```json
+  {
+    "index_name": "<string>",
+    "project_name": "<string>",
+    "files": [
+      {"file_name": "<basename>", "sha256": "<lowercase hex>"}
+    ]
+  }
+  ```
+  If `--previous-state` does not exist on disk, treat the previous file list as empty (every current file becomes an ADD).
+- Output JSON schema (exact top-level keys, no extras):
+  ```json
+  {
+    "index_name": "<from --index-name>",
+    "project_name": "<from --project-name>",
+    "actions": {
+      "add":       [ { "file_name": "...", "path": "...", "size_bytes": <int>, "sha256": "..." } ],
+      "update":    [ { "file_name": "...", "path": "...", "size_bytes": <int>, "sha256": "...", "previous_sha256": "..." } ],
+      "unchanged": [ { "file_name": "...", "sha256": "..." } ],
+      "delete":    [ { "file_name": "...", "previous_sha256": "..." } ]
+    },
+    "summary": {
+      "add": <int>, "update": <int>, "unchanged": <int>, "delete": <int>
+    }
+  }
+  ```
+  - Each of the four `actions` lists MUST be sorted alphabetically by `file_name` (case-sensitive `sorted()` order).
+  - Each integer in `summary` MUST equal the length of the corresponding `actions` list.
+  - Write the JSON with `json.dump(..., indent=2)` so it is human-readable.
+- On success, the script must print exactly one line to stdout (then exit `0`):
+  `Sync plan written to <output_path>: add=<A> update=<U> unchanged=<N> delete=<D>`
+  where `<output_path>` is the absolute path from `--output` and `<A>/<U>/<N>/<D>` are the integer counts.
+- If `--input-dir` does not exist or is not a directory, the script MUST:
+  - print the line `Error: input directory not found: <input_dir>` to stderr,
+  - NOT write any output file,
+  - exit with a non-zero status code.
+- The script MUST NOT make any outbound HTTP calls and MUST NOT instantiate `LlamaCloudIndex`. The import statement is enough to demonstrate SDK availability.
+
+## Implementation Guide
+1. The project directory `/home/user/sync_planner` already exists and contains:
+   - `inputs/` with three pre-populated files: `report.md`, `notes.txt`, and `image.jpg`.
+   - `previous_state.json` with a recorded baseline that lists `report.md` (with its current hash) and `archive.txt` (a file that no longer exists on disk).
+   Do NOT modify or delete any of these starter fixtures.
+2. Create the script at `/home/user/sync_planner/sync_planner.py`.
+3. Use `argparse` for argument parsing. Use `hashlib.sha256` for hashing.
+4. Filter files by the allowed extensions (case-insensitive). Skip `image.jpg` (it has an unsupported extension).
+5. Read the previous state if present; otherwise treat as empty. Build a dict keyed by `file_name`.
+6. Compute ADD/UPDATE/UNCHANGED/DELETE classification, sort each list alphabetically by `file_name`, and assemble the output JSON.
+7. Write the JSON using `json.dump(..., indent=2)`. Print the required success line and exit `0`.
+8. Handle the missing-input-directory error by printing to `sys.stderr` and exiting with status `1`.
+
+## Acceptance Criteria
+- Project path: /home/user/sync_planner
+- Script path: /home/user/sync_planner/sync_planner.py
+- Command (happy path): `python3 /home/user/sync_planner/sync_planner.py --input-dir /home/user/sync_planner/inputs --previous-state /home/user/sync_planner/previous_state.json --output /home/user/sync_planner/plan.json --index-name my_index --project-name Default`
+  - Exit code: `0`.
+  - Stdout (exact single line): `Sync plan written to /home/user/sync_planner/plan.json: add=1 update=0 unchanged=1 delete=1`
+  - The file `/home/user/sync_planner/plan.json` exists and matches the JSON schema described above.
+  - `index_name` == `"my_index"`, `project_name` == `"Default"`.
+  - `actions.add` is exactly one entry for `notes.txt` (correct path/size/sha256).
+  - `actions.unchanged` is exactly one entry for `report.md` (correct sha256 of the on-disk file).
+  - `actions.delete` is exactly one entry for `archive.txt` (with `previous_sha256` copied from the previous state).
+  - `actions.update` is the empty list.
+  - `image.jpg` does NOT appear in any of the four action lists.
+  - `summary` equals `{"add": 1, "update": 0, "unchanged": 1, "delete": 1}`.
+- Command (missing previous state, treated as empty): `python3 /home/user/sync_planner/sync_planner.py --input-dir /home/user/sync_planner/inputs --previous-state /home/user/sync_planner/no_such_state.json --output /home/user/sync_planner/initial_plan.json --index-name my_index`
+  - Exit code: `0`.
+  - Stdout (exact single line): `Sync plan written to /home/user/sync_planner/initial_plan.json: add=2 update=0 unchanged=0 delete=0`
+  - `actions.add` contains two entries (`notes.txt` then `report.md`, sorted alphabetically). `actions.update`, `actions.unchanged`, and `actions.delete` are empty lists.
+  - `project_name` defaults to `"Default"`.
+- Command (error path): `python3 /home/user/sync_planner/sync_planner.py --input-dir /home/user/sync_planner/does_not_exist --previous-state /home/user/sync_planner/previous_state.json --output /home/user/sync_planner/should_not_exist.json --index-name my_index`
+  - Exit code: non-zero.
+  - Stderr contains the line: `Error: input directory not found: /home/user/sync_planner/does_not_exist`
+  - The file `/home/user/sync_planner/should_not_exist.json` must NOT be created.
+- SDK usage: the script source must contain (verbatim, string match) `from llama_index.indices.managed.llama_cloud import LlamaCloudIndex` so the LlamaCloud managed-index SDK is demonstrably available in the runtime.
+
+
+EOF
+Command outputs captured
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured

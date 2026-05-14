@@ -1,0 +1,79 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 6,
+            "passed": 6,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778737136478,
+            "stop": 1778737142301
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_exists",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778737136498,
+                "stop": 1778737136499,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_imports_sdk_classes",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778737136499,
+                "stop": 1778737136499,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_full_mode_happy_path_run",
+                "status": "passed",
+                "duration": 1462,
+                "start": 1778737136500,
+                "stop": 1778737137962,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_routing_mode_run_normalises_to_uppercase",
+                "status": "passed",
+                "duration": 1381,
+                "start": 1778737137963,
+                "stop": 1778737139344,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_validation_error_for_empty_description",
+                "status": "passed",
+                "duration": 1507,
+                "start": 1778737139344,
+                "stop": 1778737140851,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_validation_error_for_missing_config_file",
+                "status": "passed",
+                "duration": 1450,
+                "start": 1778737140851,
+                "stop": 1778737142301,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

@@ -1,0 +1,20 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 9 items
+
+tests/test_final_state.py .........                                      [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_imports_llama_cloud_managed_index
+PASSED tests/test_final_state.py::test_happy_path_run_stdout_and_exit_code
+PASSED tests/test_final_state.py::test_happy_path_plan_structure
+PASSED tests/test_final_state.py::test_happy_path_add_entry_for_notes_txt
+PASSED tests/test_final_state.py::test_happy_path_unchanged_entry_for_report_md
+PASSED tests/test_final_state.py::test_happy_path_delete_entry_for_archive_txt
+PASSED tests/test_final_state.py::test_happy_path_update_list_empty_and_unsupported_excluded
+PASSED tests/test_final_state.py::test_missing_previous_state_run
+PASSED tests/test_final_state.py::test_missing_input_directory_error_path
+============================== 9 passed in 11.99s ==============================
