@@ -1,0 +1,88 @@
+Hit:1 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:2 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+curl is already the newest version (8.5.0-2ubuntu10.9).
+0 upgraded, 0 newly installed, 0 to remove and 3 not upgraded.
+downloading uv 0.9.7 x86_64-unknown-linux-gnu
+no checksums to verify
+installing to /root/.local/bin
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+Downloading pygments (1.2MiB)
+ Downloading pygments
+Installed 9 packages in 25ms
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.3.5, xprocess-1.0.2
+collected 16 items
+
+tests/test_final_state.py ..............F.                               [100%]
+
+=================================== FAILURES ===================================
+______________________ test_job_id_is_real_on_llamacloud _______________________
+
+    def test_job_id_is_real_on_llamacloud():
+        """Confirm the recorded job_id corresponds to a real, COMPLETED parse job
+        on the LlamaCloud server, by invoking the SDK from a subprocess so this
+        file stays stdlib-only."""
+        data = _load_manifest()
+        job_id = data["job_id"]
+        code = (
+            "import json,os,sys;"
+            "from llama_cloud import LlamaCloud;"
+            "c=LlamaCloud();"
+            f"r=c.parsing.get(job_id={job_id!r}, expand=['job_metadata']);"
+            "status=getattr(getattr(r,'job',None),'status',None);"
+            "print(json.dumps({'status': str(status) if status is not None else ''}))"
+        )
+        result = subprocess.run(
+            ["python3", "-c", code],
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+>       assert result.returncode == 0, (
+            f"Looking up job_id={job_id!r} via LlamaCloud SDK failed.\n"
+            f"stdout: {result.stdout}\nstderr: {result.stderr}"
+        )
+E       AssertionError: Looking up job_id='caf2d5e8-a9c8-45e9-8c02-b76d273e15ee' via LlamaCloud SDK failed.
+E         stdout: 
+E         stderr: Traceback (most recent call last):
+E           File "<string>", line 1, in <module>
+E         ModuleNotFoundError: No module named 'llama_cloud'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '-c', "import json,os,sys;from llama_cloud import LlamaCloud;c=LlamaCloud();r=c.pars...st recent call last):\n  File "<string>", line 1, in <module>\nModuleNotFoundError: No module named \'llama_cloud\'\n').returncode
+
+tests/test_final_state.py:228: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_exists
+PASSED tests/test_final_state.py::test_script_imports_llama_cloud
+PASSED tests/test_final_state.py::test_script_invokes_parsing_parse_exactly_once
+PASSED tests/test_final_state.py::test_script_requests_screenshots_and_images_metadata
+PASSED tests/test_final_state.py::test_script_does_not_hardcode_api_key
+PASSED tests/test_final_state.py::test_screenshots_dir_exists_and_non_empty
+PASSED tests/test_final_state.py::test_every_screenshot_file_is_a_valid_image
+PASSED tests/test_final_state.py::test_manifest_top_level_keys
+PASSED tests/test_final_state.py::test_manifest_source_value
+PASSED tests/test_final_state.py::test_manifest_page_count_is_three
+PASSED tests/test_final_state.py::test_manifest_job_id_shape
+PASSED tests/test_final_state.py::test_manifest_image_count_matches_images_length
+PASSED tests/test_final_state.py::test_manifest_image_count_matches_disk_files
+PASSED tests/test_final_state.py::test_manifest_entries_shape_and_size_match_disk
+PASSED tests/test_final_state.py::test_source_pdf_unchanged
+FAILED tests/test_final_state.py::test_job_id_is_real_on_llamacloud - Asserti...
+========================= 1 failed, 15 passed in 0.09s =========================

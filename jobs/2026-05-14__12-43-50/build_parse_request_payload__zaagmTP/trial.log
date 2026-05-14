@@ -1,0 +1,291 @@
+Skipping image OS validation for hb__build_parse_request_payload: docker inspect returned 1
+Running command: apt-get update && apt-get install -y curl ripgrep
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Running command: echo build_parse_request_payload__zaagmTP > /logs/artifacts/trial_id
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# Build a LlamaCloud Parse v2 Request Payload From a High-Level Intent
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. Its agentic document parser, LlamaParse, is driven by the v2 `POST /api/v2/parse` endpoint (called for you by `client.parsing.parse(...)` in the `llama-cloud` Python SDK). The Parse v2 request body is a fairly deep JSON object where every knob has a specific home. A common source of bugs is putting options at the wrong nesting level — e.g. placing `custom_prompt` under `processing_options` instead of `agentic_options`, or putting `timeouts` under `processing_options` instead of `processing_control`.
+
+In this task you will write a small build-only utility that consumes a flat, high-level *intent* JSON file (the kind of thing you might receive from another team or a UI) and emits a fully-formed Parse v2 request body with every field placed at exactly the right path. The script must construct a `LlamaCloud` client (a sanity check that the SDK and credentials are wired up correctly) but it MUST NOT actually call `client.parsing.parse(...)` or contact LlamaCloud over the network.
+
+## Pre-existing Layout
+The project directory `/home/user/parse_payload` already contains:
+
+```
+/home/user/parse_payload/
+└── intent.json
+```
+
+`intent.json` is exactly:
+
+```json
+{
+  "file_id": "file-demo-abc-123",
+  "tier": "agentic",
+  "version": "latest",
+  "pages": "1-3,5",
+  "crop_top": 0.1,
+  "crop_bottom": 0.15,
+  "ocr_languages": ["en", "fr"],
+  "tables_as_html": true,
+  "save_screenshots": true,
+  "custom_prompt": "This is a financial report. Preserve currency symbols.",
+  "enable_cost_optimizer": true,
+  "base_timeout_seconds": 300,
+  "extra_time_per_page_seconds": 30,
+  "ignore_diagonal_text": true,
+  "disable_cache": false
+}
+```
+
+## Requirements
+
+Create the following inside `/home/user/parse_payload`:
+
+### 1. `build_payload.py`
+A standalone script invoked as `python3 build_payload.py` that performs the following steps in order:
+
+1. **Validate environment**: Read `LLAMA_CLOUD_API_KEY` from `os.environ`. If the variable is unset or empty, exit with a non-zero status and print an error message to stderr.
+2. **Sanity-check the SDK**: Construct a client via `from llama_cloud import LlamaCloud` and instantiate `LlamaCloud(token=<api_key>)`. Do NOT make any network calls (no `client.parsing.parse(...)`, no `client.files.create(...)`, no `requests.*`, no `httpx.*`). Constructing the client is the only SDK interaction.
+3. **Load the intent file** from `/home/user/parse_payload/intent.json` (UTF-8, valid JSON).
+4. **Validate the tier**: The intent's `tier` field MUST be one of `fast`, `cost_effective`, `agentic`, `agentic_plus`. If not, exit with a non-zero status and print an error to stderr.
+5. **Construct the request body** as a Python dict with the exact structure described in the [Output Schema](#output-schema) section below. Each field MUST be placed at the documented nesting level.
+6. **Write the request body** to `/home/user/parse_payload/request_body.json` (UTF-8, indented with 2 spaces). Top-level keys MUST be sorted alphabetically.
+7. **Print a one-line summary** to stdout in this exact format (no extra spaces, no extra text):
+   ```
+   payload_ok file_id=<file_id> tier=<tier> top_level_keys=<N>
+   ```
+   where `<file_id>` is the value of `intent["file_id"]`, `<tier>` is the value of `intent["tier"]`, and `<N>` is the number of top-level keys in the resulting payload (an integer).
+
+### Output Schema
+
+The resulting `request_body.json` must equal EXACTLY (modulo whitespace and key ordering inside the JSON file — top-level keys must be alphabetically sorted in the file):
+
+```json
+{
+  "agentic_options": {
+    "custom_prompt": "This is a financial report. Preserve currency symbols."
+  },
+  "crop_box": {
+    "bottom": 0.15,
+    "top": 0.1
+  },
+  "disable_cache": false,
+  "file_id": "file-demo-abc-123",
+  "output_options": {
+    "images_to_save": ["screenshot"],
+    "markdown": {
+      "tables": {
+        "output_tables_as_markdown": false
+      }
+    }
+  },
+  "page_ranges": {
+    "target_pages": "1-3,5"
+  },
+  "processing_control": {
+    "timeouts": {
+      "base_in_seconds": 300,
+      "extra_time_per_page_in_seconds": 30
+    }
+  },
+  "processing_options": {
+    "cost_optimizer": {
+      "enable": true
+    },
+    "ignore": {
+      "ignore_diagonal_text": true
+    },
+    "ocr_parameters": {
+      "languages": ["en", "fr"]
+    }
+  },
+  "tier": "agentic",
+  "version": "latest"
+}
+```
+
+Field-by-field mapping (intent key → payload path):
+
+| Intent key | Payload path |
+| --- | --- |
+| `file_id` | top-level `file_id` |
+| `tier` | top-level `tier` |
+| `version` | top-level `version` |
+| `disable_cache` | top-level `disable_cache` |
+| `pages` | `page_ranges.target_pages` |
+| `crop_top` | `crop_box.top` |
+| `crop_bottom` | `crop_box.bottom` |
+| `ocr_languages` | `processing_options.ocr_parameters.languages` |
+| `enable_cost_optimizer` | `processing_options.cost_optimizer.enable` |
+| `ignore_diagonal_text` | `processing_options.ignore.ignore_diagonal_text` |
+| `custom_prompt` | `agentic_options.custom_prompt` |
+| `tables_as_html` | `output_options.markdown.tables.output_tables_as_markdown` (NEGATED — `true` in intent ⇒ `false` in payload, and vice versa) |
+| `save_screenshots` | `output_options.images_to_save` — if `true`, include the string `"screenshot"` in the array; if `false`, omit the entire `images_to_save` key |
+| `base_timeout_seconds` | `processing_control.timeouts.base_in_seconds` |
+| `extra_time_per_page_seconds` | `processing_control.timeouts.extra_time_per_page_in_seconds` |
+
+Important: do NOT include an `expand` key anywhere in the payload — `expand` is a query parameter on the GET result endpoint, not part of the parse request body.
+
+## Implementation Guide
+
+1. `cd /home/user/parse_payload`.
+2. Create `build_payload.py`. A reference implementation:
+   ```python
+   import json
+   import os
+   import sys
+
+   from llama_cloud import LlamaCloud
+
+   INTENT_PATH = "/home/user/parse_payload/intent.json"
+   OUT_PATH = "/home/user/parse_payload/request_body.json"
+   ALLOWED_TIERS = {"fast", "cost_effective", "agentic", "agentic_plus"}
+
+
+   def build_payload(intent: dict) -> dict:
+       payload = {
+           "file_id": intent["file_id"],
+           "tier": intent["tier"],
+           "version": intent["version"],
+           "disable_cache": bool(intent["disable_cache"]),
+           "page_ranges": {"target_pages": intent["pages"]},
+           "crop_box": {
+               "top": intent["crop_top"],
+               "bottom": intent["crop_bottom"],
+           },
+           "processing_options": {
+               "ocr_parameters": {"languages": list(intent["ocr_languages"])},
+               "cost_optimizer": {"enable": bool(intent["enable_cost_optimizer"])},
+               "ignore": {"ignore_diagonal_text": bool(intent["ignore_diagonal_text"])},
+           },
+           "agentic_options": {"custom_prompt": intent["custom_prompt"]},
+           "output_options": {
+               "markdown": {
+                   "tables": {
+                       "output_tables_as_markdown": not bool(intent["tables_as_html"]),
+                   },
+               },
+           },
+           "processing_control": {
+               "timeouts": {
+                   "base_in_seconds": int(intent["base_timeout_seconds"]),
+                   "extra_time_per_page_in_seconds": int(
+                       intent["extra_time_per_page_seconds"]
+                   ),
+               },
+           },
+       }
+       if intent["save_screenshots"]:
+           payload["output_options"]["images_to_save"] = ["screenshot"]
+       return payload
+
+
+   def main() -> int:
+       api_key = os.environ.get("LLAMA_CLOUD_API_KEY", "").strip()
+       if not api_key:
+           print("LLAMA_CLOUD_API_KEY is not set", file=sys.stderr)
+           return 2
+
+       _client = LlamaCloud(token=api_key)  # sanity check, no network call
+
+       with open(INTENT_PATH, "r", encoding="utf-8") as f:
+           intent = json.load(f)
+
+       if intent["tier"] not in ALLOWED_TIERS:
+           print(
+               f"invalid tier: {intent['tier']!r}; allowed: {sorted(ALLOWED_TIERS)}",
+               file=sys.stderr,
+           )
+           return 3
+
+       payload = build_payload(intent)
+       sorted_payload = dict(sorted(payload.items()))
+       with open(OUT_PATH, "w", encoding="utf-8") as f:
+           json.dump(sorted_payload, f, indent=2)
+
+       print(
+           f"payload_ok file_id={intent['file_id']} tier={intent['tier']} top_level_keys={len(sorted_payload)}"
+       )
+       return 0
+
+
+   sys.exit(main())
+   ```
+3. Run the script:
+   ```bash
+   cd /home/user/parse_payload
+   python3 build_payload.py
+   ```
+   This produces `/home/user/parse_payload/request_body.json` and prints the summary line.
+
+## Constraints
+- Project path: `/home/user/parse_payload`
+- Script path: `/home/user/parse_payload/build_payload.py`
+- Input file: `/home/user/parse_payload/intent.json`
+- Output file: `/home/user/parse_payload/request_body.json`
+- Log line: a single line on stdout matching exactly `payload_ok file_id=file-demo-abc-123 tier=agentic top_level_keys=10`.
+- Use the official `llama_cloud` Python SDK (`from llama_cloud import LlamaCloud`).
+- Do NOT make any network calls (no `client.parsing.parse(...)`, no `client.files.create(...)`, no `requests.*`, no `httpx.*`, no `urllib.request.*`, no `curl`).
+- Do NOT hardcode the API key — always read `LLAMA_CLOUD_API_KEY` from the environment.
+- The output JSON must be UTF-8, indented with 2 spaces, and have top-level keys sorted alphabetically.
+- Do NOT include an `expand` key in the payload at any nesting level.
+- The Parse v2 tier value MUST be one of `fast`, `cost_effective`, `agentic`, `agentic_plus`. (For this intent, that is `agentic`.)
+
+## Integrations
+- LlamaCloud — requires the `LLAMA_CLOUD_API_KEY` environment variable (any non-empty string is acceptable; the script only constructs the client and never issues a network request).
+
+EOF
+Command outputs captured
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured

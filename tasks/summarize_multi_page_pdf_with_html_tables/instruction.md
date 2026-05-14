@@ -1,0 +1,96 @@
+# Summarize a Multi-Page PDF with LlamaParse Using HTML Table Output
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. Its agentic document parser, LlamaParse, turns visually rich PDFs (including tables) into clean markdown. By default, LlamaParse renders tables in pipe-table markdown form, but you can flip the `output_options.markdown.tables.output_tables_as_markdown` flag to `false` to receive HTML `<table>` blocks instead — useful when a downstream pipeline expects raw HTML for richer rendering or further parsing.
+
+In this task you will build a small pipeline that parses a multi-page operations report, asks LlamaParse to emit tables as HTML, then walks every page of the parsed result and writes a single structured `summary.json` describing the document. This is more complex than a basic parse-to-markdown task because it requires (1) configuring `output_options` on the parse call, (2) iterating over every page of the result, and (3) building an aggregate summary object.
+
+## Requirements
+Write a Python script `summarize_report.py` that uses the `llama-cloud` SDK (`from llama_cloud import LlamaCloud`) to:
+  1. Upload the local PDF `operations_report.pdf` to LlamaCloud with `purpose="parse"`.
+  2. Submit a parse job with all of the following options:
+     - `tier="agentic"`
+     - `version="latest"`
+     - `output_options={"markdown": {"tables": {"output_tables_as_markdown": False}}}` (so tables come back as HTML `<table>` blocks instead of pipe-table markdown)
+     - `expand=["markdown"]`
+  3. Iterate over every page returned by the parser (`result.markdown.pages`). For each page, build a record with:
+     - `page_number` (1-based integer matching the page index in the source PDF)
+     - `word_count` (integer — number of whitespace-separated tokens in that page's markdown text)
+     - `has_html_table` (boolean — `True` iff the page's markdown contains an HTML opening table tag, i.e. the substring `<table` is present, case-insensitive)
+  4. Collect the markdown text of every page that contains an HTML table into a separate top-level list `html_tables` (preserving page order).
+  5. Assemble and write a single JSON file `summary.json` (UTF-8, `indent=2`) with the exact shape:
+     ```json
+     {
+       "total_pages": <int>,
+       "pages": [
+         {"page_number": 1, "word_count": <int>, "has_html_table": <bool>},
+         {"page_number": 2, "word_count": <int>, "has_html_table": <bool>},
+         {"page_number": 3, "word_count": <int>, "has_html_table": <bool>}
+       ],
+       "html_tables": ["<table>...</table>", "<table>...</table>"]
+     }
+     ```
+
+The script must authenticate via the `LLAMA_CLOUD_API_KEY` environment variable (the SDK reads it automatically when `LlamaCloud()` is instantiated with no arguments). Do NOT hardcode an API key.
+
+## Implementation Guide
+1. Change into the project directory `/home/user/ops_report`.
+2. Create `summarize_report.py` with logic similar to:
+   ```python
+   import json
+   from llama_cloud import LlamaCloud
+
+   client = LlamaCloud()  # reads LLAMA_CLOUD_API_KEY from the environment
+   uploaded = client.files.create(file="./operations_report.pdf", purpose="parse")
+   result = client.parsing.parse(
+       file_id=uploaded.id,
+       tier="agentic",
+       version="latest",
+       output_options={
+           "markdown": {
+               "tables": {"output_tables_as_markdown": False},
+           },
+       },
+       expand=["markdown"],
+   )
+
+   pages_meta = []
+   html_tables = []
+   for idx, page in enumerate(result.markdown.pages, start=1):
+       md = page.markdown or ""
+       has_table = "<table" in md.lower()
+       pages_meta.append({
+           "page_number": idx,
+           "word_count": len(md.split()),
+           "has_html_table": has_table,
+       })
+       if has_table:
+           html_tables.append(md)
+
+   payload = {
+       "total_pages": len(pages_meta),
+       "pages": pages_meta,
+       "html_tables": html_tables,
+   }
+   with open("summary.json", "w", encoding="utf-8") as f:
+       json.dump(payload, f, indent=2)
+   ```
+3. Execute the script with `python3 summarize_report.py` from `/home/user/ops_report`. The script will block until LlamaCloud finishes parsing and then writes the JSON file.
+4. Confirm that `summary.json` has been written.
+
+## Constraints
+- Project path: `/home/user/ops_report`
+- Input file: `/home/user/ops_report/operations_report.pdf` (already provided — a 3-page PDF; page 1 is a text-only introduction, pages 2 and 3 each contain a table)
+- Output file: `/home/user/ops_report/summary.json`
+- Script path: `/home/user/ops_report/summarize_report.py`
+- Use the `llama-cloud` SDK (the `LlamaCloud` client class). Do NOT call the REST API directly with `curl` or `requests`.
+- The parse call MUST pass `output_options` with `markdown.tables.output_tables_as_markdown` set to `False` (this is what makes LlamaParse emit `<table>` HTML for tables).
+- The script must rely on `LLAMA_CLOUD_API_KEY` from the environment, not hardcoded.
+- `summary.json` must contain exactly three top-level keys: `total_pages`, `pages`, `html_tables`.
+- `total_pages` must be the integer `3`.
+- `pages` must be a list of exactly 3 entries, each with the keys `page_number`, `word_count`, `has_html_table`; `page_number` values must be `1`, `2`, `3` in order; `word_count` values must be positive integers; `has_html_table` values must be booleans (not strings).
+- The `has_html_table` flag for page 1 must be `false`; for pages 2 and 3 it must be `true`.
+- `html_tables` must be a list with exactly 2 entries (one for page 2 and one for page 3, in page order). Each entry must contain the substring `<table` (case-insensitive).
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires the `LLAMA_CLOUD_API_KEY` environment variable.

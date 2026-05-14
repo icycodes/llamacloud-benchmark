@@ -1,0 +1,79 @@
+# Extract a PDF Sales Table to Structured JSON with LlamaParse
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. Its agentic document parser, LlamaParse, accurately converts visually-rich PDFs (including tables) into clean markdown that downstream pipelines can consume. A common real-world use case is taking a financial/operations report and turning a tabular section of the PDF into structured JSON for analytics.
+
+In this task you must build a small extraction pipeline that takes a pre-existing PDF (`quarterly_sales.pdf`), parses it with LlamaParse using the `llama-cloud` Python SDK, and writes a structured `sales.json` summarizing the product sales table contained in the first page of the document.
+
+## Requirements
+Write a Python script `extract_sales.py` that uses the `llama-cloud` SDK (`from llama_cloud import LlamaCloud`) to:
+  1. Upload the local PDF `quarterly_sales.pdf` to LlamaCloud with `purpose="parse"`.
+  2. Submit a parse job using `tier="agentic"`, `version="latest"`, and `expand=["markdown"]`.
+  3. Read the markdown text of the first page of the parsed result (i.e. `result.markdown.pages[0].markdown`).
+  4. Parse the product sales table out of that markdown and assemble a Python object with the following exact shape:
+     ```json
+     {
+       "products": [
+         {"name": "Widget",   "units_sold": 1200, "revenue_usd": 24000},
+         {"name": "Gadget",   "units_sold": 850,  "revenue_usd": 21250},
+         {"name": "Sprocket", "units_sold": 430,  "revenue_usd": 12900},
+         {"name": "Cog",      "units_sold": 670,  "revenue_usd": 18760}
+       ]
+     }
+     ```
+  5. Serialize that object to `sales.json` (UTF-8, indent=2) in the same directory.
+
+The script must authenticate using the `LLAMA_CLOUD_API_KEY` environment variable (the SDK reads it automatically when `LlamaCloud()` is instantiated with no arguments).
+
+## Implementation Guide
+1. Change into the project directory `/home/user/sales_extraction`.
+2. Create `extract_sales.py` with logic similar to:
+   ```python
+   import json
+   import re
+   from llama_cloud import LlamaCloud
+
+   client = LlamaCloud()  # reads LLAMA_CLOUD_API_KEY from the environment
+   uploaded = client.files.create(file="./quarterly_sales.pdf", purpose="parse")
+   result = client.parsing.parse(
+       file_id=uploaded.id,
+       tier="agentic",
+       version="latest",
+       expand=["markdown"],
+   )
+   page_md = result.markdown.pages[0].markdown
+
+   # Walk the markdown table on the first page and build product records.
+   products = []
+   for line in page_md.splitlines():
+       line = line.strip()
+       if not line.startswith("|"):
+           continue
+       cells = [c.strip() for c in line.strip("|").split("|")]
+       if len(cells) < 3:
+           continue
+       name, units_str, revenue_str = cells[0], cells[1], cells[2]
+       if name.lower() == "product" or set(name) <= {"-", ":"}:
+           continue  # header / separator row
+       units = int(re.sub(r"[^0-9]", "", units_str))
+       revenue = int(re.sub(r"[^0-9]", "", revenue_str))
+       products.append({"name": name, "units_sold": units, "revenue_usd": revenue})
+
+   payload = {"products": products}
+   with open("sales.json", "w", encoding="utf-8") as f:
+       json.dump(payload, f, indent=2)
+   ```
+3. Execute the script with `python3 extract_sales.py` from `/home/user/sales_extraction`. The script will block until LlamaCloud finishes parsing and returns the result.
+4. Confirm that `sales.json` has been written.
+
+## Constraints
+- Project path: `/home/user/sales_extraction`
+- Input file: `/home/user/sales_extraction/quarterly_sales.pdf` (already provided)
+- Output file: `/home/user/sales_extraction/sales.json`
+- Script path: `/home/user/sales_extraction/extract_sales.py`
+- Use the `llama-cloud` SDK (the `LlamaCloud` client class). Do NOT call the REST API directly with `curl` or `requests`.
+- The script must rely on `LLAMA_CLOUD_API_KEY` from the environment, not hardcoded.
+- The JSON object must contain a top-level key `products` whose value is a list with exactly 4 entries; each entry must have the keys `name`, `units_sold`, and `revenue_usd` with the numeric fields as integers (not strings).
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires the `LLAMA_CLOUD_API_KEY` environment variable.

@@ -1,0 +1,134 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 12,
+            "passed": 10,
+            "failed": 2,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778734508.699779,
+            "stop": 1778734508.789585
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_sync_script_exists",
+                "status": "passed",
+                "duration": 0.000417332979850471,
+                "start": 1778734508.723697,
+                "stop": 1778734508.7243063,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_sync_script_uses_llama_cloud_sdk",
+                "status": "passed",
+                "duration": 0.00034276803489774466,
+                "start": 1778734508.724475,
+                "stop": 1778734508.7249336,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_sync_script_does_not_hardcode_api_key",
+                "status": "passed",
+                "duration": 0.00031385791953653097,
+                "start": 1778734508.7250924,
+                "stop": 1778734508.7255132,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_sync_script_makes_no_network_calls",
+                "status": "passed",
+                "duration": 0.0003235919866710901,
+                "start": 1778734508.7256534,
+                "stop": 1778734508.7260797,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_sync_script_runs_successfully",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.040413572918623686,
+                "start": 1778734508.7262228,
+                "stop": 1778734508.7816005,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "sync_run = CompletedProcess(args=['python3', 'sync.py'], returncode=1, stdout='', stderr='Traceback (most recent call last):\\n  F..., line 6, in <module>\\n    from llama_cloud import LlamaCloud\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n')\n\n    def test_sync_script_runs_successfully(sync_run):\n>       assert sync_run.returncode == 0, (\n            f\"python3 sync.py exited with code {sync_run.returncode}. \"\n            f\"stdout: {sync_run.stdout!r}, stderr: {sync_run.stderr!r}\"\n        )\nE       AssertionError: python3 sync.py exited with code 1. stdout: '', stderr: 'Traceback (most recent call last):\\n  File \"/home/user/incremental_ingest/sync.py\", line 6, in <module>\\n    from llama_cloud import LlamaCloud\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n'\nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['python3', 'sync.py'], returncode=1, stdout='', stderr='Traceback (most recent call last):\\n  F..., line 6, in <module>\\n    from llama_cloud import LlamaCloud\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n').returncode\n\ntests/test_final_state.py:80: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_sync_script_prints_expected_summary",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0005317910108715296,
+                "start": 1778734508.7817824,
+                "stop": 1778734508.785739,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "sync_run = CompletedProcess(args=['python3', 'sync.py'], returncode=1, stdout='', stderr='Traceback (most recent call last):\\n  F..., line 6, in <module>\\n    from llama_cloud import LlamaCloud\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n')\n\n    def test_sync_script_prints_expected_summary(sync_run):\n        expected = \"added=1 modified=1 removed=1 unchanged=1\"\n>       assert sync_run.stdout.strip() == expected, (\n            f\"sync.py stdout must equal {expected!r}, got: {sync_run.stdout!r}\"\n        )\nE       AssertionError: sync.py stdout must equal 'added=1 modified=1 removed=1 unchanged=1', got: ''\nE       assert '' == 'added=1 modi...1 unchanged=1'\nE         \nE         - added=1 modified=1 removed=1 unchanged=1\n\ntests/test_final_state.py:88: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_current_manifest_exists_and_valid",
+                "status": "passed",
+                "duration": 0.0003638860071077943,
+                "start": 1778734508.7858987,
+                "stop": 1778734508.786385,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_current_manifest_hashes_and_sizes",
+                "status": "passed",
+                "duration": 0.0004595729988068342,
+                "start": 1778734508.78653,
+                "stop": 1778734508.7871017,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_upload_plan_exists_and_is_valid_json",
+                "status": "passed",
+                "duration": 0.0003350380575284362,
+                "start": 1778734508.7872484,
+                "stop": 1778734508.787691,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_upload_plan_contents",
+                "status": "passed",
+                "duration": 0.00033923902083188295,
+                "start": 1778734508.7878337,
+                "stop": 1778734508.7882814,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_upload_plan_summary",
+                "status": "passed",
+                "duration": 0.0003241879167035222,
+                "start": 1778734508.7884228,
+                "stop": 1778734508.788853,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_upload_plan_lists_are_sorted",
+                "status": "passed",
+                "duration": 0.0003586510429158807,
+                "start": 1778734508.788996,
+                "stop": 1778734508.7894557,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

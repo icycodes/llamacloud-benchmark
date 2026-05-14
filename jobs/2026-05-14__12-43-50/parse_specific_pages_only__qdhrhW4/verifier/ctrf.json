@@ -1,0 +1,113 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 10,
+            "passed": 9,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778734450.7196517,
+            "stop": 1778734450.7499368
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_parse_script_exists",
+                "status": "passed",
+                "duration": 0.00038821890484541655,
+                "start": 1778734450.7319293,
+                "stop": 1778734450.732494,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_parse_script_uses_llama_cloud_sdk",
+                "status": "passed",
+                "duration": 0.00033557391725480556,
+                "start": 1778734450.7326531,
+                "stop": 1778734450.7331002,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_parse_script_passes_target_pages",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0005569340428337455,
+                "start": 1778734450.733242,
+                "stop": 1778734450.7461572,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_parse_script_passes_target_pages():\n        content = _read_script()\n        assert \"page_ranges\" in content, (\n            f\"{SCRIPT_PATH} must pass a `page_ranges` argument to client.parsing.parse(...).\"\n        )\n        assert \"target_pages\" in content, (\n            f\"{SCRIPT_PATH} must specify `target_pages` inside `page_ranges`.\"\n        )\n        # Allow either single- or double-quoted \"1,3\" with optional whitespace, but it must be a string.\n        pattern = re.compile(r\"\"\"target_pages\\s*[:=]\\s*['\"]\\s*1\\s*,\\s*3\\s*['\"]\"\"\")\n>       assert pattern.search(content) is not None, (\n            f\"{SCRIPT_PATH} must set target_pages to the string '1,3' (e.g. \"\n            f\"page_ranges={{'target_pages': '1,3'}}).\"\n        )\nE       AssertionError: /home/user/catalog_task/parse_selected.py must set target_pages to the string '1,3' (e.g. page_ranges={'target_pages': '1,3'}).\nE       assert None is not None\nE        +  where None = <built-in method search of re.Pattern object at 0x2190f020>('from llama_cloud import LlamaCloud\\nimport os\\n\\ndef main():\\n    client = LlamaCloud()  # reads LLAMA_CLOUD_API_KEY ...   f.write(combined)\\n    \\n    print(f\"Successfully wrote {output_path}\")\\n\\nif __name__ == \"__main__\":\\n    main()\\n')\nE        +    where <built-in method search of re.Pattern object at 0x2190f020> = re.compile('target_pages\\\\s*[:=]\\\\s*[\\'\"]\\\\s*1\\\\s*,\\\\s*3\\\\s*[\\'\"]').search\n\ntests/test_final_state.py:49: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_parse_script_does_not_hardcode_api_key",
+                "status": "passed",
+                "duration": 0.0003010520013049245,
+                "start": 1778734450.7463105,
+                "stop": 1778734450.746716,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_md_exists",
+                "status": "passed",
+                "duration": 0.0002741870703175664,
+                "start": 1778734450.7468555,
+                "stop": 1778734450.747231,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_md_is_nonempty",
+                "status": "passed",
+                "duration": 0.0002597230486571789,
+                "start": 1778734450.7473657,
+                "stop": 1778734450.7477238,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_md_contains_page1_product",
+                "status": "passed",
+                "duration": 0.00029379292391240597,
+                "start": 1778734450.7478566,
+                "stop": 1778734450.748251,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_md_contains_page3_product",
+                "status": "passed",
+                "duration": 0.00028498400934040546,
+                "start": 1778734450.7483864,
+                "stop": 1778734450.748769,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_md_excludes_page2_product",
+                "status": "passed",
+                "duration": 0.00028882594779133797,
+                "start": 1778734450.7489042,
+                "stop": 1778734450.7493014,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_md_excludes_page4_product",
+                "status": "passed",
+                "duration": 0.0002895559882745147,
+                "start": 1778734450.7494385,
+                "stop": 1778734450.749822,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

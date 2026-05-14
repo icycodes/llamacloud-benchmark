@@ -1,0 +1,140 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 13,
+            "passed": 12,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778734646.3315606,
+            "stop": 1778734646.4463687
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_parse_script_exists",
+                "status": "passed",
+                "duration": 0.0004986890126019716,
+                "start": 1778734646.3501427,
+                "stop": 1778734646.350885,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_parse_script_uses_llama_cloud_sdk",
+                "status": "passed",
+                "duration": 0.000423950026743114,
+                "start": 1778734646.351116,
+                "stop": 1778734646.3516984,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_parse_script_invokes_parsing_parse_exactly_once",
+                "status": "passed",
+                "duration": 0.0003473738906905055,
+                "start": 1778734646.351896,
+                "stop": 1778734646.3523514,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_parse_script_invokes_parsing_get",
+                "status": "passed",
+                "duration": 0.0002982799196615815,
+                "start": 1778734646.3524919,
+                "stop": 1778734646.3528936,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_parse_script_does_not_hardcode_api_key",
+                "status": "passed",
+                "duration": 0.0003911369713023305,
+                "start": 1778734646.3530493,
+                "stop": 1778734646.353592,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_md_exists_and_nonempty",
+                "status": "passed",
+                "duration": 0.00033665099181234837,
+                "start": 1778734646.3537822,
+                "stop": 1778734646.3542418,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_md_contains_report_title",
+                "status": "passed",
+                "duration": 0.0003120851470157504,
+                "start": 1778734646.3543794,
+                "stop": 1778734646.3548002,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_md_contains_at_least_one_product",
+                "status": "passed",
+                "duration": 0.0003090210957452655,
+                "start": 1778734646.3549395,
+                "stop": 1778734646.3553524,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_txt_exists_and_nonempty",
+                "status": "passed",
+                "duration": 0.00027502398006618023,
+                "start": 1778734646.3554902,
+                "stop": 1778734646.3558667,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_txt_contains_report_title",
+                "status": "passed",
+                "duration": 0.00031217606738209724,
+                "start": 1778734646.356003,
+                "stop": 1778734646.3564184,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_txt_contains_at_least_one_product",
+                "status": "passed",
+                "duration": 0.0002955470699816942,
+                "start": 1778734646.3565555,
+                "stop": 1778734646.3569534,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_job_id_file_exists_and_nonempty",
+                "status": "passed",
+                "duration": 0.00030785391572862864,
+                "start": 1778734646.3571026,
+                "stop": 1778734646.3575158,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_job_id_is_resolvable_via_llama_cloud_sdk",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.014388681040145457,
+                "start": 1778734646.3576527,
+                "stop": 1778734646.445948,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_job_id_is_resolvable_via_llama_cloud_sdk():\n        \"\"\"Priority 1: Use the LlamaCloud SDK to confirm the recorded job_id was\n        produced by a real, completed parse job on the LlamaCloud server.\"\"\"\n        job_id = _read(JOB_ID_FILE).strip()\n        code = (\n            \"import sys\\n\"\n            \"from llama_cloud import LlamaCloud\\n\"\n            \"client = LlamaCloud()\\n\"\n            f\"job_id = {job_id!r}\\n\"\n            \"result = client.parsing.get(job_id=job_id, expand=['job_metadata'])\\n\"\n            \"status = getattr(result.job, 'status', None)\\n\"\n            \"print('JOB_ID=' + result.job.id)\\n\"\n            \"print('STATUS=' + str(status))\\n\"\n        )\n        result = subprocess.run(\n            [\"python3\", \"-c\", code],\n            capture_output=True,\n            text=True,\n            timeout=120,\n        )\n>       assert result.returncode == 0, (\n            f\"client.parsing.get(job_id={job_id!r}, expand=['job_metadata']) failed. \"\n            f\"This indicates the job id recorded in {JOB_ID_FILE} is not recognized \"\n            f\"by the LlamaCloud server. stderr: {result.stderr}\"\n        )\nE       AssertionError: client.parsing.get(job_id='pjb-xzh23x3e9uykio7fmehufamgofv8', expand=['job_metadata']) failed. This indicates the job id recorded in /home/user/llama_task/job_id.txt is not recognized by the LlamaCloud server. stderr: Traceback (most recent call last):\nE           File \"<string>\", line 2, in <module>\nE         ModuleNotFoundError: No module named 'llama_cloud'\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['python3', '-c', \"import sys\\nfrom llama_cloud import LlamaCloud\\nclient = LlamaCloud()\\njob_id...st recent call last):\\n  File \"<string>\", line 2, in <module>\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n').returncode\n\ntests/test_final_state.py:152: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            }
+        ]
+    }
+}

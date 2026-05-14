@@ -1,0 +1,55 @@
+{
+    "id": "a7eab80f-b20f-479a-9f86-fb717d48280c",
+    "started_at": "2026-05-14T12:43:50.181585",
+    "updated_at": "2026-05-14T13:09:24.599622",
+    "finished_at": "2026-05-14T13:09:24.599622",
+    "n_total_trials": 15,
+    "stats": {
+        "n_completed_trials": 15,
+        "n_errored_trials": 0,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "pochi__gemini-3-flash__tasks": {
+                "n_trials": 15,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 0.5333333333333333
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.0": [
+                            "region_aware_client_factory__DHWU2nu",
+                            "summarize_multi_page_pdf_with_ht__4S8PnfT",
+                            "parse_specific_pages_only__qdhrhW4",
+                            "incremental_ingestion_manifest__bAk7HsH",
+                            "parse_and_retrieve_text_from_job__rRUSoSE",
+                            "build_parse_request_payload__zaagmTP",
+                            "download_page_screenshots_from_p__JUTaa5V"
+                        ],
+                        "1.0": [
+                            "parse_multipage_pdf_to_per_page__NuULeBU",
+                            "extract_resume_to_pydantic_schem__zzfNDBf",
+                            "extract_tables_from_pdf_to_csv__h3xXSTc",
+                            "parse_pdf_preserve_link_urls__HJxCA6R",
+                            "async_batch_parse_to_markdown__DbcARHY",
+                            "parse_pdf_to_markdown__wUCDvnz",
+                            "build_pdf_structure_inventory__VJ6Wvpb",
+                            "extract_pdf_table_to_json__A5q4vvE"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        },
+        "n_input_tokens": 0,
+        "n_cache_tokens": 0,
+        "n_output_tokens": 296429,
+        "cost_usd": null
+    }
+}

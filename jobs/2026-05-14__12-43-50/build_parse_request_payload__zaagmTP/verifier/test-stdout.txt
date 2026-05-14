@@ -1,0 +1,83 @@
+Hit:1 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:2 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+curl is already the newest version (8.5.0-2ubuntu10.9).
+0 upgraded, 0 newly installed, 0 to remove and 3 not upgraded.
+downloading uv 0.9.7 x86_64-unknown-linux-gnu
+no checksums to verify
+installing to /root/.local/bin
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+Downloading pygments (1.2MiB)
+ Downloading pygments
+Installed 9 packages in 23ms
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.3.5, xprocess-1.0.2
+collected 18 items
+
+tests/test_final_state.py .....FF...........                             [100%]
+
+=================================== FAILURES ===================================
+________________________ test_script_runs_successfully _________________________
+
+script_run = CompletedProcess(args=['python3', 'build_payload.py'], returncode=1, stdout='', stderr='Traceback (most recent call la..., line 5, in <module>\n    from llama_cloud import LlamaCloud\nModuleNotFoundError: No module named \'llama_cloud\'\n')
+
+    def test_script_runs_successfully(script_run):
+>       assert script_run.returncode == 0, (
+            f"python3 build_payload.py exited with code {script_run.returncode}. "
+            f"stdout: {script_run.stdout!r}, stderr: {script_run.stderr!r}"
+        )
+E       AssertionError: python3 build_payload.py exited with code 1. stdout: '', stderr: 'Traceback (most recent call last):\n  File "/home/user/parse_payload/build_payload.py", line 5, in <module>\n    from llama_cloud import LlamaCloud\nModuleNotFoundError: No module named \'llama_cloud\'\n'
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', 'build_payload.py'], returncode=1, stdout='', stderr='Traceback (most recent call la..., line 5, in <module>\n    from llama_cloud import LlamaCloud\nModuleNotFoundError: No module named \'llama_cloud\'\n').returncode
+
+tests/test_final_state.py:132: AssertionError
+_____________________ test_script_prints_expected_summary ______________________
+
+script_run = CompletedProcess(args=['python3', 'build_payload.py'], returncode=1, stdout='', stderr='Traceback (most recent call la..., line 5, in <module>\n    from llama_cloud import LlamaCloud\nModuleNotFoundError: No module named \'llama_cloud\'\n')
+
+    def test_script_prints_expected_summary(script_run):
+        expected = "payload_ok file_id=file-demo-abc-123 tier=agentic top_level_keys=10"
+>       assert script_run.stdout.strip() == expected, (
+            f"build_payload.py stdout must equal {expected!r}, got: {script_run.stdout!r}"
+        )
+E       AssertionError: build_payload.py stdout must equal 'payload_ok file_id=file-demo-abc-123 tier=agentic top_level_keys=10', got: ''
+E       assert '' == 'payload_ok f...level_keys=10'
+E         
+E         - payload_ok file_id=file-demo-abc-123 tier=agentic top_level_keys=10
+
+tests/test_final_state.py:140: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_exists
+PASSED tests/test_final_state.py::test_script_uses_llama_cloud_sdk
+PASSED tests/test_final_state.py::test_script_does_not_hardcode_api_key
+PASSED tests/test_final_state.py::test_script_makes_no_network_calls
+PASSED tests/test_final_state.py::test_script_does_not_mention_expand
+PASSED tests/test_final_state.py::test_request_body_exists
+PASSED tests/test_final_state.py::test_request_body_matches_expected
+PASSED tests/test_final_state.py::test_request_body_top_level_keys
+PASSED tests/test_final_state.py::test_request_body_top_level_keys_are_alphabetically_sorted
+PASSED tests/test_final_state.py::test_request_body_has_no_expand_anywhere
+PASSED tests/test_final_state.py::test_custom_prompt_is_under_agentic_options
+PASSED tests/test_final_state.py::test_timeouts_is_under_processing_control
+PASSED tests/test_final_state.py::test_page_ranges_and_crop_box_are_top_level
+PASSED tests/test_final_state.py::test_output_options_tables_negated_correctly
+PASSED tests/test_final_state.py::test_output_options_images_to_save_included
+PASSED tests/test_final_state.py::test_processing_options_nested_fields
+FAILED tests/test_final_state.py::test_script_runs_successfully - AssertionEr...
+FAILED tests/test_final_state.py::test_script_prints_expected_summary - Asser...
+========================= 2 failed, 16 passed in 0.09s =========================
