@@ -1,0 +1,92 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 8,
+            "passed": 8,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778734933.692815,
+            "stop": 1778734933.7130184
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_extract_script_exists",
+                "status": "passed",
+                "duration": 0.0003902289317920804,
+                "start": 1778734933.7084131,
+                "stop": 1778734933.7089803,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_extract_script_uses_llama_cloud_sdk",
+                "status": "passed",
+                "duration": 0.00034025893546640873,
+                "start": 1778734933.7091515,
+                "stop": 1778734933.709609,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_extract_script_does_not_hardcode_api_key",
+                "status": "passed",
+                "duration": 0.000304530025459826,
+                "start": 1778734933.7097547,
+                "stop": 1778734933.710171,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_sales_json_exists_and_nonempty",
+                "status": "passed",
+                "duration": 0.0002797569613903761,
+                "start": 1778734933.7103033,
+                "stop": 1778734933.7106802,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_sales_json_is_valid_json_object_with_products_key",
+                "status": "passed",
+                "duration": 0.0003305950667709112,
+                "start": 1778734933.7108197,
+                "stop": 1778734933.711256,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_sales_json_has_exactly_four_products",
+                "status": "passed",
+                "duration": 0.000313902972266078,
+                "start": 1778734933.7113955,
+                "stop": 1778734933.7118115,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_sales_json_entry_schema",
+                "status": "passed",
+                "duration": 0.0003292688634246588,
+                "start": 1778734933.7119484,
+                "stop": 1778734933.712379,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_sales_json_contains_all_expected_products_with_correct_values",
+                "status": "passed",
+                "duration": 0.0002995989052578807,
+                "start": 1778734933.7125103,
+                "stop": 1778734933.7129035,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

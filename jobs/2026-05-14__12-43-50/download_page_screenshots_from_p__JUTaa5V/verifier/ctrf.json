@@ -1,0 +1,167 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 16,
+            "passed": 15,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778735349.4201808,
+            "stop": 1778735349.5093584
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_exists",
+                "status": "passed",
+                "duration": 0.00041460490319877863,
+                "start": 1778735349.4468303,
+                "stop": 1778735349.447435,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_imports_llama_cloud",
+                "status": "passed",
+                "duration": 0.0003482119645923376,
+                "start": 1778735349.447602,
+                "stop": 1778735349.4480658,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_invokes_parsing_parse_exactly_once",
+                "status": "passed",
+                "duration": 0.00030772306490689516,
+                "start": 1778735349.4482107,
+                "stop": 1778735349.4486227,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_requests_screenshots_and_images_metadata",
+                "status": "passed",
+                "duration": 0.0003194508608430624,
+                "start": 1778735349.4487617,
+                "stop": 1778735349.4491875,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_does_not_hardcode_api_key",
+                "status": "passed",
+                "duration": 0.00030425097793340683,
+                "start": 1778735349.4493296,
+                "stop": 1778735349.4497375,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_screenshots_dir_exists_and_non_empty",
+                "status": "passed",
+                "duration": 0.0003233101451769471,
+                "start": 1778735349.4498756,
+                "stop": 1778735349.450315,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_every_screenshot_file_is_a_valid_image",
+                "status": "passed",
+                "duration": 0.0004932100418955088,
+                "start": 1778735349.450453,
+                "stop": 1778735349.4510572,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_manifest_top_level_keys",
+                "status": "passed",
+                "duration": 0.00033473619259893894,
+                "start": 1778735349.4512005,
+                "stop": 1778735349.4516401,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_manifest_source_value",
+                "status": "passed",
+                "duration": 0.00033994787372648716,
+                "start": 1778735349.4517817,
+                "stop": 1778735349.4522285,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_manifest_page_count_is_three",
+                "status": "passed",
+                "duration": 0.000326463021337986,
+                "start": 1778735349.452369,
+                "stop": 1778735349.452801,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_manifest_job_id_shape",
+                "status": "passed",
+                "duration": 0.00033670489210635424,
+                "start": 1778735349.4529405,
+                "stop": 1778735349.453383,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_manifest_image_count_matches_images_length",
+                "status": "passed",
+                "duration": 0.0003266921266913414,
+                "start": 1778735349.453524,
+                "stop": 1778735349.4539564,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_manifest_image_count_matches_disk_files",
+                "status": "passed",
+                "duration": 0.00036363210529088974,
+                "start": 1778735349.4541063,
+                "stop": 1778735349.4545786,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_manifest_entries_shape_and_size_match_disk",
+                "status": "passed",
+                "duration": 0.0003958840388804674,
+                "start": 1778735349.4547195,
+                "stop": 1778735349.4552307,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_job_id_is_real_on_llamacloud",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.03795749496202916,
+                "start": 1778735349.4553735,
+                "stop": 1778735349.508551,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_job_id_is_real_on_llamacloud():\n        \"\"\"Confirm the recorded job_id corresponds to a real, COMPLETED parse job\n        on the LlamaCloud server, by invoking the SDK from a subprocess so this\n        file stays stdlib-only.\"\"\"\n        data = _load_manifest()\n        job_id = data[\"job_id\"]\n        code = (\n            \"import json,os,sys;\"\n            \"from llama_cloud import LlamaCloud;\"\n            \"c=LlamaCloud();\"\n            f\"r=c.parsing.get(job_id={job_id!r}, expand=['job_metadata']);\"\n            \"status=getattr(getattr(r,'job',None),'status',None);\"\n            \"print(json.dumps({'status': str(status) if status is not None else ''}))\"\n        )\n        result = subprocess.run(\n            [\"python3\", \"-c\", code],\n            capture_output=True,\n            text=True,\n            timeout=120,\n        )\n>       assert result.returncode == 0, (\n            f\"Looking up job_id={job_id!r} via LlamaCloud SDK failed.\\n\"\n            f\"stdout: {result.stdout}\\nstderr: {result.stderr}\"\n        )\nE       AssertionError: Looking up job_id='caf2d5e8-a9c8-45e9-8c02-b76d273e15ee' via LlamaCloud SDK failed.\nE         stdout: \nE         stderr: Traceback (most recent call last):\nE           File \"<string>\", line 1, in <module>\nE         ModuleNotFoundError: No module named 'llama_cloud'\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['python3', '-c', \"import json,os,sys;from llama_cloud import LlamaCloud;c=LlamaCloud();r=c.pars...st recent call last):\\n  File \"<string>\", line 1, in <module>\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n').returncode\n\ntests/test_final_state.py:228: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_source_pdf_unchanged",
+                "status": "passed",
+                "duration": 0.0003616579342633486,
+                "start": 1778735349.508744,
+                "stop": 1778735349.509219,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

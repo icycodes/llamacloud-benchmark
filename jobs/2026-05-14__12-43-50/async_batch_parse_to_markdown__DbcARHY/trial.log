@@ -1,0 +1,135 @@
+Skipping image OS validation for hb__async_batch_parse_to_markdown: docker inspect returned 1
+Running command: apt-get update && apt-get install -y curl ripgrep
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Running command: echo async_batch_parse_to_markdown__DbcARHY > /logs/artifacts/trial_id
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# Batch-Parse a Folder of PDFs Concurrently with `AsyncLlamaCloud`
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. Its agentic document parser, LlamaParse, exposes both a synchronous `LlamaCloud` client and a fully asynchronous `AsyncLlamaCloud` client in the `llama_cloud` Python SDK. When you have a folder of documents to parse, the recommended high-throughput pattern is to drive parses concurrently via `AsyncLlamaCloud` plus `asyncio.gather`, optionally rate-limited with an `asyncio.Semaphore`, so that you are not waiting for each parse job to finish before starting the next.
+
+In this task you must build that batch parsing pipeline for a small folder of pre-existing PDFs and emit a per-document markdown file.
+
+## Requirements
+Write a single Python script `batch_parse.py` (placed at `/home/user/batch_parse/batch_parse.py`) that:
+
+1. Imports the **async** client: `from llama_cloud import AsyncLlamaCloud`.
+2. Reads the API key from the `LLAMA_CLOUD_API_KEY` environment variable (do **not** hardcode it; either instantiate `AsyncLlamaCloud()` with no arguments — the SDK will pick the env var up — or pass `api_key=os.getenv("LLAMA_CLOUD_API_KEY")`).
+3. Discovers every `*.pdf` file inside `/home/user/batch_parse/pdfs/` (there are three: `alpha.pdf`, `bravo.pdf`, `charlie.pdf`).
+4. For every PDF concurrently:
+   - Uploads it via `await client.files.create(file=<absolute path>, purpose="parse")`.
+   - Submits an agentic parse job via `await client.parsing.parse(file_id=<uploaded.id>, tier="agentic", version="latest", expand=["markdown"])`.
+   - Concatenates `result.markdown.pages[*].markdown` in page order (use a single newline between pages).
+   - Writes the concatenated markdown to `/home/user/batch_parse/out/<basename>.md` (UTF-8) where `<basename>` is the PDF file name without the `.pdf` extension (e.g. `alpha.pdf` → `out/alpha.md`).
+5. Drives the per-file coroutines concurrently using `asyncio.gather` (NOT a sequential `for ... await ...` loop) and wraps the work in an `async def main(): ...` coroutine launched with `asyncio.run(main())`.
+6. Creates the output directory `/home/user/batch_parse/out/` if it does not already exist.
+
+## Implementation Guide
+1. `cd /home/user/batch_parse`.
+2. Create `batch_parse.py` along these lines:
+   ```python
+   import asyncio
+   import os
+   from pathlib import Path
+
+   from llama_cloud import AsyncLlamaCloud
+
+   PDF_DIR = Path("/home/user/batch_parse/pdfs")
+   OUT_DIR = Path("/home/user/batch_parse/out")
+
+
+   async def parse_one(client: AsyncLlamaCloud, pdf_path: Path) -> None:
+       uploaded = await client.files.create(file=str(pdf_path), purpose="parse")
+       result = await client.parsing.parse(
+           file_id=uploaded.id,
+           tier="agentic",
+           version="latest",
+           expand=["markdown"],
+       )
+       parts = [(p.markdown or "") for p in result.markdown.pages]
+       combined = "\n".join(parts)
+       out_path = OUT_DIR / f"{pdf_path.stem}.md"
+       out_path.write_text(combined, encoding="utf-8")
+
+
+   async def main() -> None:
+       OUT_DIR.mkdir(parents=True, exist_ok=True)
+       client = AsyncLlamaCloud(api_key=os.environ["LLAMA_CLOUD_API_KEY"])
+       pdf_paths = sorted(PDF_DIR.glob("*.pdf"))
+       await asyncio.gather(*(parse_one(client, p) for p in pdf_paths))
+
+
+   asyncio.run(main())
+   ```
+3. Run it with `python3 batch_parse.py` from `/home/user/batch_parse`. The script blocks until all three parse jobs finish concurrently.
+4. Confirm that `/home/user/batch_parse/out/alpha.md`, `/home/user/batch_parse/out/bravo.md`, and `/home/user/batch_parse/out/charlie.md` were all written.
+
+## Constraints
+- Project path: `/home/user/batch_parse`
+- Input directory: `/home/user/batch_parse/pdfs/` (already populated with `alpha.pdf`, `bravo.pdf`, `charlie.pdf`)
+- Output directory: `/home/user/batch_parse/out/` (must be created by the script if missing)
+- Script path: `/home/user/batch_parse/batch_parse.py`
+- Output files (UTF-8):
+  - `/home/user/batch_parse/out/alpha.md`
+  - `/home/user/batch_parse/out/bravo.md`
+  - `/home/user/batch_parse/out/charlie.md`
+- Use the **async** client `AsyncLlamaCloud` from the `llama_cloud` SDK. Do NOT use the synchronous `LlamaCloud` client. Do NOT call the REST API directly with `curl`, `requests`, or `httpx`.
+- Drive parses concurrently with `asyncio.gather`. A purely sequential `for ... await client.parsing.parse(...)` loop is NOT acceptable.
+- The script must rely on `LLAMA_CLOUD_API_KEY` from the environment — no hardcoded `llx-...` literal anywhere in the script.
+- Each output markdown file MUST contain the unique marker phrase from the corresponding source PDF (see Specific Test Data in the verification plan).
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires the `LLAMA_CLOUD_API_KEY` environment variable.
+
+EOF
+Command outputs captured
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured

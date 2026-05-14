@@ -1,0 +1,84 @@
+Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:2 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+curl is already the newest version (8.5.0-2ubuntu10.9).
+0 upgraded, 0 newly installed, 0 to remove and 3 not upgraded.
+downloading uv 0.9.7 x86_64-unknown-linux-gnu
+no checksums to verify
+installing to /root/.local/bin
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+Downloading pygments (1.2MiB)
+ Downloading pygments
+Installed 9 packages in 21ms
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.3.5, xprocess-1.0.2
+collected 13 items
+
+tests/test_final_state.py ............F                                  [100%]
+
+=================================== FAILURES ===================================
+________________ test_job_id_is_resolvable_via_llama_cloud_sdk _________________
+
+    def test_job_id_is_resolvable_via_llama_cloud_sdk():
+        """Priority 1: Use the LlamaCloud SDK to confirm the recorded job_id was
+        produced by a real, completed parse job on the LlamaCloud server."""
+        job_id = _read(JOB_ID_FILE).strip()
+        code = (
+            "import sys\n"
+            "from llama_cloud import LlamaCloud\n"
+            "client = LlamaCloud()\n"
+            f"job_id = {job_id!r}\n"
+            "result = client.parsing.get(job_id=job_id, expand=['job_metadata'])\n"
+            "status = getattr(result.job, 'status', None)\n"
+            "print('JOB_ID=' + result.job.id)\n"
+            "print('STATUS=' + str(status))\n"
+        )
+        result = subprocess.run(
+            ["python3", "-c", code],
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+>       assert result.returncode == 0, (
+            f"client.parsing.get(job_id={job_id!r}, expand=['job_metadata']) failed. "
+            f"This indicates the job id recorded in {JOB_ID_FILE} is not recognized "
+            f"by the LlamaCloud server. stderr: {result.stderr}"
+        )
+E       AssertionError: client.parsing.get(job_id='pjb-xzh23x3e9uykio7fmehufamgofv8', expand=['job_metadata']) failed. This indicates the job id recorded in /home/user/llama_task/job_id.txt is not recognized by the LlamaCloud server. stderr: Traceback (most recent call last):
+E           File "<string>", line 2, in <module>
+E         ModuleNotFoundError: No module named 'llama_cloud'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '-c', "import sys\nfrom llama_cloud import LlamaCloud\nclient = LlamaCloud()\njob_id...st recent call last):\n  File "<string>", line 2, in <module>\nModuleNotFoundError: No module named \'llama_cloud\'\n').returncode
+
+tests/test_final_state.py:152: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_parse_script_exists
+PASSED tests/test_final_state.py::test_parse_script_uses_llama_cloud_sdk
+PASSED tests/test_final_state.py::test_parse_script_invokes_parsing_parse_exactly_once
+PASSED tests/test_final_state.py::test_parse_script_invokes_parsing_get
+PASSED tests/test_final_state.py::test_parse_script_does_not_hardcode_api_key
+PASSED tests/test_final_state.py::test_output_md_exists_and_nonempty
+PASSED tests/test_final_state.py::test_output_md_contains_report_title
+PASSED tests/test_final_state.py::test_output_md_contains_at_least_one_product
+PASSED tests/test_final_state.py::test_output_txt_exists_and_nonempty
+PASSED tests/test_final_state.py::test_output_txt_contains_report_title
+PASSED tests/test_final_state.py::test_output_txt_contains_at_least_one_product
+PASSED tests/test_final_state.py::test_job_id_file_exists_and_nonempty
+FAILED tests/test_final_state.py::test_job_id_is_resolvable_via_llama_cloud_sdk
+========================= 1 failed, 12 passed in 0.12s =========================

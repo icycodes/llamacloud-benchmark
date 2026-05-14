@@ -1,0 +1,188 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 18,
+            "passed": 16,
+            "failed": 2,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778734831.8688917,
+            "stop": 1778734831.9567888
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_exists",
+                "status": "passed",
+                "duration": 0.0003899108851328492,
+                "start": 1778734831.8924167,
+                "stop": 1778734831.8930042,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_uses_llama_cloud_sdk",
+                "status": "passed",
+                "duration": 0.000339590129442513,
+                "start": 1778734831.8931797,
+                "stop": 1778734831.893636,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_does_not_hardcode_api_key",
+                "status": "passed",
+                "duration": 0.0003165480447933078,
+                "start": 1778734831.8937826,
+                "stop": 1778734831.8942082,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_makes_no_network_calls",
+                "status": "passed",
+                "duration": 0.0003155068261548877,
+                "start": 1778734831.894353,
+                "stop": 1778734831.8947759,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_does_not_mention_expand",
+                "status": "passed",
+                "duration": 0.00031420611776411533,
+                "start": 1778734831.894921,
+                "stop": 1778734831.8953447,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_runs_successfully",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.01996467204298824,
+                "start": 1778734831.8954878,
+                "stop": 1778734831.9435272,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "script_run = CompletedProcess(args=['python3', 'build_payload.py'], returncode=1, stdout='', stderr='Traceback (most recent call la..., line 5, in <module>\\n    from llama_cloud import LlamaCloud\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n')\n\n    def test_script_runs_successfully(script_run):\n>       assert script_run.returncode == 0, (\n            f\"python3 build_payload.py exited with code {script_run.returncode}. \"\n            f\"stdout: {script_run.stdout!r}, stderr: {script_run.stderr!r}\"\n        )\nE       AssertionError: python3 build_payload.py exited with code 1. stdout: '', stderr: 'Traceback (most recent call last):\\n  File \"/home/user/parse_payload/build_payload.py\", line 5, in <module>\\n    from llama_cloud import LlamaCloud\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n'\nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['python3', 'build_payload.py'], returncode=1, stdout='', stderr='Traceback (most recent call la..., line 5, in <module>\\n    from llama_cloud import LlamaCloud\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n').returncode\n\ntests/test_final_state.py:132: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_script_prints_expected_summary",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0006009348435327411,
+                "start": 1778734831.9437494,
+                "stop": 1778734831.9483664,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "script_run = CompletedProcess(args=['python3', 'build_payload.py'], returncode=1, stdout='', stderr='Traceback (most recent call la..., line 5, in <module>\\n    from llama_cloud import LlamaCloud\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n')\n\n    def test_script_prints_expected_summary(script_run):\n        expected = \"payload_ok file_id=file-demo-abc-123 tier=agentic top_level_keys=10\"\n>       assert script_run.stdout.strip() == expected, (\n            f\"build_payload.py stdout must equal {expected!r}, got: {script_run.stdout!r}\"\n        )\nE       AssertionError: build_payload.py stdout must equal 'payload_ok file_id=file-demo-abc-123 tier=agentic top_level_keys=10', got: ''\nE       assert '' == 'payload_ok f...level_keys=10'\nE         \nE         - payload_ok file_id=file-demo-abc-123 tier=agentic top_level_keys=10\n\ntests/test_final_state.py:140: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_request_body_exists",
+                "status": "passed",
+                "duration": 0.0002929300535470247,
+                "start": 1778734831.9485302,
+                "stop": 1778734831.9489334,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_request_body_matches_expected",
+                "status": "passed",
+                "duration": 0.001199273974634707,
+                "start": 1778734831.9492886,
+                "stop": 1778734831.95087,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_request_body_top_level_keys",
+                "status": "passed",
+                "duration": 0.0004112230380997062,
+                "start": 1778734831.9512968,
+                "stop": 1778734831.9518452,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_request_body_top_level_keys_are_alphabetically_sorted",
+                "status": "passed",
+                "duration": 0.00037060794420540333,
+                "start": 1778734831.9519877,
+                "stop": 1778734831.952473,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_request_body_has_no_expand_anywhere",
+                "status": "passed",
+                "duration": 0.00035973801277577877,
+                "start": 1778734831.9526212,
+                "stop": 1778734831.9530935,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_custom_prompt_is_under_agentic_options",
+                "status": "passed",
+                "duration": 0.0003308219602331519,
+                "start": 1778734831.953242,
+                "stop": 1778734831.9536839,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_timeouts_is_under_processing_control",
+                "status": "passed",
+                "duration": 0.00033949187491089106,
+                "start": 1778734831.9538295,
+                "stop": 1778734831.9542804,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_page_ranges_and_crop_box_are_top_level",
+                "status": "passed",
+                "duration": 0.000330346985720098,
+                "start": 1778734831.9544277,
+                "stop": 1778734831.9548688,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_options_tables_negated_correctly",
+                "status": "passed",
+                "duration": 0.00034504709765315056,
+                "start": 1778734831.9550142,
+                "stop": 1778734831.9554703,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_options_images_to_save_included",
+                "status": "passed",
+                "duration": 0.0003371149068698287,
+                "start": 1778734831.9556155,
+                "stop": 1778734831.9560614,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_processing_options_nested_fields",
+                "status": "passed",
+                "duration": 0.0003445758484303951,
+                "start": 1778734831.9562075,
+                "stop": 1778734831.9566584,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

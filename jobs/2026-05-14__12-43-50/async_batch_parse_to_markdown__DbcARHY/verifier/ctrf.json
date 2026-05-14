@@ -1,0 +1,101 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 9,
+            "passed": 9,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778734674.4294639,
+            "stop": 1778734674.5072482
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_batch_parse_script_exists",
+                "status": "passed",
+                "duration": 0.0005427729338407516,
+                "start": 1778734674.5001562,
+                "stop": 1778734674.5009553,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_batch_parse_script_uses_async_llama_cloud_sdk",
+                "status": "passed",
+                "duration": 0.00045432604383677244,
+                "start": 1778734674.5011945,
+                "stop": 1778734674.5018044,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_batch_parse_script_uses_asyncio_gather",
+                "status": "passed",
+                "duration": 0.00041815510485321283,
+                "start": 1778734674.5019994,
+                "stop": 1778734674.5025766,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_batch_parse_script_does_not_use_sync_client",
+                "status": "passed",
+                "duration": 0.0004138449439778924,
+                "start": 1778734674.5027661,
+                "stop": 1778734674.5033195,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_batch_parse_script_does_not_hardcode_api_key",
+                "status": "passed",
+                "duration": 0.00040751195047050714,
+                "start": 1778734674.5035076,
+                "stop": 1778734674.5040538,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_directory_exists",
+                "status": "passed",
+                "duration": 0.00035891414154320955,
+                "start": 1778734674.5042424,
+                "stop": 1778734674.5047367,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_each_output_markdown_exists_and_nonempty",
+                "status": "passed",
+                "duration": 0.0004034328740090132,
+                "start": 1778734674.5049183,
+                "stop": 1778734674.505457,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_each_output_markdown_contains_its_own_marker",
+                "status": "passed",
+                "duration": 0.0004851389676332474,
+                "start": 1778734674.505639,
+                "stop": 1778734674.5062659,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_each_output_markdown_excludes_other_markers",
+                "status": "passed",
+                "duration": 0.00048685120418667793,
+                "start": 1778734674.5064569,
+                "stop": 1778734674.5070772,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

@@ -1,0 +1,77 @@
+Hit:1 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:2 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+curl is already the newest version (8.5.0-2ubuntu10.9).
+0 upgraded, 0 newly installed, 0 to remove and 3 not upgraded.
+downloading uv 0.9.7 x86_64-unknown-linux-gnu
+no checksums to verify
+installing to /root/.local/bin
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+Downloading pygments (1.2MiB)
+ Downloading pygments
+Installed 9 packages in 17ms
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.3.5, xprocess-1.0.2
+collected 12 items
+
+tests/test_final_state.py ....FF......                                   [100%]
+
+=================================== FAILURES ===================================
+______________________ test_sync_script_runs_successfully ______________________
+
+sync_run = CompletedProcess(args=['python3', 'sync.py'], returncode=1, stdout='', stderr='Traceback (most recent call last):\n  F..., line 6, in <module>\n    from llama_cloud import LlamaCloud\nModuleNotFoundError: No module named \'llama_cloud\'\n')
+
+    def test_sync_script_runs_successfully(sync_run):
+>       assert sync_run.returncode == 0, (
+            f"python3 sync.py exited with code {sync_run.returncode}. "
+            f"stdout: {sync_run.stdout!r}, stderr: {sync_run.stderr!r}"
+        )
+E       AssertionError: python3 sync.py exited with code 1. stdout: '', stderr: 'Traceback (most recent call last):\n  File "/home/user/incremental_ingest/sync.py", line 6, in <module>\n    from llama_cloud import LlamaCloud\nModuleNotFoundError: No module named \'llama_cloud\'\n'
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', 'sync.py'], returncode=1, stdout='', stderr='Traceback (most recent call last):\n  F..., line 6, in <module>\n    from llama_cloud import LlamaCloud\nModuleNotFoundError: No module named \'llama_cloud\'\n').returncode
+
+tests/test_final_state.py:80: AssertionError
+___________________ test_sync_script_prints_expected_summary ___________________
+
+sync_run = CompletedProcess(args=['python3', 'sync.py'], returncode=1, stdout='', stderr='Traceback (most recent call last):\n  F..., line 6, in <module>\n    from llama_cloud import LlamaCloud\nModuleNotFoundError: No module named \'llama_cloud\'\n')
+
+    def test_sync_script_prints_expected_summary(sync_run):
+        expected = "added=1 modified=1 removed=1 unchanged=1"
+>       assert sync_run.stdout.strip() == expected, (
+            f"sync.py stdout must equal {expected!r}, got: {sync_run.stdout!r}"
+        )
+E       AssertionError: sync.py stdout must equal 'added=1 modified=1 removed=1 unchanged=1', got: ''
+E       assert '' == 'added=1 modi...1 unchanged=1'
+E         
+E         - added=1 modified=1 removed=1 unchanged=1
+
+tests/test_final_state.py:88: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_sync_script_exists
+PASSED tests/test_final_state.py::test_sync_script_uses_llama_cloud_sdk
+PASSED tests/test_final_state.py::test_sync_script_does_not_hardcode_api_key
+PASSED tests/test_final_state.py::test_sync_script_makes_no_network_calls
+PASSED tests/test_final_state.py::test_current_manifest_exists_and_valid
+PASSED tests/test_final_state.py::test_current_manifest_hashes_and_sizes
+PASSED tests/test_final_state.py::test_upload_plan_exists_and_is_valid_json
+PASSED tests/test_final_state.py::test_upload_plan_contents
+PASSED tests/test_final_state.py::test_upload_plan_summary
+PASSED tests/test_final_state.py::test_upload_plan_lists_are_sorted
+FAILED tests/test_final_state.py::test_sync_script_runs_successfully - Assert...
+FAILED tests/test_final_state.py::test_sync_script_prints_expected_summary - ...
+========================= 2 failed, 10 passed in 0.09s =========================

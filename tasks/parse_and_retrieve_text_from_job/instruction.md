@@ -1,0 +1,67 @@
+# Parse a PDF Once, then Retrieve Plain Text from the Same Job
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. Its `llama-cloud` Python SDK exposes LlamaParse, an agentic document parser. A powerful — and often overlooked — capability is that **parse results are persisted on the server**: you can run a parse job once with a minimal `expand` list (saving response size and download time), and then later call `client.parsing.get(job_id=..., expand=[...])` to retrieve *additional* representations of the same job (markdown, plain text, items, etc.) **without re-parsing the file**.
+
+In this task you must implement this two-stage retrieval pattern: parse the PDF once for full markdown, persist the `job_id`, and then make a second call against the same `job_id` to fetch the full plain-text rendering of the same job. This avoids paying for parsing twice when downstream consumers need both markdown and plain text.
+
+## Requirements
+Create a single Python script at `/home/user/llama_task/parse_and_retrieve.py` that:
+
+1. Imports the `LlamaCloud` client from the `llama_cloud` SDK (i.e. `from llama_cloud import LlamaCloud`).
+2. Authenticates using the `LLAMA_CLOUD_API_KEY` environment variable. Instantiate `LlamaCloud()` with no arguments — the SDK reads the key from the environment automatically. **Do NOT hardcode the API key in the script.**
+3. Stage 1 — Parse:
+   - Uploads `/home/user/llama_task/report.pdf` with `client.files.create(file="./report.pdf", purpose="parse")`.
+   - Calls `client.parsing.parse(file_id=<uploaded.id>, tier="agentic", version="latest", expand=["markdown_full"])`. The SDK blocks until the job finishes.
+   - Writes the parsed full markdown (`result.markdown_full`) to `/home/user/llama_task/output.md` (UTF-8).
+   - Writes the parse job's id (`result.job.id`) to `/home/user/llama_task/job_id.txt` (UTF-8, no trailing newline required).
+4. Stage 2 — Retrieve text from the same job (without re-parsing):
+   - Calls `client.parsing.get(job_id=<result.job.id>, expand=["text_full"])`.
+   - Writes the returned plain text (`text_result.text_full`) to `/home/user/llama_task/output.txt` (UTF-8).
+5. The script must NOT upload `report.pdf` a second time and must NOT call `client.parsing.parse(...)` a second time. The plain text MUST come from `client.parsing.get(...)` against the previously-obtained `job_id`.
+
+## Implementation Guide
+1. `cd /home/user/llama_task`.
+2. Create `parse_and_retrieve.py` with logic similar to:
+   ```python
+   from llama_cloud import LlamaCloud
+
+   client = LlamaCloud()  # reads LLAMA_CLOUD_API_KEY from the environment
+
+   # Stage 1: upload + parse, asking only for full markdown
+   uploaded = client.files.create(file="./report.pdf", purpose="parse")
+   result = client.parsing.parse(
+       file_id=uploaded.id,
+       tier="agentic",
+       version="latest",
+       expand=["markdown_full"],
+   )
+
+   job_id = result.job.id
+   with open("output.md", "w", encoding="utf-8") as f:
+       f.write(result.markdown_full)
+   with open("job_id.txt", "w", encoding="utf-8") as f:
+       f.write(job_id)
+
+   # Stage 2: retrieve a different representation of the SAME job, no re-parsing
+   text_result = client.parsing.get(job_id=job_id, expand=["text_full"])
+   with open("output.txt", "w", encoding="utf-8") as f:
+       f.write(text_result.text_full)
+   ```
+3. Run the script once: `python3 parse_and_retrieve.py`.
+4. Confirm that `output.md`, `output.txt`, and `job_id.txt` were all written in `/home/user/llama_task`.
+
+## Constraints
+- Project path: `/home/user/llama_task`
+- Input file: `/home/user/llama_task/report.pdf` (already provided)
+- Script path: `/home/user/llama_task/parse_and_retrieve.py`
+- Output files (all UTF-8):
+  - `/home/user/llama_task/output.md` — full markdown (from `result.markdown_full`)
+  - `/home/user/llama_task/output.txt` — full plain text (from `text_result.text_full` returned by `client.parsing.get`)
+  - `/home/user/llama_task/job_id.txt` — the parse job id returned by stage 1
+- Use the `llama-cloud` SDK (`from llama_cloud import LlamaCloud`). Do NOT call the REST API directly with `curl`, `requests`, or `httpx`.
+- The script must rely on `LLAMA_CLOUD_API_KEY` from the environment — no hardcoded `llx-...` literal.
+- `client.parsing.parse(...)` MUST be invoked exactly once. The plain-text rendering MUST come from `client.parsing.get(job_id=..., expand=["text_full"])` against the job returned by stage 1.
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires the `LLAMA_CLOUD_API_KEY` environment variable.

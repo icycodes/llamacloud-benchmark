@@ -1,0 +1,113 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 10,
+            "passed": 9,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778734145.5862873,
+            "stop": 1778734145.6259353
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_summarize_script_exists",
+                "status": "passed",
+                "duration": 0.0004207261372357607,
+                "start": 1778734145.606318,
+                "stop": 1778734145.6069283,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_summarize_script_uses_llama_cloud_sdk",
+                "status": "passed",
+                "duration": 0.00034298794344067574,
+                "start": 1778734145.6071088,
+                "stop": 1778734145.607569,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_summarize_script_configures_html_tables_output",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.0005737508181482553,
+                "start": 1778734145.607719,
+                "stop": 1778734145.6217167,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_summarize_script_configures_html_tables_output():\n        with open(SCRIPT_PATH, \"r\", encoding=\"utf-8\") as f:\n            content = f.read()\n        assert \"output_options\" in content, (\n            f\"{SCRIPT_PATH} must pass output_options to client.parsing.parse(...) so tables come back as HTML.\"\n        )\n        # output_tables_as_markdown must be set to False (Python literal). Match the\n        # key and the False value with arbitrary whitespace between them.\n        pattern = re.compile(r\"output_tables_as_markdown\\s*[:=]\\s*False\")\n>       assert pattern.search(content), (\n            f\"{SCRIPT_PATH} must set output_options.markdown.tables.output_tables_as_markdown to False \"\n            f\"so that LlamaParse emits HTML <table> blocks instead of pipe-table markdown.\"\n        )\nE       AssertionError: /home/user/ops_report/summarize_report.py must set output_options.markdown.tables.output_tables_as_markdown to False so that LlamaParse emits HTML <table> blocks instead of pipe-table markdown.\nE       assert None\nE        +  where None = <built-in method search of re.Pattern object at 0x14c0680>('import json\\nimport os\\nfrom llama_cloud import LlamaCloud\\n\\ndef summarize_report():\\n    # The client reads LLAMA_C... indent=2)\\n    \\n    print(\"Successfully wrote summary.json\")\\n\\nif __name__ == \"__main__\":\\n    summarize_report()\\n')\nE        +    where <built-in method search of re.Pattern object at 0x14c0680> = re.compile('output_tables_as_markdown\\\\s*[:=]\\\\s*False').search\n\ntests/test_final_state.py:45: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_summarize_script_does_not_hardcode_api_key",
+                "status": "passed",
+                "duration": 0.00032192200887948275,
+                "start": 1778734145.6218784,
+                "stop": 1778734145.6223178,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_summary_json_exists_and_nonempty",
+                "status": "passed",
+                "duration": 0.00028539507184177637,
+                "start": 1778734145.6224651,
+                "stop": 1778734145.6228557,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_summary_json_is_valid_json_with_expected_top_level_keys",
+                "status": "passed",
+                "duration": 0.00034665886778384447,
+                "start": 1778734145.6229975,
+                "stop": 1778734145.6234524,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_summary_total_pages_is_three",
+                "status": "passed",
+                "duration": 0.0003415459068492055,
+                "start": 1778734145.6235974,
+                "stop": 1778734145.6240442,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_summary_pages_structure",
+                "status": "passed",
+                "duration": 0.00033622304908931255,
+                "start": 1778734145.6241908,
+                "stop": 1778734145.6246347,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_summary_has_html_table_flags_match_source_pdf",
+                "status": "passed",
+                "duration": 0.00033374305348843336,
+                "start": 1778734145.6247797,
+                "stop": 1778734145.6252215,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_summary_html_tables_list",
+                "status": "passed",
+                "duration": 0.00033259496558457613,
+                "start": 1778734145.6253664,
+                "stop": 1778734145.625802,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

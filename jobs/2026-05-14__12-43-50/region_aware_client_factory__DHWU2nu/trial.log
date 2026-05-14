@@ -1,0 +1,174 @@
+Skipping image OS validation for hb__region_aware_client_factory: docker inspect returned 1
+Running command: apt-get update && apt-get install -y curl ripgrep
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Running command: echo region_aware_client_factory__DHWU2nu > /logs/artifacts/trial_id
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# Region-Aware LlamaCloud Client Factory
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. It is deployed in two regions:
+
+| Region | API base URL |
+| --- | --- |
+| North America (NA) | `https://api.cloud.llamaindex.ai` |
+| Europe (EU) | `https://api.cloud.eu.llamaindex.ai` |
+
+The `llama_cloud` Python SDK's `LlamaCloud` client defaults to the NA endpoint. If your organization (and your API key) live in EU, you **must** pass `base_url='https://api.cloud.eu.llamaindex.ai'` when constructing the client, otherwise every request will fail with an authentication error. This is one of the most common LlamaCloud setup mistakes.
+
+In this task you will build a small, region-aware client factory and a runner script that resolves the right base URL based on a `region` argument and constructs a properly-configured `LlamaCloud` client.
+
+## Requirements
+Create two files inside the project directory `/home/user/region_setup`:
+
+### 1. `client_factory.py`
+A reusable module that defines all of the following at module top level:
+
+- A constant `NA_BASE_URL` set to the string `"https://api.cloud.llamaindex.ai"`.
+- A constant `EU_BASE_URL` set to the string `"https://api.cloud.eu.llamaindex.ai"`.
+- A function `resolve_base_url(region: str) -> str` that:
+  - Returns `EU_BASE_URL` when `region` (stripped and lower-cased) is exactly the string `"eu"`.
+  - Returns `NA_BASE_URL` for any other input (e.g. `"na"`, `"us"`, `"NA"`, `"default"`, or an empty string).
+- A function `make_client(region: str) -> LlamaCloud` that:
+  - Imports `LlamaCloud` from the `llama_cloud` SDK (i.e. `from llama_cloud import LlamaCloud`).
+  - Reads the API key from the `LLAMA_CLOUD_API_KEY` environment variable (do NOT hardcode it; use `os.environ["LLAMA_CLOUD_API_KEY"]`).
+  - Calls `resolve_base_url(region)` to pick the correct base URL.
+  - Returns `LlamaCloud(token=<api_key>, base_url=<base_url>)`.
+
+### 2. `run.py`
+A runner script that exercises the factory:
+
+- It takes a single positional command-line argument: the region string (`sys.argv[1]`).
+- It imports `make_client` and `resolve_base_url` from `client_factory`.
+- It calls `make_client(region)` (which sanity-checks that the client can be constructed).
+- It builds a JSON payload of the form:
+  ```json
+  {
+    "region": "<input region>",
+    "base_url": "<resolved base url>",
+    "client_type": "<class name of the returned client>"
+  }
+  ```
+  where `client_type` must equal `"LlamaCloud"` (i.e. `type(client).__name__`).
+- It writes that payload to a file named `resolved_<region>.json` inside `/home/user/region_setup`, encoded as UTF-8 with `indent=2`.
+
+## Implementation Guide
+1. `cd /home/user/region_setup`.
+2. Create `client_factory.py` with the constants and the two functions described above. Reference implementation:
+   ```python
+   import os
+   from llama_cloud import LlamaCloud
+
+   NA_BASE_URL = "https://api.cloud.llamaindex.ai"
+   EU_BASE_URL = "https://api.cloud.eu.llamaindex.ai"
+
+   def resolve_base_url(region: str) -> str:
+       if (region or "").strip().lower() == "eu":
+           return EU_BASE_URL
+       return NA_BASE_URL
+
+   def make_client(region: str) -> LlamaCloud:
+       api_key = os.environ["LLAMA_CLOUD_API_KEY"]
+       base_url = resolve_base_url(region)
+       return LlamaCloud(token=api_key, base_url=base_url)
+   ```
+3. Create `run.py`:
+   ```python
+   import json
+   import os
+   import sys
+
+   from client_factory import make_client, resolve_base_url
+
+
+   def main() -> None:
+       region = sys.argv[1]
+       client = make_client(region)
+       payload = {
+           "region": region,
+           "base_url": resolve_base_url(region),
+           "client_type": type(client).__name__,
+       }
+       out_path = os.path.join(
+           os.path.dirname(os.path.abspath(__file__)),
+           f"resolved_{region}.json",
+       )
+       with open(out_path, "w", encoding="utf-8") as f:
+           json.dump(payload, f, indent=2)
+
+
+   main()
+   ```
+4. Run the script once for each region:
+   ```bash
+   python3 run.py na
+   python3 run.py eu
+   ```
+   This must produce both `resolved_na.json` and `resolved_eu.json` in `/home/user/region_setup`.
+
+## Constraints
+- Project path: `/home/user/region_setup`
+- Module path: `/home/user/region_setup/client_factory.py`
+- Runner path: `/home/user/region_setup/run.py`
+- Output files: `/home/user/region_setup/resolved_na.json` and `/home/user/region_setup/resolved_eu.json`
+- Use the official `llama_cloud` SDK (import `from llama_cloud import LlamaCloud`). Do NOT call the REST API directly with `curl` or `requests`.
+- Do NOT hardcode the API key — always read `LLAMA_CLOUD_API_KEY` from the environment.
+- The base URLs in `client_factory.py` must be exact string literals (no trailing slash, no `http://`):
+  - `NA_BASE_URL == "https://api.cloud.llamaindex.ai"`
+  - `EU_BASE_URL == "https://api.cloud.eu.llamaindex.ai"`
+- Region matching in `resolve_base_url` must be case-insensitive but only the literal `"eu"` (after `strip().lower()`) selects EU. All other inputs MUST fall back to NA.
+
+## Integrations
+- LlamaCloud — requires the `LLAMA_CLOUD_API_KEY` environment variable (any non-empty string is acceptable for construction; no network call is made during client instantiation).
+
+EOF
+Command outputs captured
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured

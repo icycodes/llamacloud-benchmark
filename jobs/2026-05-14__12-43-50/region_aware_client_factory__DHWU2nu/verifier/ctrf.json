@@ -1,0 +1,155 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "8.4.1"
+        },
+        "summary": {
+            "tests": 13,
+            "passed": 7,
+            "failed": 6,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778734157.4378166,
+            "stop": 1778734157.6883461
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_client_factory_module_exists",
+                "status": "passed",
+                "duration": 0.0004293958190828562,
+                "start": 1778734157.457703,
+                "stop": 1778734157.4583137,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_run_script_exists",
+                "status": "passed",
+                "duration": 0.0002923649735748768,
+                "start": 1778734157.4584723,
+                "stop": 1778734157.4588892,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_client_factory_uses_llama_cloud_sdk",
+                "status": "passed",
+                "duration": 0.0003154618898406625,
+                "start": 1778734157.4590402,
+                "stop": 1778734157.459464,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_client_factory_does_not_hardcode_api_key",
+                "status": "passed",
+                "duration": 0.0003046640194952488,
+                "start": 1778734157.4596055,
+                "stop": 1778734157.460013,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_run_script_imports_client_factory",
+                "status": "passed",
+                "duration": 0.00030050298664718866,
+                "start": 1778734157.4601626,
+                "stop": 1778734157.460576,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_client_factory_module_constants_via_subprocess",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.012470872956328094,
+                "start": 1778734157.4607098,
+                "stop": 1778734157.4963715,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_client_factory_module_constants_via_subprocess():\n        \"\"\"Priority 1 \u2014 exercise the user's module directly via Python and validate constants.\"\"\"\n        code = (\n            \"import sys; sys.path.insert(0, '/home/user/region_setup'); \"\n            \"import client_factory; \"\n            \"print('NA=' + client_factory.NA_BASE_URL); \"\n            \"print('EU=' + client_factory.EU_BASE_URL)\"\n        )\n        result = subprocess.run(\n            [\"python3\", \"-c\", code],\n            capture_output=True,\n            text=True,\n            cwd=PROJECT_DIR,\n        )\n>       assert result.returncode == 0, (\n            f\"Importing client_factory failed. stderr: {result.stderr}\"\n        )\nE       AssertionError: Importing client_factory failed. stderr: Traceback (most recent call last):\nE           File \"<string>\", line 1, in <module>\nE           File \"/home/user/region_setup/client_factory.py\", line 2, in <module>\nE             from llama_cloud import LlamaCloud\nE         ModuleNotFoundError: No module named 'llama_cloud'\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['python3', '-c', \"import sys; sys.path.insert(0, '/home/user/region_setup'); import client_fact..., line 2, in <module>\\n    from llama_cloud import LlamaCloud\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n').returncode\n\ntests/test_final_state.py:86: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_resolve_base_url_eu_lowercase",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.015379017917439342,
+                "start": 1778734157.496594,
+                "stop": 1778734157.5222416,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_resolve_base_url_eu_lowercase():\n        code = (\n            \"import sys; sys.path.insert(0, '/home/user/region_setup'); \"\n            \"import client_factory; \"\n            \"print(client_factory.resolve_base_url('eu'))\"\n        )\n        result = subprocess.run(\n            [\"python3\", \"-c\", code],\n            capture_output=True,\n            text=True,\n            cwd=PROJECT_DIR,\n        )\n>       assert result.returncode == 0, (\n            f\"resolve_base_url('eu') call failed. stderr: {result.stderr}\"\n        )\nE       AssertionError: resolve_base_url('eu') call failed. stderr: Traceback (most recent call last):\nE           File \"<string>\", line 1, in <module>\nE           File \"/home/user/region_setup/client_factory.py\", line 2, in <module>\nE             from llama_cloud import LlamaCloud\nE         ModuleNotFoundError: No module named 'llama_cloud'\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['python3', '-c', \"import sys; sys.path.insert(0, '/home/user/region_setup'); import client_fact..., line 2, in <module>\\n    from llama_cloud import LlamaCloud\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n').returncode\n\ntests/test_final_state.py:109: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_resolve_base_url_eu_case_insensitive",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.030953742912970483,
+                "start": 1778734157.5225275,
+                "stop": 1778734157.562622,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_resolve_base_url_eu_case_insensitive():\n        code = (\n            \"import sys; sys.path.insert(0, '/home/user/region_setup'); \"\n            \"import client_factory; \"\n            \"print(client_factory.resolve_base_url('EU'))\"\n        )\n        result = subprocess.run(\n            [\"python3\", \"-c\", code],\n            capture_output=True,\n            text=True,\n            cwd=PROJECT_DIR,\n        )\n>       assert result.returncode == 0, (\n            f\"resolve_base_url('EU') call failed. stderr: {result.stderr}\"\n        )\nE       AssertionError: resolve_base_url('EU') call failed. stderr: Traceback (most recent call last):\nE           File \"<string>\", line 1, in <module>\nE           File \"/home/user/region_setup/client_factory.py\", line 2, in <module>\nE             from llama_cloud import LlamaCloud\nE         ModuleNotFoundError: No module named 'llama_cloud'\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['python3', '-c', \"import sys; sys.path.insert(0, '/home/user/region_setup'); import client_fact..., line 2, in <module>\\n    from llama_cloud import LlamaCloud\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n').returncode\n\ntests/test_final_state.py:129: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_resolve_base_url_na_default",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.030131411040201783,
+                "start": 1778734157.5631077,
+                "stop": 1778734157.6026702,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_resolve_base_url_na_default():\n        code = (\n            \"import sys; sys.path.insert(0, '/home/user/region_setup'); \"\n            \"import client_factory; \"\n            \"print(client_factory.resolve_base_url('na'))\"\n        )\n        result = subprocess.run(\n            [\"python3\", \"-c\", code],\n            capture_output=True,\n            text=True,\n            cwd=PROJECT_DIR,\n        )\n>       assert result.returncode == 0, (\n            f\"resolve_base_url('na') call failed. stderr: {result.stderr}\"\n        )\nE       AssertionError: resolve_base_url('na') call failed. stderr: Traceback (most recent call last):\nE           File \"<string>\", line 1, in <module>\nE           File \"/home/user/region_setup/client_factory.py\", line 2, in <module>\nE             from llama_cloud import LlamaCloud\nE         ModuleNotFoundError: No module named 'llama_cloud'\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['python3', '-c', \"import sys; sys.path.insert(0, '/home/user/region_setup'); import client_fact..., line 2, in <module>\\n    from llama_cloud import LlamaCloud\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n').returncode\n\ntests/test_final_state.py:150: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_resolve_base_url_non_eu_falls_back_to_na",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.022325890138745308,
+                "start": 1778734157.6031702,
+                "stop": 1778734157.6358447,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_resolve_base_url_non_eu_falls_back_to_na():\n        code = (\n            \"import sys; sys.path.insert(0, '/home/user/region_setup'); \"\n            \"import client_factory; \"\n            \"print(client_factory.resolve_base_url('us'))\"\n        )\n        result = subprocess.run(\n            [\"python3\", \"-c\", code],\n            capture_output=True,\n            text=True,\n            cwd=PROJECT_DIR,\n        )\n>       assert result.returncode == 0, (\n            f\"resolve_base_url('us') call failed. stderr: {result.stderr}\"\n        )\nE       AssertionError: resolve_base_url('us') call failed. stderr: Traceback (most recent call last):\nE           File \"<string>\", line 1, in <module>\nE           File \"/home/user/region_setup/client_factory.py\", line 2, in <module>\nE             from llama_cloud import LlamaCloud\nE         ModuleNotFoundError: No module named 'llama_cloud'\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['python3', '-c', \"import sys; sys.path.insert(0, '/home/user/region_setup'); import client_fact..., line 2, in <module>\\n    from llama_cloud import LlamaCloud\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n').returncode\n\ntests/test_final_state.py:170: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_make_client_returns_llama_cloud_instance",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 0.03476182115264237,
+                "start": 1778734157.636385,
+                "stop": 1778734157.6835656,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_make_client_returns_llama_cloud_instance():\n        code = (\n            \"import sys; sys.path.insert(0, '/home/user/region_setup'); \"\n            \"import client_factory; \"\n            \"client = client_factory.make_client('eu'); \"\n            \"print(type(client).__name__)\"\n        )\n        result = subprocess.run(\n            [\"python3\", \"-c\", code],\n            capture_output=True,\n            text=True,\n            cwd=PROJECT_DIR,\n        )\n>       assert result.returncode == 0, (\n            f\"make_client('eu') call failed. stderr: {result.stderr}\"\n        )\nE       AssertionError: make_client('eu') call failed. stderr: Traceback (most recent call last):\nE           File \"<string>\", line 1, in <module>\nE           File \"/home/user/region_setup/client_factory.py\", line 2, in <module>\nE             from llama_cloud import LlamaCloud\nE         ModuleNotFoundError: No module named 'llama_cloud'\nE         \nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['python3', '-c', \"import sys; sys.path.insert(0, '/home/user/region_setup'); import client_fact..., line 2, in <module>\\n    from llama_cloud import LlamaCloud\\nModuleNotFoundError: No module named \\'llama_cloud\\'\\n').returncode\n\ntests/test_final_state.py:192: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_resolved_na_json_exists_and_valid",
+                "status": "passed",
+                "duration": 0.0011929291067644954,
+                "start": 1778734157.6841772,
+                "stop": 1778734157.6857572,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_resolved_eu_json_exists_and_valid",
+                "status": "passed",
+                "duration": 0.0012030020589008927,
+                "start": 1778734157.6863177,
+                "stop": 1778734157.687863,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

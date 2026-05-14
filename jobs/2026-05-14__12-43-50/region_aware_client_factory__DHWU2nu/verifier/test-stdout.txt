@@ -1,0 +1,214 @@
+Hit:1 http://security.ubuntu.com/ubuntu noble-security InRelease
+Hit:2 http://archive.ubuntu.com/ubuntu noble InRelease
+Hit:3 http://archive.ubuntu.com/ubuntu noble-updates InRelease
+Hit:4 http://archive.ubuntu.com/ubuntu noble-backports InRelease
+Reading package lists...
+Reading package lists...
+Building dependency tree...
+Reading state information...
+curl is already the newest version (8.5.0-2ubuntu10.9).
+0 upgraded, 0 newly installed, 0 to remove and 3 not upgraded.
+downloading uv 0.9.7 x86_64-unknown-linux-gnu
+no checksums to verify
+installing to /root/.local/bin
+  uv
+  uvx
+everything's installed!
+
+To add $HOME/.local/bin to your PATH, either restart your shell or run:
+
+    source $HOME/.local/bin/env (sh, bash, zsh)
+    source $HOME/.local/bin/env.fish (fish)
+Downloading pygments (1.2MiB)
+ Downloading pygments
+Installed 9 packages in 36ms
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-8.4.1, pluggy-1.6.0
+rootdir: /tests
+plugins: json-ctrf-0.3.5, xprocess-1.0.2
+collected 13 items
+
+tests/test_final_state.py .....FFFFFF..                                  [100%]
+
+=================================== FAILURES ===================================
+_____________ test_client_factory_module_constants_via_subprocess ______________
+
+    def test_client_factory_module_constants_via_subprocess():
+        """Priority 1 — exercise the user's module directly via Python and validate constants."""
+        code = (
+            "import sys; sys.path.insert(0, '/home/user/region_setup'); "
+            "import client_factory; "
+            "print('NA=' + client_factory.NA_BASE_URL); "
+            "print('EU=' + client_factory.EU_BASE_URL)"
+        )
+        result = subprocess.run(
+            ["python3", "-c", code],
+            capture_output=True,
+            text=True,
+            cwd=PROJECT_DIR,
+        )
+>       assert result.returncode == 0, (
+            f"Importing client_factory failed. stderr: {result.stderr}"
+        )
+E       AssertionError: Importing client_factory failed. stderr: Traceback (most recent call last):
+E           File "<string>", line 1, in <module>
+E           File "/home/user/region_setup/client_factory.py", line 2, in <module>
+E             from llama_cloud import LlamaCloud
+E         ModuleNotFoundError: No module named 'llama_cloud'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '-c', "import sys; sys.path.insert(0, '/home/user/region_setup'); import client_fact..., line 2, in <module>\n    from llama_cloud import LlamaCloud\nModuleNotFoundError: No module named \'llama_cloud\'\n').returncode
+
+tests/test_final_state.py:86: AssertionError
+______________________ test_resolve_base_url_eu_lowercase ______________________
+
+    def test_resolve_base_url_eu_lowercase():
+        code = (
+            "import sys; sys.path.insert(0, '/home/user/region_setup'); "
+            "import client_factory; "
+            "print(client_factory.resolve_base_url('eu'))"
+        )
+        result = subprocess.run(
+            ["python3", "-c", code],
+            capture_output=True,
+            text=True,
+            cwd=PROJECT_DIR,
+        )
+>       assert result.returncode == 0, (
+            f"resolve_base_url('eu') call failed. stderr: {result.stderr}"
+        )
+E       AssertionError: resolve_base_url('eu') call failed. stderr: Traceback (most recent call last):
+E           File "<string>", line 1, in <module>
+E           File "/home/user/region_setup/client_factory.py", line 2, in <module>
+E             from llama_cloud import LlamaCloud
+E         ModuleNotFoundError: No module named 'llama_cloud'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '-c', "import sys; sys.path.insert(0, '/home/user/region_setup'); import client_fact..., line 2, in <module>\n    from llama_cloud import LlamaCloud\nModuleNotFoundError: No module named \'llama_cloud\'\n').returncode
+
+tests/test_final_state.py:109: AssertionError
+__________________ test_resolve_base_url_eu_case_insensitive ___________________
+
+    def test_resolve_base_url_eu_case_insensitive():
+        code = (
+            "import sys; sys.path.insert(0, '/home/user/region_setup'); "
+            "import client_factory; "
+            "print(client_factory.resolve_base_url('EU'))"
+        )
+        result = subprocess.run(
+            ["python3", "-c", code],
+            capture_output=True,
+            text=True,
+            cwd=PROJECT_DIR,
+        )
+>       assert result.returncode == 0, (
+            f"resolve_base_url('EU') call failed. stderr: {result.stderr}"
+        )
+E       AssertionError: resolve_base_url('EU') call failed. stderr: Traceback (most recent call last):
+E           File "<string>", line 1, in <module>
+E           File "/home/user/region_setup/client_factory.py", line 2, in <module>
+E             from llama_cloud import LlamaCloud
+E         ModuleNotFoundError: No module named 'llama_cloud'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '-c', "import sys; sys.path.insert(0, '/home/user/region_setup'); import client_fact..., line 2, in <module>\n    from llama_cloud import LlamaCloud\nModuleNotFoundError: No module named \'llama_cloud\'\n').returncode
+
+tests/test_final_state.py:129: AssertionError
+_______________________ test_resolve_base_url_na_default _______________________
+
+    def test_resolve_base_url_na_default():
+        code = (
+            "import sys; sys.path.insert(0, '/home/user/region_setup'); "
+            "import client_factory; "
+            "print(client_factory.resolve_base_url('na'))"
+        )
+        result = subprocess.run(
+            ["python3", "-c", code],
+            capture_output=True,
+            text=True,
+            cwd=PROJECT_DIR,
+        )
+>       assert result.returncode == 0, (
+            f"resolve_base_url('na') call failed. stderr: {result.stderr}"
+        )
+E       AssertionError: resolve_base_url('na') call failed. stderr: Traceback (most recent call last):
+E           File "<string>", line 1, in <module>
+E           File "/home/user/region_setup/client_factory.py", line 2, in <module>
+E             from llama_cloud import LlamaCloud
+E         ModuleNotFoundError: No module named 'llama_cloud'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '-c', "import sys; sys.path.insert(0, '/home/user/region_setup'); import client_fact..., line 2, in <module>\n    from llama_cloud import LlamaCloud\nModuleNotFoundError: No module named \'llama_cloud\'\n').returncode
+
+tests/test_final_state.py:150: AssertionError
+________________ test_resolve_base_url_non_eu_falls_back_to_na _________________
+
+    def test_resolve_base_url_non_eu_falls_back_to_na():
+        code = (
+            "import sys; sys.path.insert(0, '/home/user/region_setup'); "
+            "import client_factory; "
+            "print(client_factory.resolve_base_url('us'))"
+        )
+        result = subprocess.run(
+            ["python3", "-c", code],
+            capture_output=True,
+            text=True,
+            cwd=PROJECT_DIR,
+        )
+>       assert result.returncode == 0, (
+            f"resolve_base_url('us') call failed. stderr: {result.stderr}"
+        )
+E       AssertionError: resolve_base_url('us') call failed. stderr: Traceback (most recent call last):
+E           File "<string>", line 1, in <module>
+E           File "/home/user/region_setup/client_factory.py", line 2, in <module>
+E             from llama_cloud import LlamaCloud
+E         ModuleNotFoundError: No module named 'llama_cloud'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '-c', "import sys; sys.path.insert(0, '/home/user/region_setup'); import client_fact..., line 2, in <module>\n    from llama_cloud import LlamaCloud\nModuleNotFoundError: No module named \'llama_cloud\'\n').returncode
+
+tests/test_final_state.py:170: AssertionError
+________________ test_make_client_returns_llama_cloud_instance _________________
+
+    def test_make_client_returns_llama_cloud_instance():
+        code = (
+            "import sys; sys.path.insert(0, '/home/user/region_setup'); "
+            "import client_factory; "
+            "client = client_factory.make_client('eu'); "
+            "print(type(client).__name__)"
+        )
+        result = subprocess.run(
+            ["python3", "-c", code],
+            capture_output=True,
+            text=True,
+            cwd=PROJECT_DIR,
+        )
+>       assert result.returncode == 0, (
+            f"make_client('eu') call failed. stderr: {result.stderr}"
+        )
+E       AssertionError: make_client('eu') call failed. stderr: Traceback (most recent call last):
+E           File "<string>", line 1, in <module>
+E           File "/home/user/region_setup/client_factory.py", line 2, in <module>
+E             from llama_cloud import LlamaCloud
+E         ModuleNotFoundError: No module named 'llama_cloud'
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '-c', "import sys; sys.path.insert(0, '/home/user/region_setup'); import client_fact..., line 2, in <module>\n    from llama_cloud import LlamaCloud\nModuleNotFoundError: No module named \'llama_cloud\'\n').returncode
+
+tests/test_final_state.py:192: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_client_factory_module_exists
+PASSED tests/test_final_state.py::test_run_script_exists
+PASSED tests/test_final_state.py::test_client_factory_uses_llama_cloud_sdk
+PASSED tests/test_final_state.py::test_client_factory_does_not_hardcode_api_key
+PASSED tests/test_final_state.py::test_run_script_imports_client_factory
+PASSED tests/test_final_state.py::test_resolved_na_json_exists_and_valid
+PASSED tests/test_final_state.py::test_resolved_eu_json_exists_and_valid
+FAILED tests/test_final_state.py::test_client_factory_module_constants_via_subprocess
+FAILED tests/test_final_state.py::test_resolve_base_url_eu_lowercase - Assert...
+FAILED tests/test_final_state.py::test_resolve_base_url_eu_case_insensitive
+FAILED tests/test_final_state.py::test_resolve_base_url_na_default - Assertio...
+FAILED tests/test_final_state.py::test_resolve_base_url_non_eu_falls_back_to_na
+FAILED tests/test_final_state.py::test_make_client_returns_llama_cloud_instance
+========================= 6 failed, 7 passed in 0.26s ==========================
