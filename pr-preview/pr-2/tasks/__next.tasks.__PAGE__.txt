@@ -1,0 +1,1462 @@
+1:"$Sreact.fragment"
+2:I[42654,["/llamacloud-benchmark/pr-preview/pr-2/_next/static/chunks/babff0e7418ab052.js","/llamacloud-benchmark/pr-preview/pr-2/_next/static/chunks/3ecbb78a8ff87549.js","/llamacloud-benchmark/pr-preview/pr-2/_next/static/chunks/28c0ea01e9ff9346.js","/llamacloud-benchmark/pr-preview/pr-2/_next/static/chunks/be08138953094657.js"],"TasksPageClient"]
+15:I[75049,["/llamacloud-benchmark/pr-preview/pr-2/_next/static/chunks/d2c13bb33c4fcd54.js","/llamacloud-benchmark/pr-preview/pr-2/_next/static/chunks/c21188132e0e0d48.js"],"OutletBoundary"]
+16:"$Sreact.suspense"
+3:T12e7,# Batch-Parse a Folder of PDFs Concurrently with `AsyncLlamaCloud`
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. Its agentic document parser, LlamaParse, exposes both a synchronous `LlamaCloud` client and a fully asynchronous `AsyncLlamaCloud` client in the `llama_cloud` Python SDK. When you have a folder of documents to parse, the recommended high-throughput pattern is to drive parses concurrently via `AsyncLlamaCloud` plus `asyncio.gather`, optionally rate-limited with an `asyncio.Semaphore`, so that you are not waiting for each parse job to finish before starting the next.
+
+In this task you must build that batch parsing pipeline for a small folder of pre-existing PDFs and emit a per-document markdown file.
+
+## Requirements
+Write a single Python script `batch_parse.py` (placed at `/home/user/batch_parse/batch_parse.py`) that:
+
+1. Imports the **async** client: `from llama_cloud import AsyncLlamaCloud`.
+2. Reads the API key from the `LLAMA_CLOUD_API_KEY` environment variable (do **not** hardcode it; either instantiate `AsyncLlamaCloud()` with no arguments — the SDK will pick the env var up — or pass `api_key=os.getenv("LLAMA_CLOUD_API_KEY")`).
+3. Discovers every `*.pdf` file inside `/home/user/batch_parse/pdfs/` (there are three: `alpha.pdf`, `bravo.pdf`, `charlie.pdf`).
+4. For every PDF concurrently:
+   - Uploads it via `await client.files.create(file=<absolute path>, purpose="parse")`.
+   - Submits an agentic parse job via `await client.parsing.parse(file_id=<uploaded.id>, tier="agentic", version="latest", expand=["markdown"])`.
+   - Concatenates `result.markdown.pages[*].markdown` in page order (use a single newline between pages).
+   - Writes the concatenated markdown to `/home/user/batch_parse/out/<basename>.md` (UTF-8) where `<basename>` is the PDF file name without the `.pdf` extension (e.g. `alpha.pdf` → `out/alpha.md`).
+5. Drives the per-file coroutines concurrently using `asyncio.gather` (NOT a sequential `for ... await ...` loop) and wraps the work in an `async def main(): ...` coroutine launched with `asyncio.run(main())`.
+6. Creates the output directory `/home/user/batch_parse/out/` if it does not already exist.
+
+## Implementation Guide
+1. `cd /home/user/batch_parse`.
+2. Create `batch_parse.py` along these lines:
+   ```python
+   import asyncio
+   import os
+   from pathlib import Path
+
+   from llama_cloud import AsyncLlamaCloud
+
+   PDF_DIR = Path("/home/user/batch_parse/pdfs")
+   OUT_DIR = Path("/home/user/batch_parse/out")
+
+
+   async def parse_one(client: AsyncLlamaCloud, pdf_path: Path) -> None:
+       uploaded = await client.files.create(file=str(pdf_path), purpose="parse")
+       result = await client.parsing.parse(
+           file_id=uploaded.id,
+           tier="agentic",
+           version="latest",
+           expand=["markdown"],
+       )
+       parts = [(p.markdown or "") for p in result.markdown.pages]
+       combined = "\n".join(parts)
+       out_path = OUT_DIR / f"{pdf_path.stem}.md"
+       out_path.write_text(combined, encoding="utf-8")
+
+
+   async def main() -> None:
+       OUT_DIR.mkdir(parents=True, exist_ok=True)
+       client = AsyncLlamaCloud(api_key=os.environ["LLAMA_CLOUD_API_KEY"])
+       pdf_paths = sorted(PDF_DIR.glob("*.pdf"))
+       await asyncio.gather(*(parse_one(client, p) for p in pdf_paths))
+
+
+   asyncio.run(main())
+   ```
+3. Run it with `python3 batch_parse.py` from `/home/user/batch_parse`. The script blocks until all three parse jobs finish concurrently.
+4. Confirm that `/home/user/batch_parse/out/alpha.md`, `/home/user/batch_parse/out/bravo.md`, and `/home/user/batch_parse/out/charlie.md` were all written.
+
+## Constraints
+- Project path: `/home/user/batch_parse`
+- Input directory: `/home/user/batch_parse/pdfs/` (already populated with `alpha.pdf`, `bravo.pdf`, `charlie.pdf`)
+- Output directory: `/home/user/batch_parse/out/` (must be created by the script if missing)
+- Script path: `/home/user/batch_parse/batch_parse.py`
+- Output files (UTF-8):
+  - `/home/user/batch_parse/out/alpha.md`
+  - `/home/user/batch_parse/out/bravo.md`
+  - `/home/user/batch_parse/out/charlie.md`
+- Use the **async** client `AsyncLlamaCloud` from the `llama_cloud` SDK. Do NOT use the synchronous `LlamaCloud` client. Do NOT call the REST API directly with `curl`, `requests`, or `httpx`.
+- Drive parses concurrently with `asyncio.gather`. A purely sequential `for ... await client.parsing.parse(...)` loop is NOT acceptable.
+- The script must rely on `LLAMA_CLOUD_API_KEY` from the environment — no hardcoded `llx-...` literal anywhere in the script.
+- Each output markdown file MUST contain the unique marker phrase from the corresponding source PDF (see Specific Test Data in the verification plan).
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires the `LLAMA_CLOUD_API_KEY` environment variable.
+4:T2735,# Build a LlamaCloud Parse v2 Request Payload From a High-Level Intent
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. Its agentic document parser, LlamaParse, is driven by the v2 `POST /api/v2/parse` endpoint (called for you by `client.parsing.parse(...)` in the `llama-cloud` Python SDK). The Parse v2 request body is a fairly deep JSON object where every knob has a specific home. A common source of bugs is putting options at the wrong nesting level — e.g. placing `custom_prompt` under `processing_options` instead of `agentic_options`, or putting `timeouts` under `processing_options` instead of `processing_control`.
+
+In this task you will write a small build-only utility that consumes a flat, high-level *intent* JSON file (the kind of thing you might receive from another team or a UI) and emits a fully-formed Parse v2 request body with every field placed at exactly the right path. The script must construct a `LlamaCloud` client (a sanity check that the SDK and credentials are wired up correctly) but it MUST NOT actually call `client.parsing.parse(...)` or contact LlamaCloud over the network.
+
+## Pre-existing Layout
+The project directory `/home/user/parse_payload` already contains:
+
+```
+/home/user/parse_payload/
+└── intent.json
+```
+
+`intent.json` is exactly:
+
+```json
+{
+  "file_id": "file-demo-abc-123",
+  "tier": "agentic",
+  "version": "latest",
+  "pages": "1-3,5",
+  "crop_top": 0.1,
+  "crop_bottom": 0.15,
+  "ocr_languages": ["en", "fr"],
+  "tables_as_html": true,
+  "save_screenshots": true,
+  "custom_prompt": "This is a financial report. Preserve currency symbols.",
+  "enable_cost_optimizer": true,
+  "base_timeout_seconds": 300,
+  "extra_time_per_page_seconds": 30,
+  "ignore_diagonal_text": true,
+  "disable_cache": false
+}
+```
+
+## Requirements
+
+Create the following inside `/home/user/parse_payload`:
+
+### 1. `build_payload.py`
+A standalone script invoked as `python3 build_payload.py` that performs the following steps in order:
+
+1. **Validate environment**: Read `LLAMA_CLOUD_API_KEY` from `os.environ`. If the variable is unset or empty, exit with a non-zero status and print an error message to stderr.
+2. **Sanity-check the SDK**: Construct a client via `from llama_cloud import LlamaCloud` and instantiate `LlamaCloud(token=<api_key>)`. Do NOT make any network calls (no `client.parsing.parse(...)`, no `client.files.create(...)`, no `requests.*`, no `httpx.*`). Constructing the client is the only SDK interaction.
+3. **Load the intent file** from `/home/user/parse_payload/intent.json` (UTF-8, valid JSON).
+4. **Validate the tier**: The intent's `tier` field MUST be one of `fast`, `cost_effective`, `agentic`, `agentic_plus`. If not, exit with a non-zero status and print an error to stderr.
+5. **Construct the request body** as a Python dict with the exact structure described in the [Output Schema](#output-schema) section below. Each field MUST be placed at the documented nesting level.
+6. **Write the request body** to `/home/user/parse_payload/request_body.json` (UTF-8, indented with 2 spaces). Top-level keys MUST be sorted alphabetically.
+7. **Print a one-line summary** to stdout in this exact format (no extra spaces, no extra text):
+   ```
+   payload_ok file_id=<file_id> tier=<tier> top_level_keys=<N>
+   ```
+   where `<file_id>` is the value of `intent["file_id"]`, `<tier>` is the value of `intent["tier"]`, and `<N>` is the number of top-level keys in the resulting payload (an integer).
+
+### Output Schema
+
+The resulting `request_body.json` must equal EXACTLY (modulo whitespace and key ordering inside the JSON file — top-level keys must be alphabetically sorted in the file):
+
+```json
+{
+  "agentic_options": {
+    "custom_prompt": "This is a financial report. Preserve currency symbols."
+  },
+  "crop_box": {
+    "bottom": 0.15,
+    "top": 0.1
+  },
+  "disable_cache": false,
+  "file_id": "file-demo-abc-123",
+  "output_options": {
+    "images_to_save": ["screenshot"],
+    "markdown": {
+      "tables": {
+        "output_tables_as_markdown": false
+      }
+    }
+  },
+  "page_ranges": {
+    "target_pages": "1-3,5"
+  },
+  "processing_control": {
+    "timeouts": {
+      "base_in_seconds": 300,
+      "extra_time_per_page_in_seconds": 30
+    }
+  },
+  "processing_options": {
+    "cost_optimizer": {
+      "enable": true
+    },
+    "ignore": {
+      "ignore_diagonal_text": true
+    },
+    "ocr_parameters": {
+      "languages": ["en", "fr"]
+    }
+  },
+  "tier": "agentic",
+  "version": "latest"
+}
+```
+
+Field-by-field mapping (intent key → payload path):
+
+| Intent key | Payload path |
+| --- | --- |
+| `file_id` | top-level `file_id` |
+| `tier` | top-level `tier` |
+| `version` | top-level `version` |
+| `disable_cache` | top-level `disable_cache` |
+| `pages` | `page_ranges.target_pages` |
+| `crop_top` | `crop_box.top` |
+| `crop_bottom` | `crop_box.bottom` |
+| `ocr_languages` | `processing_options.ocr_parameters.languages` |
+| `enable_cost_optimizer` | `processing_options.cost_optimizer.enable` |
+| `ignore_diagonal_text` | `processing_options.ignore.ignore_diagonal_text` |
+| `custom_prompt` | `agentic_options.custom_prompt` |
+| `tables_as_html` | `output_options.markdown.tables.output_tables_as_markdown` (NEGATED — `true` in intent ⇒ `false` in payload, and vice versa) |
+| `save_screenshots` | `output_options.images_to_save` — if `true`, include the string `"screenshot"` in the array; if `false`, omit the entire `images_to_save` key |
+| `base_timeout_seconds` | `processing_control.timeouts.base_in_seconds` |
+| `extra_time_per_page_seconds` | `processing_control.timeouts.extra_time_per_page_in_seconds` |
+
+Important: do NOT include an `expand` key anywhere in the payload — `expand` is a query parameter on the GET result endpoint, not part of the parse request body.
+
+## Implementation Guide
+
+1. `cd /home/user/parse_payload`.
+2. Create `build_payload.py`. A reference implementation:
+   ```python
+   import json
+   import os
+   import sys
+
+   from llama_cloud import LlamaCloud
+
+   INTENT_PATH = "/home/user/parse_payload/intent.json"
+   OUT_PATH = "/home/user/parse_payload/request_body.json"
+   ALLOWED_TIERS = {"fast", "cost_effective", "agentic", "agentic_plus"}
+
+
+   def build_payload(intent: dict) -> dict:
+       payload = {
+           "file_id": intent["file_id"],
+           "tier": intent["tier"],
+           "version": intent["version"],
+           "disable_cache": bool(intent["disable_cache"]),
+           "page_ranges": {"target_pages": intent["pages"]},
+           "crop_box": {
+               "top": intent["crop_top"],
+               "bottom": intent["crop_bottom"],
+           },
+           "processing_options": {
+               "ocr_parameters": {"languages": list(intent["ocr_languages"])},
+               "cost_optimizer": {"enable": bool(intent["enable_cost_optimizer"])},
+               "ignore": {"ignore_diagonal_text": bool(intent["ignore_diagonal_text"])},
+           },
+           "agentic_options": {"custom_prompt": intent["custom_prompt"]},
+           "output_options": {
+               "markdown": {
+                   "tables": {
+                       "output_tables_as_markdown": not bool(intent["tables_as_html"]),
+                   },
+               },
+           },
+           "processing_control": {
+               "timeouts": {
+                   "base_in_seconds": int(intent["base_timeout_seconds"]),
+                   "extra_time_per_page_in_seconds": int(
+                       intent["extra_time_per_page_seconds"]
+                   ),
+               },
+           },
+       }
+       if intent["save_screenshots"]:
+           payload["output_options"]["images_to_save"] = ["screenshot"]
+       return payload
+
+
+   def main() -> int:
+       api_key = os.environ.get("LLAMA_CLOUD_API_KEY", "").strip()
+       if not api_key:
+           print("LLAMA_CLOUD_API_KEY is not set", file=sys.stderr)
+           return 2
+
+       _client = LlamaCloud(token=api_key)  # sanity check, no network call
+
+       with open(INTENT_PATH, "r", encoding="utf-8") as f:
+           intent = json.load(f)
+
+       if intent["tier"] not in ALLOWED_TIERS:
+           print(
+               f"invalid tier: {intent['tier']!r}; allowed: {sorted(ALLOWED_TIERS)}",
+               file=sys.stderr,
+           )
+           return 3
+
+       payload = build_payload(intent)
+       sorted_payload = dict(sorted(payload.items()))
+       with open(OUT_PATH, "w", encoding="utf-8") as f:
+           json.dump(sorted_payload, f, indent=2)
+
+       print(
+           f"payload_ok file_id={intent['file_id']} tier={intent['tier']} top_level_keys={len(sorted_payload)}"
+       )
+       return 0
+
+
+   sys.exit(main())
+   ```
+3. Run the script:
+   ```bash
+   cd /home/user/parse_payload
+   python3 build_payload.py
+   ```
+   This produces `/home/user/parse_payload/request_body.json` and prints the summary line.
+
+## Constraints
+- Project path: `/home/user/parse_payload`
+- Script path: `/home/user/parse_payload/build_payload.py`
+- Input file: `/home/user/parse_payload/intent.json`
+- Output file: `/home/user/parse_payload/request_body.json`
+- Log line: a single line on stdout matching exactly `payload_ok file_id=file-demo-abc-123 tier=agentic top_level_keys=10`.
+- Use the official `llama_cloud` Python SDK (`from llama_cloud import LlamaCloud`).
+- Do NOT make any network calls (no `client.parsing.parse(...)`, no `client.files.create(...)`, no `requests.*`, no `httpx.*`, no `urllib.request.*`, no `curl`).
+- Do NOT hardcode the API key — always read `LLAMA_CLOUD_API_KEY` from the environment.
+- The output JSON must be UTF-8, indented with 2 spaces, and have top-level keys sorted alphabetically.
+- Do NOT include an `expand` key in the payload at any nesting level.
+- The Parse v2 tier value MUST be one of `fast`, `cost_effective`, `agentic`, `agentic_plus`. (For this intent, that is `agentic`.)
+
+## Integrations
+- LlamaCloud — requires the `LLAMA_CLOUD_API_KEY` environment variable (any non-empty string is acceptable; the script only constructs the client and never issues a network request).
+5:T1646,# Build a Structured Item Inventory from a Multi-Page PDF with LlamaParse
+
+## Background
+You are building a document indexing pipeline that needs to know not just the plain text of a PDF, but the *structure* of each page: which blocks are headings, which are paragraphs, which are tables, which are lists, etc. Plain markdown is not enough — downstream services need a typed, page-anchored inventory of every element so chunking, deduplication, and citation can be done deterministically.
+
+The team uses LlamaCloud's LlamaParse service, which (in non-`fast` tiers) returns a structured `items` array per page where each item has a `type` field (e.g. `heading`, `text`, `table`, `list`). Your job is to write the pipeline step that turns a PDF into this typed inventory.
+
+A pre-existing multi-page PDF is available at `/home/user/myproject/report.pdf` (3 pages). It contains the following section titles, one per page:
+- Page 1: `Project Phoenix Overview` (followed by an introductory paragraph mentioning `Phoenix Initiative`).
+- Page 2: `Implementation Roadmap` (followed by a paragraph mentioning `milestones`).
+- Page 3: `Risk Assessment Summary` (followed by a paragraph mentioning `Mitigation`).
+
+The Python packages `llama-cloud-services` and `llama-cloud` are already installed in the environment, and the API key is configured via the `LLAMA_CLOUD_API_KEY` environment variable.
+
+## Requirements
+- Implement a Python script at `/home/user/myproject/build_inventory.py`.
+- The script must use the LlamaCloud LlamaParse SDK (either `llama_cloud_services.LlamaParse` with `get_json_result(...)`, or `llama_cloud_services.LlamaParse.parse(...)` and walking `result.pages`, or `llama_cloud.LlamaCloud` with `expand=["items", "markdown"]`) to parse `/home/user/myproject/report.pdf` and obtain the per-page `items` arrays.
+- Do NOT use the `fast` tier — `items` is not available there. Use the SDK defaults or explicitly request a non-`fast` tier (e.g. `tier="agentic"`).
+- The script must walk every page and produce a single JSON output at `/home/user/myproject/inventory.json` with this exact top-level structure:
+  ```json
+  {
+    "source": "report.pdf",
+    "page_count": <total number of pages, int>,
+    "item_count": <total number of items across all pages, int>,
+    "by_type": { "<item_type>": <int>, ... },
+    "items": [
+      { "page": <int>, "type": "<item_type>", "value": "<short text>" },
+      ...
+    ]
+  }
+  ```
+  Rules for the structure:
+  - `source` MUST be the basename of the parsed file (`"report.pdf"`).
+  - `page_count` MUST equal the number of distinct pages parsed (3 for this PDF).
+  - `item_count` MUST equal `len(items)` and MUST equal the sum of the values in `by_type`.
+  - `by_type` MUST be a JSON object mapping item-type strings (e.g. `"heading"`, `"text"`, `"table"`, `"list"`) to a non-negative integer count of how many items of that type appear in `items`.
+  - `items` MUST be a JSON list ordered first by ascending `page`, then by the original order of the item within that page.
+  - Each entry in `items` MUST have an integer `page` (1-indexed), a non-empty string `type` (taken verbatim from the LlamaParse item's `type` field), and a non-empty string `value`. The `value` MUST be a short text snippet representing that item: prefer the item's `value` field if present, otherwise its `md` field, otherwise its `text` field. If the resulting string is longer than 500 characters, truncate it to its first 500 characters.
+- Running the script must produce `/home/user/myproject/inventory.json`. Use `python3 build_inventory.py` as the entry point.
+
+## Implementation Guide
+1. Read the API key from the `LLAMA_CLOUD_API_KEY` environment variable (the SDK reads it automatically; if you instantiate the parser explicitly with `api_key=...`, use this env var).
+2. Parse `/home/user/myproject/report.pdf` with LlamaParse and obtain the per-page `items`. Two valid approaches:
+   - `from llama_cloud_services import LlamaParse; parser = LlamaParse(result_type="markdown"); json_results = parser.get_json_result("/home/user/myproject/report.pdf")` → iterate `json_results[0]["pages"]`; each page has an `items` list and a `page` index.
+   - Or use the new client: `from llama_cloud import LlamaCloud; client = LlamaCloud(); file = client.files.create(file="/home/user/myproject/report.pdf", purpose="parse"); result = client.parsing.parse(file_id=file.id, tier="agentic", version="latest", expand=["items", "markdown"])` → iterate `result.items.pages`; each page has `page_number` and `items`.
+3. For each page (1-indexed) and each item on that page, append `{"page": <page>, "type": <item['type']>, "value": <truncated text>}` to the `items` list, preserving original order. Skip items whose computed `value` would be empty (after stripping whitespace).
+4. Build the `by_type` mapping by counting `item["type"]` occurrences in `items`.
+5. Set `source` to `"report.pdf"`, `page_count` to the number of pages parsed, `item_count` to `len(items)`.
+6. Write the structure to `/home/user/myproject/inventory.json` using `json.dump(..., indent=2)` with UTF-8 encoding.
+7. Execute the script once so that `inventory.json` exists when verification runs.
+
+## Constraints
+- Project path: /home/user/myproject
+- Output file: /home/user/myproject/inventory.json
+- The script must perform a real LlamaParse API call — do not hardcode the inventory, do not hand-build item types from prior knowledge of the PDF.
+- Do not modify `/home/user/myproject/report.pdf`.
+- The script must exit with code 0 when invoked as `python3 /home/user/myproject/build_inventory.py`.
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires `LLAMA_CLOUD_API_KEY` set in the environment.
+6:T1f72,# Download Per-Page Screenshots from a LlamaParse Job
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. Its agentic document parser, LlamaParse, can render every page of a parsed document as a PNG screenshot — this is a common building block for multimodal RAG pipelines that want to feed both extracted text and the page image into a VLM. The pattern is two-stage:
+
+1. **Generate** the screenshots at parse time by setting `output_options={"images_to_save": ["screenshot"]}`.
+2. **Fetch** them via the `images_content_metadata` expand value, which returns a structured list of `{ filename, presigned_url, ... }` entries. You then download each `presigned_url` with a normal HTTP GET and save the bytes to disk.
+
+A common mistake here is to omit `images_to_save` (in which case the screenshots are never generated and `images_content_metadata.images` comes back empty), or to forget that `images_content_metadata` does NOT inline the bytes — you have to fetch each `presigned_url` yourself.
+
+In this task you must implement that two-stage pipeline end-to-end against a pre-existing 3-page PDF.
+
+## Pre-existing Layout
+The project directory `/home/user/screenshot_task` already contains:
+
+```
+/home/user/screenshot_task/
+└── report.pdf            # 3-page PDF, generated deterministically at image-build time
+```
+
+The 3 pages contain the section titles `Alpha Section`, `Bravo Section`, and `Charlie Section` respectively, in that order.
+
+## Requirements
+
+Create a single Python script `download_screenshots.py` at `/home/user/screenshot_task/download_screenshots.py` that:
+
+1. Imports the synchronous client: `from llama_cloud import LlamaCloud`.
+2. Authenticates using the `LLAMA_CLOUD_API_KEY` environment variable. Instantiate `LlamaCloud()` with no arguments (the SDK reads the key from the environment) or pass `token=os.environ["LLAMA_CLOUD_API_KEY"]`. **Do NOT hardcode the API key in the script** (no `llx-...` literal).
+3. Uploads `/home/user/screenshot_task/report.pdf` to LlamaCloud via:
+   ```python
+   uploaded = client.files.create(file="/home/user/screenshot_task/report.pdf", purpose="parse")
+   ```
+4. Invokes `client.parsing.parse(...)` EXACTLY ONCE with:
+   - `file_id=uploaded.id`
+   - `tier="agentic"`
+   - `version="latest"`
+   - `output_options={"images_to_save": ["screenshot"]}` (this is what causes screenshots to be generated)
+   - `expand=["images_content_metadata"]` (so the response contains the list of presigned image URLs)
+5. Reads the resulting `result.images_content_metadata.images` list (each entry has `filename`, `presigned_url`, `content_type`, `size_bytes`, and `index`).
+6. For every image entry, downloads the bytes from `presigned_url` and writes them to `/home/user/screenshot_task/screenshots/<filename>` (the bytes MUST be the raw response body — do NOT re-encode). Use `urllib.request` from the standard library, or `requests`/`httpx` if you prefer (you may install nothing extra; `urllib.request` is preinstalled). Create the `screenshots/` directory if it does not already exist.
+7. After all downloads succeed, writes a manifest file `/home/user/screenshot_task/manifest.json` (UTF-8, `indent=2`) with this exact shape:
+   ```json
+   {
+     "source": "report.pdf",
+     "job_id": "<the parse job id>",
+     "page_count": 3,
+     "image_count": <int, must equal len(images)>,
+     "images": [
+       { "filename": "<filename>", "size_bytes": <int>, "saved_path": "/home/user/screenshot_task/screenshots/<filename>" },
+       ...
+     ]
+   }
+   ```
+   Rules for the manifest:
+   - `source` MUST be the literal string `"report.pdf"`.
+   - `job_id` MUST be the parse job's id (`result.job.id`).
+   - `page_count` MUST be the integer `3`.
+   - `image_count` MUST equal `len(result.images_content_metadata.images)` and MUST equal the number of files written under `screenshots/`.
+   - `images` MUST be a list, one entry per saved file, ordered by ascending `index` from the LlamaParse response.
+   - Each entry's `size_bytes` MUST equal the actual on-disk size of the saved file in bytes.
+   - Each entry's `saved_path` MUST be the absolute path of the saved file (`/home/user/screenshot_task/screenshots/<filename>`).
+8. The script must run end-to-end as `python3 download_screenshots.py` from `/home/user/screenshot_task` and exit with status 0.
+
+## Implementation Guide
+
+1. `cd /home/user/screenshot_task`.
+2. Create `download_screenshots.py`. A reference implementation:
+   ```python
+   import json
+   import os
+   import urllib.request
+   from pathlib import Path
+
+   from llama_cloud import LlamaCloud
+
+   PROJECT_DIR = Path("/home/user/screenshot_task")
+   PDF_PATH = PROJECT_DIR / "report.pdf"
+   SCREENSHOTS_DIR = PROJECT_DIR / "screenshots"
+   MANIFEST_PATH = PROJECT_DIR / "manifest.json"
+
+
+   def main() -> None:
+       SCREENSHOTS_DIR.mkdir(parents=True, exist_ok=True)
+
+       client = LlamaCloud()  # reads LLAMA_CLOUD_API_KEY from the environment
+
+       uploaded = client.files.create(file=str(PDF_PATH), purpose="parse")
+
+       result = client.parsing.parse(
+           file_id=uploaded.id,
+           tier="agentic",
+           version="latest",
+           output_options={"images_to_save": ["screenshot"]},
+           expand=["images_content_metadata"],
+       )
+
+       images = sorted(
+           list(result.images_content_metadata.images),
+           key=lambda im: im.index,
+       )
+
+       manifest_entries = []
+       for image in images:
+           dst = SCREENSHOTS_DIR / image.filename
+           with urllib.request.urlopen(image.presigned_url) as resp:
+               data = resp.read()
+           dst.write_bytes(data)
+           manifest_entries.append({
+               "filename": image.filename,
+               "size_bytes": dst.stat().st_size,
+               "saved_path": str(dst),
+           })
+
+       manifest = {
+           "source": "report.pdf",
+           "job_id": result.job.id,
+           "page_count": 3,
+           "image_count": len(manifest_entries),
+           "images": manifest_entries,
+       }
+       with open(MANIFEST_PATH, "w", encoding="utf-8") as f:
+           json.dump(manifest, f, indent=2)
+
+
+   main()
+   ```
+3. Run the script:
+   ```bash
+   cd /home/user/screenshot_task
+   python3 download_screenshots.py
+   ```
+4. Confirm the artifacts exist:
+   - `/home/user/screenshot_task/screenshots/` contains one image file per page.
+   - `/home/user/screenshot_task/manifest.json` lists every saved image.
+
+## Constraints
+- Project path: `/home/user/screenshot_task`
+- Input PDF: `/home/user/screenshot_task/report.pdf` (must not be modified)
+- Script path: `/home/user/screenshot_task/download_screenshots.py`
+- Screenshots directory: `/home/user/screenshot_task/screenshots/`
+- Manifest file: `/home/user/screenshot_task/manifest.json`
+- Use the official `llama_cloud` Python SDK (`from llama_cloud import LlamaCloud`). Do NOT call the LlamaCloud REST API directly with `curl`, `requests`, or `httpx`; the only HTTP traffic outside the SDK is the S3 presigned URL download.
+- The script must rely on `LLAMA_CLOUD_API_KEY` from the environment — no hardcoded `llx-...` literal anywhere.
+- `client.parsing.parse(...)` MUST be invoked exactly once. Do NOT issue a second `parsing.parse(...)` call (e.g. once without `images_to_save` and once with) — the screenshots MUST be requested in the single parse call.
+- The `output_options` argument passed to `parsing.parse` MUST include `"images_to_save"` containing the literal string `"screenshot"`. The `expand` argument MUST include the literal string `"images_content_metadata"`.
+- The image files saved to disk MUST be the raw bytes returned by the presigned URLs (do NOT re-encode them or wrap them in JSON).
+- The PDF has 3 pages, so the manifest's `page_count` MUST be `3` and `image_count` MUST be `>= 1`.
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires the `LLAMA_CLOUD_API_KEY` environment variable. The presigned URL download targets `s3.amazonaws.com` (or a comparable LlamaCloud-managed bucket) and requires outbound internet access.
+7:T10d4,# Extract a PDF Sales Table to Structured JSON with LlamaParse
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. Its agentic document parser, LlamaParse, accurately converts visually-rich PDFs (including tables) into clean markdown that downstream pipelines can consume. A common real-world use case is taking a financial/operations report and turning a tabular section of the PDF into structured JSON for analytics.
+
+In this task you must build a small extraction pipeline that takes a pre-existing PDF (`quarterly_sales.pdf`), parses it with LlamaParse using the `llama-cloud` Python SDK, and writes a structured `sales.json` summarizing the product sales table contained in the first page of the document.
+
+## Requirements
+Write a Python script `extract_sales.py` that uses the `llama-cloud` SDK (`from llama_cloud import LlamaCloud`) to:
+  1. Upload the local PDF `quarterly_sales.pdf` to LlamaCloud with `purpose="parse"`.
+  2. Submit a parse job using `tier="agentic"`, `version="latest"`, and `expand=["markdown"]`.
+  3. Read the markdown text of the first page of the parsed result (i.e. `result.markdown.pages[0].markdown`).
+  4. Parse the product sales table out of that markdown and assemble a Python object with the following exact shape:
+     ```json
+     {
+       "products": [
+         {"name": "Widget",   "units_sold": 1200, "revenue_usd": 24000},
+         {"name": "Gadget",   "units_sold": 850,  "revenue_usd": 21250},
+         {"name": "Sprocket", "units_sold": 430,  "revenue_usd": 12900},
+         {"name": "Cog",      "units_sold": 670,  "revenue_usd": 18760}
+       ]
+     }
+     ```
+  5. Serialize that object to `sales.json` (UTF-8, indent=2) in the same directory.
+
+The script must authenticate using the `LLAMA_CLOUD_API_KEY` environment variable (the SDK reads it automatically when `LlamaCloud()` is instantiated with no arguments).
+
+## Implementation Guide
+1. Change into the project directory `/home/user/sales_extraction`.
+2. Create `extract_sales.py` with logic similar to:
+   ```python
+   import json
+   import re
+   from llama_cloud import LlamaCloud
+
+   client = LlamaCloud()  # reads LLAMA_CLOUD_API_KEY from the environment
+   uploaded = client.files.create(file="./quarterly_sales.pdf", purpose="parse")
+   result = client.parsing.parse(
+       file_id=uploaded.id,
+       tier="agentic",
+       version="latest",
+       expand=["markdown"],
+   )
+   page_md = result.markdown.pages[0].markdown
+
+   # Walk the markdown table on the first page and build product records.
+   products = []
+   for line in page_md.splitlines():
+       line = line.strip()
+       if not line.startswith("|"):
+           continue
+       cells = [c.strip() for c in line.strip("|").split("|")]
+       if len(cells) < 3:
+           continue
+       name, units_str, revenue_str = cells[0], cells[1], cells[2]
+       if name.lower() == "product" or set(name) <= {"-", ":"}:
+           continue  # header / separator row
+       units = int(re.sub(r"[^0-9]", "", units_str))
+       revenue = int(re.sub(r"[^0-9]", "", revenue_str))
+       products.append({"name": name, "units_sold": units, "revenue_usd": revenue})
+
+   payload = {"products": products}
+   with open("sales.json", "w", encoding="utf-8") as f:
+       json.dump(payload, f, indent=2)
+   ```
+3. Execute the script with `python3 extract_sales.py` from `/home/user/sales_extraction`. The script will block until LlamaCloud finishes parsing and returns the result.
+4. Confirm that `sales.json` has been written.
+
+## Constraints
+- Project path: `/home/user/sales_extraction`
+- Input file: `/home/user/sales_extraction/quarterly_sales.pdf` (already provided)
+- Output file: `/home/user/sales_extraction/sales.json`
+- Script path: `/home/user/sales_extraction/extract_sales.py`
+- Use the `llama-cloud` SDK (the `LlamaCloud` client class). Do NOT call the REST API directly with `curl` or `requests`.
+- The script must rely on `LLAMA_CLOUD_API_KEY` from the environment, not hardcoded.
+- The JSON object must contain a top-level key `products` whose value is a list with exactly 4 entries; each entry must have the keys `name`, `units_sold`, and `revenue_usd` with the numeric fields as integers (not strings).
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires the `LLAMA_CLOUD_API_KEY` environment variable.
+8:T1943,# Extract a Resume to Structured JSON with LlamaExtract and a Pydantic Schema
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. In addition to LlamaParse (which converts visually rich documents to clean markdown), LlamaCloud also exposes **LlamaExtract**, a structured-data extraction API. Instead of returning markdown for you to post-process, LlamaExtract takes a **data schema** (defined as a Pydantic model or raw JSON Schema) and returns a structured object that conforms to it.
+
+The canonical pattern with the `llama-cloud` Python SDK is:
+
+1. Define a `pydantic.BaseModel` describing the fields you want.
+2. Upload the source document with `client.files.create(file=..., purpose="extract")`.
+3. Submit an extraction job with `client.extract.create(file_input=..., configuration={"data_schema": Model.model_json_schema(), "extraction_target": "per_doc", "tier": "agentic"})`.
+4. Poll `client.extract.get(job.id)` until `status` is `"COMPLETED"` (or `"FAILED"`/`"CANCELLED"`).
+5. Read `job.extract_result` (a dict matching your schema) and persist it as JSON.
+
+In this task you will build that pipeline end-to-end against a single resume document and persist the extracted structured output to disk.
+
+## Pre-existing Layout
+The project directory `/home/user/resume_extract` already contains exactly one file, `resume.txt`, with this content:
+
+```
+Candidate Name: Jane Doe
+Email: jane.doe@example.com
+Phone: 555-123-4567
+
+Technical Skills: Python, SQL, AWS, Docker, Kubernetes
+
+Experience:
+- Senior Software Engineer at AcmeCorp (2020-Present)
+- Software Engineer at Beta Inc (2018-2020)
+
+Education: BS Computer Science, MIT, 2018
+```
+
+## Requirements
+Create a Python script `/home/user/resume_extract/extract_resume.py` that:
+
+1. **Defines a Pydantic schema** named `Resume` at module top level. It MUST be a subclass of `pydantic.BaseModel` and contain exactly these three fields (use `pydantic.Field` with `description=...` so the LLM gets context):
+   - `name: str` — Full name of the candidate.
+   - `email: str` — Email address of the candidate.
+   - `skills: list[str]` — Technical skills and technologies mentioned in the resume.
+2. **Reads the API key** from the `LLAMA_CLOUD_API_KEY` environment variable. Do NOT hardcode the key. If the variable is unset or empty, exit with a non-zero status code and print an error to stderr.
+3. **Instantiates a client** via `from llama_cloud import LlamaCloud` and either `LlamaCloud()` (the SDK reads `LLAMA_CLOUD_API_KEY` from the environment automatically) or `LlamaCloud(api_key=os.environ["LLAMA_CLOUD_API_KEY"])`.
+4. **Uploads `resume.txt`** with `client.files.create(file="./resume.txt", purpose="extract")` and captures the returned `file_obj.id`.
+5. **Submits an extract job** with `client.extract.create(...)`:
+   - `file_input=<uploaded file id>`
+   - `configuration={"data_schema": Resume.model_json_schema(), "extraction_target": "per_doc", "tier": "agentic"}`
+6. **Polls** `client.extract.get(job.id)` in a loop, sleeping 2 seconds between iterations, until the job status is one of `"COMPLETED"`, `"FAILED"`, or `"CANCELLED"`. If the terminal status is not `"COMPLETED"`, exit with a non-zero status and print an error.
+7. **Serializes `job.extract_result`** (a `dict`) to `/home/user/resume_extract/extracted.json` as UTF-8, indented with 2 spaces. The JSON file must contain at least the keys `name`, `email`, and `skills` with values populated from the resume.
+
+## Implementation Guide
+1. `cd /home/user/resume_extract`.
+2. Create `extract_resume.py`. Reference implementation:
+   ```python
+   import json
+   import os
+   import sys
+   import time
+
+   from pydantic import BaseModel, Field
+   from llama_cloud import LlamaCloud
+
+
+   class Resume(BaseModel):
+       name: str = Field(description="Full name of the candidate")
+       email: str = Field(description="Email address of the candidate")
+       skills: list[str] = Field(
+           description="Technical skills and technologies mentioned in the resume"
+       )
+
+
+   def main() -> int:
+       api_key = os.environ.get("LLAMA_CLOUD_API_KEY", "").strip()
+       if not api_key:
+           print("LLAMA_CLOUD_API_KEY is not set", file=sys.stderr)
+           return 2
+
+       client = LlamaCloud()  # reads LLAMA_CLOUD_API_KEY from the environment
+
+       file_obj = client.files.create(file="./resume.txt", purpose="extract")
+
+       job = client.extract.create(
+           file_input=file_obj.id,
+           configuration={
+               "data_schema": Resume.model_json_schema(),
+               "extraction_target": "per_doc",
+               "tier": "agentic",
+           },
+       )
+
+       while job.status not in ("COMPLETED", "FAILED", "CANCELLED"):
+           time.sleep(2)
+           job = client.extract.get(job.id)
+
+       if job.status != "COMPLETED":
+           print(f"extract job ended with status: {job.status}", file=sys.stderr)
+           return 3
+
+       with open("/home/user/resume_extract/extracted.json", "w", encoding="utf-8") as f:
+           json.dump(job.extract_result, f, indent=2)
+       return 0
+
+
+   sys.exit(main())
+   ```
+3. Run the script:
+   ```bash
+   cd /home/user/resume_extract
+   python3 extract_resume.py
+   ```
+   The script will block until LlamaExtract finishes and returns the result. On success it creates `/home/user/resume_extract/extracted.json`.
+
+## Constraints
+- Project path: `/home/user/resume_extract`
+- Input file: `/home/user/resume_extract/resume.txt` (already provided — do NOT modify it)
+- Script path: `/home/user/resume_extract/extract_resume.py`
+- Output file: `/home/user/resume_extract/extracted.json`
+- Use the official `llama_cloud` Python SDK (`from llama_cloud import LlamaCloud`). Do NOT call the REST API directly with `curl`, `requests`, `httpx`, or `urllib.request`.
+- Use a Pydantic v2 `BaseModel` with `pydantic.Field` descriptions to define the schema. The configuration passed to `client.extract.create` must include `"data_schema": Resume.model_json_schema()`, `"extraction_target": "per_doc"`, and `"tier": "agentic"`.
+- Do NOT hardcode the API key — always read `LLAMA_CLOUD_API_KEY` from the environment.
+- `extracted.json` must be a valid JSON object containing the keys `name`, `email`, and `skills`. `skills` must be a non-empty JSON array of strings.
+
+## Integrations
+- LlamaCloud (LlamaExtract) — requires the `LLAMA_CLOUD_API_KEY` environment variable. The script makes real network calls to the LlamaExtract API.
+9:T114b,# Extract Every Table from a Multi-Page PDF to CSV with LlamaParse
+
+## Background
+You are building a financial data pipeline. Analysts need every table from a multi-page report exported as standalone CSV files (one CSV per table) so they can load them directly into pandas / a data warehouse. The team has chosen LlamaCloud's LlamaParse service because it returns structured `items` per page (headings, paragraphs, tables, etc.), so tables can be found and exported deterministically.
+
+A pre-existing multi-page PDF lives at `/home/user/myproject/quarterly_report.pdf`. It has 2 pages and each page contains a clearly tabular block:
+- Page 1: a quarterly revenue table with columns `Quarter`, `Revenue`, `Profit`.
+- Page 2: an employee headcount table with columns `Department`, `Headcount`, `Open Roles`.
+
+The Python packages `llama-cloud-services` and `llama-cloud` are already installed in the environment, and the API key is configured via the `LLAMA_CLOUD_API_KEY` environment variable.
+
+## Requirements
+- Implement a Python script at `/home/user/myproject/extract_tables.py`.
+- The script must use the LlamaCloud LlamaParse SDK (`llama_cloud.LlamaCloud` is recommended, but `llama_cloud_services.LlamaParse` is also acceptable) to parse `/home/user/myproject/quarterly_report.pdf` with the `items` view available (e.g. `tier="agentic"`, `version="latest"`, `expand=["items", "markdown"]`).
+- The script must walk every parsed page, collect every element whose type is `"table"`, and export each table to its own CSV file under the directory `/home/user/myproject/tables/`. Each CSV filename MUST follow the deterministic pattern `table_p{page:03d}_{i}.csv`, where `page` is the 1-indexed page the table was found on and `i` is the 0-indexed order of the table within that page (`table_p001_0.csv`, `table_p002_0.csv`, ...).
+- The script must also write a summary JSON file to `/home/user/myproject/tables_summary.json` with this exact top-level structure:
+  ```json
+  {
+    "source": "quarterly_report.pdf",
+    "table_count": <total number of tables found>,
+    "tables": [
+      {"page": <int>, "file": "table_pNNN_M.csv", "rows": <int>, "cols": <int>}
+    ]
+  }
+  ```
+  - `tables` MUST be a JSON list ordered by `(page ASC, file ASC)`.
+  - Each object MUST have an integer `page` (1-indexed), a string `file` matching the CSV filename written in `/home/user/myproject/tables/`, an integer `rows` (number of rows in that table, including header row if present), and an integer `cols` (number of columns).
+  - `table_count` MUST equal the length of `tables`.
+- Running the script must produce the CSV files and the summary JSON. Use `python3 extract_tables.py` as the entry point.
+
+## Implementation Guide
+1. Read the API key from the `LLAMA_CLOUD_API_KEY` environment variable (the SDK reads it automatically).
+2. Upload `/home/user/myproject/quarterly_report.pdf` via `client.files.create(file="...", purpose="parse")` and call `client.parsing.parse(file_id=..., tier="agentic", version="latest", expand=["items", "markdown"])`.
+3. Iterate `result.items.pages`; for each `page`, iterate `page.items`. Tables have `getattr(item, "type", None) == "table"` and expose a `csv` string field plus a `rows` field (a list of lists).
+4. Make sure the directory `/home/user/myproject/tables/` exists, then write `item.csv` to `/home/user/myproject/tables/table_p{page.page_number:03d}_{i}.csv` (UTF-8, no BOM). `i` is the order of the table within that page (start at 0).
+5. Compute the row count and column count for each table from `item.rows` (or by re-parsing the CSV with `csv.reader`) and append an entry to the summary list.
+6. Sort the summary list by `(page, file)` and serialize it as JSON to `/home/user/myproject/tables_summary.json` using `json.dump(... , indent=2)`.
+7. Execute the script once so that the output files exist when verification runs.
+
+## Constraints
+- Project path: /home/user/myproject
+- Output directory: /home/user/myproject/tables/
+- Summary file: /home/user/myproject/tables_summary.json
+- The script must perform a real LlamaParse API call — do not hardcode CSV contents, do not hand-write CSV from prior knowledge of the PDF.
+- Do not modify `/home/user/myproject/quarterly_report.pdf`.
+- The script must exit with code 0 when invoked as `python3 /home/user/myproject/extract_tables.py`.
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires `LLAMA_CLOUD_API_KEY` set in the environment.
+a:T222a,# Incremental Ingestion Plan for a LlamaCloud Index
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG platform. The `client.pipelines.files.create()` endpoint uses **additive/upsert semantics** — files NOT included in the request remain unchanged in the index, and files INCLUDED are added or re-indexed. To keep a managed index in sync with a local folder *cheaply*, you should only upsert files whose content has actually changed and only delete files that disappeared locally.
+
+In this task you will build the planning half of that workflow: a script that computes a content-addressed manifest of a local folder, diffs it against a prior manifest, and writes a structured `upload_plan.json` describing exactly which files to upload, update, delete, or skip. The script must also construct a `llama_cloud.LlamaCloud` client (sanity check that the SDK and API key are wired up correctly) but it MUST NOT make any network calls.
+
+## Pre-existing Layout
+
+The project directory `/home/user/incremental_ingest` already contains:
+
+```
+/home/user/incremental_ingest/
+├── data/
+│   ├── intro.txt        # content unchanged since last sync
+│   ├── glossary.txt     # content has been edited since last sync
+│   └── changelog.txt    # brand-new file, not in the prior manifest
+└── prior_manifest.json  # snapshot of the previous sync, contains entries for intro.txt, glossary.txt, and removed_doc.txt
+```
+
+The schema of `prior_manifest.json` is:
+```json
+{
+  "files": {
+    "<relative_path>": {"sha256": "<hex sha256>", "size": <int bytes>}
+  }
+}
+```
+
+`removed_doc.txt` exists ONLY in `prior_manifest.json` — there is NO physical file for it on disk anymore. Your script must treat that as a deletion.
+
+## Requirements
+
+Create the following inside `/home/user/incremental_ingest`:
+
+### 1. `sync.py`
+A standalone script that, when invoked as `python3 sync.py`, performs the following steps in order:
+
+1. **Validate environment**: Read `LLAMA_CLOUD_API_KEY` from `os.environ`. If the variable is unset or empty, exit with a non-zero status and print an error to stderr.
+2. **Sanity-check the SDK**: Construct a client via `from llama_cloud import LlamaCloud` and instantiate `LlamaCloud(token=<api_key>)`. Do NOT make any network calls (no `files.create`, no `pipelines.*`). The construction itself is what we are validating.
+3. **Scan local data**: Walk the directory `/home/user/incremental_ingest/data` recursively. For every regular file, compute its SHA-256 hex digest (lower-case) and its size in bytes. Use forward-slash-joined paths *relative to the data directory* as the file's key (e.g. `intro.txt`, not `/home/user/incremental_ingest/data/intro.txt`).
+4. **Write the current manifest**: Persist the new manifest to `/home/user/incremental_ingest/current_manifest.json` using exactly the same schema as `prior_manifest.json`:
+   ```json
+   {
+     "files": {
+       "<relative_path>": {"sha256": "<hex>", "size": <int>}
+     }
+   }
+   ```
+   The JSON file must be UTF-8 encoded, indented with 2 spaces, and `files` must be sorted alphabetically by key.
+5. **Compute the diff** against `/home/user/incremental_ingest/prior_manifest.json`:
+   - `added`: keys present in the current manifest but absent from the prior manifest.
+   - `modified`: keys present in BOTH manifests but with a different `sha256`.
+   - `removed`: keys present in the prior manifest but absent from the current manifest.
+   - `unchanged`: keys present in both manifests with identical `sha256`.
+6. **Write the upload plan** to `/home/user/incremental_ingest/upload_plan.json` with the following exact schema:
+   ```json
+   {
+     "to_upload": ["<relative_path>", ...],   // sorted union of added + modified
+     "to_delete": ["<relative_path>", ...],   // sorted list of removed
+     "unchanged": ["<relative_path>", ...],   // sorted list of unchanged
+     "added": ["<relative_path>", ...],       // sorted list of added (subset of to_upload)
+     "modified": ["<relative_path>", ...],    // sorted list of modified (subset of to_upload)
+     "summary": {
+       "added": <int>,
+       "modified": <int>,
+       "removed": <int>,
+       "unchanged": <int>,
+       "total_current": <int>,    // number of files in current_manifest
+       "total_prior": <int>       // number of files in prior_manifest
+     }
+   }
+   ```
+   Every list MUST be sorted alphabetically. The JSON file must be UTF-8 encoded and indented with 2 spaces.
+7. **Print a one-line summary** to stdout in this exact format (do not change spacing or wording):
+   ```
+   added=<N> modified=<N> removed=<N> unchanged=<N>
+   ```
+
+## Implementation Guide
+
+1. `cd /home/user/incremental_ingest`.
+2. Create `sync.py`. A reference implementation:
+   ```python
+   import hashlib
+   import json
+   import os
+   import sys
+
+   from llama_cloud import LlamaCloud
+
+   DATA_DIR = "/home/user/incremental_ingest/data"
+   PRIOR_PATH = "/home/user/incremental_ingest/prior_manifest.json"
+   CURRENT_PATH = "/home/user/incremental_ingest/current_manifest.json"
+   PLAN_PATH = "/home/user/incremental_ingest/upload_plan.json"
+
+
+   def sha256_of_file(path: str) -> str:
+       h = hashlib.sha256()
+       with open(path, "rb") as f:
+           for chunk in iter(lambda: f.read(65536), b""):
+               h.update(chunk)
+       return h.hexdigest()
+
+
+   def build_manifest(root: str) -> dict:
+       files = {}
+       for dirpath, _dirnames, filenames in os.walk(root):
+           for name in filenames:
+               abs_path = os.path.join(dirpath, name)
+               rel = os.path.relpath(abs_path, root).replace(os.sep, "/")
+               files[rel] = {
+                   "sha256": sha256_of_file(abs_path),
+                   "size": os.path.getsize(abs_path),
+               }
+       return {"files": dict(sorted(files.items()))}
+
+
+   def main() -> int:
+       api_key = os.environ.get("LLAMA_CLOUD_API_KEY", "").strip()
+       if not api_key:
+           print("LLAMA_CLOUD_API_KEY is not set", file=sys.stderr)
+           return 2
+
+       # Sanity-check the SDK — do NOT make any network calls.
+       _client = LlamaCloud(token=api_key)
+
+       current = build_manifest(DATA_DIR)
+       with open(CURRENT_PATH, "w", encoding="utf-8") as f:
+           json.dump(current, f, indent=2)
+
+       with open(PRIOR_PATH, "r", encoding="utf-8") as f:
+           prior = json.load(f)
+
+       cur_files = current["files"]
+       old_files = prior.get("files", {})
+
+       added = sorted(set(cur_files) - set(old_files))
+       removed = sorted(set(old_files) - set(cur_files))
+       common = set(cur_files) & set(old_files)
+       modified = sorted(
+           k for k in common if cur_files[k]["sha256"] != old_files[k]["sha256"]
+       )
+       unchanged = sorted(
+           k for k in common if cur_files[k]["sha256"] == old_files[k]["sha256"]
+       )
+
+       to_upload = sorted(set(added) | set(modified))
+
+       plan = {
+           "to_upload": to_upload,
+           "to_delete": removed,
+           "unchanged": unchanged,
+           "added": added,
+           "modified": modified,
+           "summary": {
+               "added": len(added),
+               "modified": len(modified),
+               "removed": len(removed),
+               "unchanged": len(unchanged),
+               "total_current": len(cur_files),
+               "total_prior": len(old_files),
+           },
+       }
+       with open(PLAN_PATH, "w", encoding="utf-8") as f:
+           json.dump(plan, f, indent=2)
+
+       print(
+           f"added={len(added)} modified={len(modified)} removed={len(removed)} unchanged={len(unchanged)}"
+       )
+       return 0
+
+
+   sys.exit(main())
+   ```
+3. Run the script:
+   ```bash
+   cd /home/user/incremental_ingest
+   python3 sync.py
+   ```
+   This must produce both `current_manifest.json` and `upload_plan.json`.
+
+## Constraints
+- Project path: `/home/user/incremental_ingest`
+- Script path: `/home/user/incremental_ingest/sync.py`
+- Output files: `/home/user/incremental_ingest/current_manifest.json` and `/home/user/incremental_ingest/upload_plan.json`
+- Use the official `llama_cloud` Python SDK (`from llama_cloud import LlamaCloud`). Do NOT call any LlamaCloud HTTP endpoint via `requests` or `curl`.
+- Do NOT hardcode the API key — always read `LLAMA_CLOUD_API_KEY` from the environment.
+- All file keys in the manifests and in `upload_plan.json` must be POSIX-style relative paths (use `/`, never `\\`).
+- All list fields inside `upload_plan.json` MUST be sorted alphabetically.
+- SHA-256 digests MUST be lower-case hex.
+- The script must not make any network calls to LlamaCloud.
+
+## Integrations
+- LlamaCloud — requires the `LLAMA_CLOUD_API_KEY` environment variable (any non-empty string is acceptable; no outbound network call is made).
+b:T11d5,# Parse a PDF Once, then Retrieve Plain Text from the Same Job
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. Its `llama-cloud` Python SDK exposes LlamaParse, an agentic document parser. A powerful — and often overlooked — capability is that **parse results are persisted on the server**: you can run a parse job once with a minimal `expand` list (saving response size and download time), and then later call `client.parsing.get(job_id=..., expand=[...])` to retrieve *additional* representations of the same job (markdown, plain text, items, etc.) **without re-parsing the file**.
+
+In this task you must implement this two-stage retrieval pattern: parse the PDF once for full markdown, persist the `job_id`, and then make a second call against the same `job_id` to fetch the full plain-text rendering of the same job. This avoids paying for parsing twice when downstream consumers need both markdown and plain text.
+
+## Requirements
+Create a single Python script at `/home/user/llama_task/parse_and_retrieve.py` that:
+
+1. Imports the `LlamaCloud` client from the `llama_cloud` SDK (i.e. `from llama_cloud import LlamaCloud`).
+2. Authenticates using the `LLAMA_CLOUD_API_KEY` environment variable. Instantiate `LlamaCloud()` with no arguments — the SDK reads the key from the environment automatically. **Do NOT hardcode the API key in the script.**
+3. Stage 1 — Parse:
+   - Uploads `/home/user/llama_task/report.pdf` with `client.files.create(file="./report.pdf", purpose="parse")`.
+   - Calls `client.parsing.parse(file_id=<uploaded.id>, tier="agentic", version="latest", expand=["markdown_full"])`. The SDK blocks until the job finishes.
+   - Writes the parsed full markdown (`result.markdown_full`) to `/home/user/llama_task/output.md` (UTF-8).
+   - Writes the parse job's id (`result.job.id`) to `/home/user/llama_task/job_id.txt` (UTF-8, no trailing newline required).
+4. Stage 2 — Retrieve text from the same job (without re-parsing):
+   - Calls `client.parsing.get(job_id=<result.job.id>, expand=["text_full"])`.
+   - Writes the returned plain text (`text_result.text_full`) to `/home/user/llama_task/output.txt` (UTF-8).
+5. The script must NOT upload `report.pdf` a second time and must NOT call `client.parsing.parse(...)` a second time. The plain text MUST come from `client.parsing.get(...)` against the previously-obtained `job_id`.
+
+## Implementation Guide
+1. `cd /home/user/llama_task`.
+2. Create `parse_and_retrieve.py` with logic similar to:
+   ```python
+   from llama_cloud import LlamaCloud
+
+   client = LlamaCloud()  # reads LLAMA_CLOUD_API_KEY from the environment
+
+   # Stage 1: upload + parse, asking only for full markdown
+   uploaded = client.files.create(file="./report.pdf", purpose="parse")
+   result = client.parsing.parse(
+       file_id=uploaded.id,
+       tier="agentic",
+       version="latest",
+       expand=["markdown_full"],
+   )
+
+   job_id = result.job.id
+   with open("output.md", "w", encoding="utf-8") as f:
+       f.write(result.markdown_full)
+   with open("job_id.txt", "w", encoding="utf-8") as f:
+       f.write(job_id)
+
+   # Stage 2: retrieve a different representation of the SAME job, no re-parsing
+   text_result = client.parsing.get(job_id=job_id, expand=["text_full"])
+   with open("output.txt", "w", encoding="utf-8") as f:
+       f.write(text_result.text_full)
+   ```
+3. Run the script once: `python3 parse_and_retrieve.py`.
+4. Confirm that `output.md`, `output.txt`, and `job_id.txt` were all written in `/home/user/llama_task`.
+
+## Constraints
+- Project path: `/home/user/llama_task`
+- Input file: `/home/user/llama_task/report.pdf` (already provided)
+- Script path: `/home/user/llama_task/parse_and_retrieve.py`
+- Output files (all UTF-8):
+  - `/home/user/llama_task/output.md` — full markdown (from `result.markdown_full`)
+  - `/home/user/llama_task/output.txt` — full plain text (from `text_result.text_full` returned by `client.parsing.get`)
+  - `/home/user/llama_task/job_id.txt` — the parse job id returned by stage 1
+- Use the `llama-cloud` SDK (`from llama_cloud import LlamaCloud`). Do NOT call the REST API directly with `curl`, `requests`, or `httpx`.
+- The script must rely on `LLAMA_CLOUD_API_KEY` from the environment — no hardcoded `llx-...` literal.
+- `client.parsing.parse(...)` MUST be invoked exactly once. The plain-text rendering MUST come from `client.parsing.get(job_id=..., expand=["text_full"])` against the job returned by stage 1.
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires the `LLAMA_CLOUD_API_KEY` environment variable.
+c:Tc62,# Parse a Multi-Page PDF to Per-Page JSON with LlamaParse
+
+## Background
+You are building an ingestion pipeline that needs page-level granularity for downstream chunking and citation. Plain combined Markdown is not enough — each page must remain individually addressable so that retrieval results can cite specific pages of the source document. The team uses LlamaCloud's LlamaParse service.
+
+A pre-existing multi-page PDF is available at `/home/user/myproject/report.pdf` (3 pages). The Python packages `llama-cloud-services` and `llama-cloud` are pre-installed, and the API key is available via the `LLAMA_CLOUD_API_KEY` environment variable.
+
+## Requirements
+- Implement a Python script at `/home/user/myproject/parse_pages.py`.
+- The script must call the LlamaCloud LlamaParse SDK (either `llama_cloud_services.LlamaParse` or the `llama_cloud.LlamaCloud` client) to parse `/home/user/myproject/report.pdf` with Markdown output.
+- The script must write the per-page parsed Markdown to `/home/user/myproject/pages.json` as a JSON document with this exact top-level structure:
+  ```json
+  {
+    "source": "report.pdf",
+    "page_count": <total number of pages>,
+    "pages": [
+      {"page": 1, "markdown": "...page 1 markdown..."},
+      {"page": 2, "markdown": "...page 2 markdown..."},
+      {"page": 3, "markdown": "...page 3 markdown..."}
+    ]
+  }
+  ```
+  - `pages` MUST be a JSON list of objects.
+  - Each object MUST have an integer `page` field that is 1-indexed and matches the page number, and a non-empty string `markdown` field with that page's parsed content.
+  - `pages` MUST be ordered by ascending page number (1, 2, 3).
+  - `page_count` MUST equal the length of `pages`.
+- Running the script must produce the JSON file. Use `python3 parse_pages.py` as the entry point.
+
+## Implementation Guide
+1. Read the API key from the `LLAMA_CLOUD_API_KEY` environment variable (the SDK reads it automatically).
+2. Parse `/home/user/myproject/report.pdf` with LlamaParse and request per-page Markdown output. Two valid approaches:
+   - `llama_cloud_services.LlamaParse(result_type="markdown").load_data("/home/user/myproject/report.pdf")` returns one `Document` per page; use `documents[i].text` and 1-indexed page numbers.
+   - `llama_cloud.LlamaCloud()` with `client.files.create(...)` and `client.parsing.parse(file_id=..., tier="agentic", version="latest", expand=["markdown"])`; the result exposes `result.markdown.pages`, each having a `markdown` attribute.
+3. Build the JSON structure described above, ordered by ascending page number.
+4. Write it to `/home/user/myproject/pages.json` using `json.dump(...)` with UTF-8 encoding.
+5. Execute the script once so that `pages.json` exists when verification runs.
+
+## Constraints
+- Project path: /home/user/myproject
+- Output file: /home/user/myproject/pages.json
+- The script must perform a real LlamaParse API call — do not hardcode the Markdown content.
+- Do not modify `/home/user/myproject/report.pdf`.
+- The script must exit with code 0 when invoked as `python3 /home/user/myproject/parse_pages.py`.
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires `LLAMA_CLOUD_API_KEY` set in the environment.
+d:Tf03,# Preserve Hyperlink Destinations When Parsing a PDF with LlamaParse (`annotate_links`)
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. Its agentic document parser, LlamaParse, converts visually rich PDFs into clean markdown. By default LlamaParse renders link **anchor text** in the markdown output, but the underlying URLs are dropped — which is unhelpful for downstream RAG pipelines that want to retain citations and follow-up references.
+
+Flipping `output_options.markdown.annotate_links` to `True` instructs LlamaParse to preserve link destinations in the rendered markdown (so a hyperlink that says "Visit our docs" pointing at `https://example.com/docs` is rendered as a markdown link such as `[Visit our docs](https://example.com/docs)` instead of plain text).
+
+In this task you must build a small pipeline that parses a single-page PDF containing two embedded hyperlinks and writes the link-annotated markdown to disk so the URLs are retained.
+
+## Requirements
+Write a Python script `parse_with_links.py` that uses the `llama-cloud` SDK (`from llama_cloud import LlamaCloud`) to:
+  1. Upload the local PDF `references.pdf` to LlamaCloud with `purpose="parse"`.
+  2. Submit a parse job with all of the following options:
+     - `tier="agentic"`
+     - `version="latest"`
+     - `output_options={"markdown": {"annotate_links": True}}` (so the URL of every hyperlink in the PDF is preserved in the rendered markdown)
+     - `expand=["markdown"]`
+  3. Concatenate the `markdown` field of every page returned by the parser (`result.markdown.pages`) in order, using a single newline as the separator between pages.
+  4. Write that concatenated markdown to `links_output.md` in the same directory (UTF-8 encoded).
+
+The script must authenticate via the `LLAMA_CLOUD_API_KEY` environment variable (the SDK reads it automatically when `LlamaCloud()` is instantiated with no arguments). Do NOT hardcode an API key.
+
+## Implementation Guide
+1. Change into the project directory `/home/user/links_task`.
+2. Create `parse_with_links.py` with logic similar to:
+   ```python
+   from llama_cloud import LlamaCloud
+
+   client = LlamaCloud()  # reads LLAMA_CLOUD_API_KEY from the environment
+   uploaded = client.files.create(file="./references.pdf", purpose="parse")
+   result = client.parsing.parse(
+       file_id=uploaded.id,
+       tier="agentic",
+       version="latest",
+       output_options={
+           "markdown": {"annotate_links": True},
+       },
+       expand=["markdown"],
+   )
+
+   parts = [(p.markdown or "") for p in result.markdown.pages]
+   combined = "\n".join(parts)
+   with open("links_output.md", "w", encoding="utf-8") as f:
+       f.write(combined)
+   ```
+3. Execute the script with `python3 parse_with_links.py` from `/home/user/links_task`. The script will block until LlamaCloud finishes parsing and then writes the markdown file.
+4. Confirm that `links_output.md` has been written.
+
+## Constraints
+- Project path: `/home/user/links_task`
+- Input file: `/home/user/links_task/references.pdf` (already provided — a 1-page PDF with two embedded hyperlinks)
+- Output file: `/home/user/links_task/links_output.md`
+- Script path: `/home/user/links_task/parse_with_links.py`
+- Use the `llama-cloud` SDK (the `LlamaCloud` client class). Do NOT call the REST API directly with `curl` or `requests`.
+- The parse call MUST pass `output_options` with `markdown.annotate_links` set to `True`. This is the documented switch that preserves link destinations in the rendered markdown.
+- The script must rely on `LLAMA_CLOUD_API_KEY` from the environment, not hardcoded.
+- The resulting `links_output.md` must preserve both source URLs verbatim: `https://example.com/docs` and `https://llamaindex.ai`.
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires the `LLAMA_CLOUD_API_KEY` environment variable.
+e:Ta16,# Parse a PDF Report to Markdown with LlamaParse
+
+## Background
+LlamaCloud is LlamaIndex's managed platform for production-grade document parsing and retrieval. Its `llama-cloud` Python SDK exposes LlamaParse, an agentic document parser that turns PDFs into clean, structured markdown that downstream RAG pipelines can consume.
+
+In this task you must build a small parsing pipeline that takes a pre-existing PDF report and produces a markdown rendering of its first page using the LlamaCloud SDK.
+
+## Requirements
+- Write a Python script `parse_report.py` that uses the `llama-cloud` SDK (`from llama_cloud import LlamaCloud`) to:
+  1. Upload the local PDF `report.pdf` to LlamaCloud with `purpose="parse"`.
+  2. Submit a parse job using `tier="agentic"`, `version="latest"`, and `expand=["markdown"]`.
+  3. Read the markdown text for the first page of the parsed result (i.e. `result.markdown.pages[0].markdown`).
+  4. Write that markdown text to `output.md` in the same directory.
+- The script must authenticate using the `LLAMA_CLOUD_API_KEY` environment variable (the SDK reads it automatically when `LlamaCloud()` is instantiated with no arguments).
+- Running the script must produce a non-empty `output.md`.
+
+## Implementation Guide
+1. Change into the project directory `/home/user/llama_task`.
+2. Create `parse_report.py` with logic similar to:
+   ```python
+   from llama_cloud import LlamaCloud
+
+   client = LlamaCloud()  # reads LLAMA_CLOUD_API_KEY from the environment
+   uploaded = client.files.create(file="./report.pdf", purpose="parse")
+   result = client.parsing.parse(
+       file_id=uploaded.id,
+       tier="agentic",
+       version="latest",
+       expand=["markdown"],
+   )
+   first_page_md = result.markdown.pages[0].markdown
+   with open("output.md", "w", encoding="utf-8") as f:
+       f.write(first_page_md)
+   ```
+3. Execute the script with `python3 parse_report.py` from `/home/user/llama_task`. The script will block until LlamaCloud finishes parsing and returns the result.
+4. Confirm that `output.md` was written.
+
+## Constraints
+- Project path: `/home/user/llama_task`
+- Input file: `/home/user/llama_task/report.pdf` (already provided)
+- Output file: `/home/user/llama_task/output.md`
+- Script path: `/home/user/llama_task/parse_report.py`
+- Use the `llama-cloud` SDK (the `LlamaCloud` client class). Do NOT call the REST API directly with `curl` or `requests`.
+- The script must rely on `LLAMA_CLOUD_API_KEY` from the environment, not hardcoded.
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires the `LLAMA_CLOUD_API_KEY` environment variable.
+f:Te69,# Parse Only Specific Pages of a PDF with LlamaParse (`page_ranges.target_pages`)
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. Its agentic document parser, LlamaParse, turns visually rich PDFs into clean markdown. By default LlamaParse parses every page of a document, which is wasteful when you only need a subset. For partial parses, the `parsing.parse` API accepts a top-level `page_ranges` argument with a `target_pages` field that takes a comma-separated string of **1-based** page numbers and ranges (e.g. `"1,3,7-12"`). Pages outside of that selection are skipped entirely and their content does not appear in the result.
+
+In this task you must build a small parsing pipeline that takes a pre-existing 4-page PDF (`catalog.pdf`) and parses only **pages 1 and 3** using the `llama-cloud` Python SDK, then writes the combined markdown text of those two pages to `selected_pages.md`.
+
+## Requirements
+Write a Python script `parse_selected.py` that uses the `llama-cloud` SDK (`from llama_cloud import LlamaCloud`) to:
+  1. Upload the local PDF `catalog.pdf` to LlamaCloud with `purpose="parse"`.
+  2. Submit a parse job with all of the following options:
+     - `tier="agentic"`
+     - `version="latest"`
+     - `page_ranges={"target_pages": "1,3"}` (LlamaParse must only parse pages 1 and 3)
+     - `expand=["markdown"]`
+  3. Concatenate the `markdown` field of every page returned by the parser (`result.markdown.pages`) in order, using a single newline as the separator between pages.
+  4. Write that concatenated markdown to `selected_pages.md` in the same directory (UTF-8 encoded).
+
+The script must authenticate via the `LLAMA_CLOUD_API_KEY` environment variable (the SDK reads it automatically when `LlamaCloud()` is instantiated with no arguments). Do NOT hardcode an API key.
+
+## Implementation Guide
+1. Change into the project directory `/home/user/catalog_task`.
+2. Create `parse_selected.py` with logic similar to:
+   ```python
+   from llama_cloud import LlamaCloud
+
+   client = LlamaCloud()  # reads LLAMA_CLOUD_API_KEY from the environment
+   uploaded = client.files.create(file="./catalog.pdf", purpose="parse")
+   result = client.parsing.parse(
+       file_id=uploaded.id,
+       tier="agentic",
+       version="latest",
+       page_ranges={"target_pages": "1,3"},
+       expand=["markdown"],
+   )
+
+   parts = [(p.markdown or "") for p in result.markdown.pages]
+   combined = "\n".join(parts)
+   with open("selected_pages.md", "w", encoding="utf-8") as f:
+       f.write(combined)
+   ```
+3. Execute the script with `python3 parse_selected.py` from `/home/user/catalog_task`. The script will block until LlamaCloud finishes parsing and then writes the markdown file.
+4. Confirm that `selected_pages.md` has been written.
+
+## Constraints
+- Project path: `/home/user/catalog_task`
+- Input file: `/home/user/catalog_task/catalog.pdf` (already provided — a 4-page PDF)
+- Output file: `/home/user/catalog_task/selected_pages.md`
+- Script path: `/home/user/catalog_task/parse_selected.py`
+- Use the `llama-cloud` SDK (the `LlamaCloud` client class). Do NOT call the REST API directly with `curl` or `requests`.
+- The parse call MUST pass `page_ranges` with `target_pages="1,3"`. Do NOT pass `target_pages` as a top-level keyword argument; it belongs inside `page_ranges`.
+- The script must rely on `LLAMA_CLOUD_API_KEY` from the environment, not hardcoded.
+- The output `selected_pages.md` must only contain content from pages 1 and 3 of the source PDF. Content unique to pages 2 and 4 (the words `Bracket` and `Dynamo`) must NOT appear.
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires the `LLAMA_CLOUD_API_KEY` environment variable.
+10:T1486,# Region-Aware LlamaCloud Client Factory
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. It is deployed in two regions:
+
+| Region | API base URL |
+| --- | --- |
+| North America (NA) | `https://api.cloud.llamaindex.ai` |
+| Europe (EU) | `https://api.cloud.eu.llamaindex.ai` |
+
+The `llama_cloud` Python SDK's `LlamaCloud` client defaults to the NA endpoint. If your organization (and your API key) live in EU, you **must** pass `base_url='https://api.cloud.eu.llamaindex.ai'` when constructing the client, otherwise every request will fail with an authentication error. This is one of the most common LlamaCloud setup mistakes.
+
+In this task you will build a small, region-aware client factory and a runner script that resolves the right base URL based on a `region` argument and constructs a properly-configured `LlamaCloud` client.
+
+## Requirements
+Create two files inside the project directory `/home/user/region_setup`:
+
+### 1. `client_factory.py`
+A reusable module that defines all of the following at module top level:
+
+- A constant `NA_BASE_URL` set to the string `"https://api.cloud.llamaindex.ai"`.
+- A constant `EU_BASE_URL` set to the string `"https://api.cloud.eu.llamaindex.ai"`.
+- A function `resolve_base_url(region: str) -> str` that:
+  - Returns `EU_BASE_URL` when `region` (stripped and lower-cased) is exactly the string `"eu"`.
+  - Returns `NA_BASE_URL` for any other input (e.g. `"na"`, `"us"`, `"NA"`, `"default"`, or an empty string).
+- A function `make_client(region: str) -> LlamaCloud` that:
+  - Imports `LlamaCloud` from the `llama_cloud` SDK (i.e. `from llama_cloud import LlamaCloud`).
+  - Reads the API key from the `LLAMA_CLOUD_API_KEY` environment variable (do NOT hardcode it; use `os.environ["LLAMA_CLOUD_API_KEY"]`).
+  - Calls `resolve_base_url(region)` to pick the correct base URL.
+  - Returns `LlamaCloud(token=<api_key>, base_url=<base_url>)`.
+
+### 2. `run.py`
+A runner script that exercises the factory:
+
+- It takes a single positional command-line argument: the region string (`sys.argv[1]`).
+- It imports `make_client` and `resolve_base_url` from `client_factory`.
+- It calls `make_client(region)` (which sanity-checks that the client can be constructed).
+- It builds a JSON payload of the form:
+  ```json
+  {
+    "region": "<input region>",
+    "base_url": "<resolved base url>",
+    "client_type": "<class name of the returned client>"
+  }
+  ```
+  where `client_type` must equal `"LlamaCloud"` (i.e. `type(client).__name__`).
+- It writes that payload to a file named `resolved_<region>.json` inside `/home/user/region_setup`, encoded as UTF-8 with `indent=2`.
+
+## Implementation Guide
+1. `cd /home/user/region_setup`.
+2. Create `client_factory.py` with the constants and the two functions described above. Reference implementation:
+   ```python
+   import os
+   from llama_cloud import LlamaCloud
+
+   NA_BASE_URL = "https://api.cloud.llamaindex.ai"
+   EU_BASE_URL = "https://api.cloud.eu.llamaindex.ai"
+
+   def resolve_base_url(region: str) -> str:
+       if (region or "").strip().lower() == "eu":
+           return EU_BASE_URL
+       return NA_BASE_URL
+
+   def make_client(region: str) -> LlamaCloud:
+       api_key = os.environ["LLAMA_CLOUD_API_KEY"]
+       base_url = resolve_base_url(region)
+       return LlamaCloud(token=api_key, base_url=base_url)
+   ```
+3. Create `run.py`:
+   ```python
+   import json
+   import os
+   import sys
+
+   from client_factory import make_client, resolve_base_url
+
+
+   def main() -> None:
+       region = sys.argv[1]
+       client = make_client(region)
+       payload = {
+           "region": region,
+           "base_url": resolve_base_url(region),
+           "client_type": type(client).__name__,
+       }
+       out_path = os.path.join(
+           os.path.dirname(os.path.abspath(__file__)),
+           f"resolved_{region}.json",
+       )
+       with open(out_path, "w", encoding="utf-8") as f:
+           json.dump(payload, f, indent=2)
+
+
+   main()
+   ```
+4. Run the script once for each region:
+   ```bash
+   python3 run.py na
+   python3 run.py eu
+   ```
+   This must produce both `resolved_na.json` and `resolved_eu.json` in `/home/user/region_setup`.
+
+## Constraints
+- Project path: `/home/user/region_setup`
+- Module path: `/home/user/region_setup/client_factory.py`
+- Runner path: `/home/user/region_setup/run.py`
+- Output files: `/home/user/region_setup/resolved_na.json` and `/home/user/region_setup/resolved_eu.json`
+- Use the official `llama_cloud` SDK (import `from llama_cloud import LlamaCloud`). Do NOT call the REST API directly with `curl` or `requests`.
+- Do NOT hardcode the API key — always read `LLAMA_CLOUD_API_KEY` from the environment.
+- The base URLs in `client_factory.py` must be exact string literals (no trailing slash, no `http://`):
+  - `NA_BASE_URL == "https://api.cloud.llamaindex.ai"`
+  - `EU_BASE_URL == "https://api.cloud.eu.llamaindex.ai"`
+- Region matching in `resolve_base_url` must be case-insensitive but only the literal `"eu"` (after `strip().lower()`) selects EU. All other inputs MUST fall back to NA.
+
+## Integrations
+- LlamaCloud — requires the `LLAMA_CLOUD_API_KEY` environment variable (any non-empty string is acceptable for construction; no network call is made during client instantiation).
+11:T16a8,# Summarize a Multi-Page PDF with LlamaParse Using HTML Table Output
+
+## Background
+LlamaCloud is LlamaIndex's managed RAG-as-a-Service platform. Its agentic document parser, LlamaParse, turns visually rich PDFs (including tables) into clean markdown. By default, LlamaParse renders tables in pipe-table markdown form, but you can flip the `output_options.markdown.tables.output_tables_as_markdown` flag to `false` to receive HTML `<table>` blocks instead — useful when a downstream pipeline expects raw HTML for richer rendering or further parsing.
+
+In this task you will build a small pipeline that parses a multi-page operations report, asks LlamaParse to emit tables as HTML, then walks every page of the parsed result and writes a single structured `summary.json` describing the document. This is more complex than a basic parse-to-markdown task because it requires (1) configuring `output_options` on the parse call, (2) iterating over every page of the result, and (3) building an aggregate summary object.
+
+## Requirements
+Write a Python script `summarize_report.py` that uses the `llama-cloud` SDK (`from llama_cloud import LlamaCloud`) to:
+  1. Upload the local PDF `operations_report.pdf` to LlamaCloud with `purpose="parse"`.
+  2. Submit a parse job with all of the following options:
+     - `tier="agentic"`
+     - `version="latest"`
+     - `output_options={"markdown": {"tables": {"output_tables_as_markdown": False}}}` (so tables come back as HTML `<table>` blocks instead of pipe-table markdown)
+     - `expand=["markdown"]`
+  3. Iterate over every page returned by the parser (`result.markdown.pages`). For each page, build a record with:
+     - `page_number` (1-based integer matching the page index in the source PDF)
+     - `word_count` (integer — number of whitespace-separated tokens in that page's markdown text)
+     - `has_html_table` (boolean — `True` iff the page's markdown contains an HTML opening table tag, i.e. the substring `<table` is present, case-insensitive)
+  4. Collect the markdown text of every page that contains an HTML table into a separate top-level list `html_tables` (preserving page order).
+  5. Assemble and write a single JSON file `summary.json` (UTF-8, `indent=2`) with the exact shape:
+     ```json
+     {
+       "total_pages": <int>,
+       "pages": [
+         {"page_number": 1, "word_count": <int>, "has_html_table": <bool>},
+         {"page_number": 2, "word_count": <int>, "has_html_table": <bool>},
+         {"page_number": 3, "word_count": <int>, "has_html_table": <bool>}
+       ],
+       "html_tables": ["<table>...</table>", "<table>...</table>"]
+     }
+     ```
+
+The script must authenticate via the `LLAMA_CLOUD_API_KEY` environment variable (the SDK reads it automatically when `LlamaCloud()` is instantiated with no arguments). Do NOT hardcode an API key.
+
+## Implementation Guide
+1. Change into the project directory `/home/user/ops_report`.
+2. Create `summarize_report.py` with logic similar to:
+   ```python
+   import json
+   from llama_cloud import LlamaCloud
+
+   client = LlamaCloud()  # reads LLAMA_CLOUD_API_KEY from the environment
+   uploaded = client.files.create(file="./operations_report.pdf", purpose="parse")
+   result = client.parsing.parse(
+       file_id=uploaded.id,
+       tier="agentic",
+       version="latest",
+       output_options={
+           "markdown": {
+               "tables": {"output_tables_as_markdown": False},
+           },
+       },
+       expand=["markdown"],
+   )
+
+   pages_meta = []
+   html_tables = []
+   for idx, page in enumerate(result.markdown.pages, start=1):
+       md = page.markdown or ""
+       has_table = "<table" in md.lower()
+       pages_meta.append({
+           "page_number": idx,
+           "word_count": len(md.split()),
+           "has_html_table": has_table,
+       })
+       if has_table:
+           html_tables.append(md)
+
+   payload = {
+       "total_pages": len(pages_meta),
+       "pages": pages_meta,
+       "html_tables": html_tables,
+   }
+   with open("summary.json", "w", encoding="utf-8") as f:
+       json.dump(payload, f, indent=2)
+   ```
+3. Execute the script with `python3 summarize_report.py` from `/home/user/ops_report`. The script will block until LlamaCloud finishes parsing and then writes the JSON file.
+4. Confirm that `summary.json` has been written.
+
+## Constraints
+- Project path: `/home/user/ops_report`
+- Input file: `/home/user/ops_report/operations_report.pdf` (already provided — a 3-page PDF; page 1 is a text-only introduction, pages 2 and 3 each contain a table)
+- Output file: `/home/user/ops_report/summary.json`
+- Script path: `/home/user/ops_report/summarize_report.py`
+- Use the `llama-cloud` SDK (the `LlamaCloud` client class). Do NOT call the REST API directly with `curl` or `requests`.
+- The parse call MUST pass `output_options` with `markdown.tables.output_tables_as_markdown` set to `False` (this is what makes LlamaParse emit `<table>` HTML for tables).
+- The script must rely on `LLAMA_CLOUD_API_KEY` from the environment, not hardcoded.
+- `summary.json` must contain exactly three top-level keys: `total_pages`, `pages`, `html_tables`.
+- `total_pages` must be the integer `3`.
+- `pages` must be a list of exactly 3 entries, each with the keys `page_number`, `word_count`, `has_html_table`; `page_number` values must be `1`, `2`, `3` in order; `word_count` values must be positive integers; `has_html_table` values must be booleans (not strings).
+- The `has_html_table` flag for page 1 must be `false`; for pages 2 and 3 it must be `true`.
+- `html_tables` must be a list with exactly 2 entries (one for page 2 and one for page 3, in page order). Each entry must contain the substring `<table` (case-insensitive).
+
+## Integrations
+- LlamaCloud (LlamaParse) — requires the `LLAMA_CLOUD_API_KEY` environment variable.
+0:{"buildId":"TAUH9YdrvKzHc7YDQXOzR","rsc":["$","$1","c",{"children":[["$","div",null,{"className":"min-h-screen bg-background text-foreground font-sans selection:bg-primary/20","children":[["$","div",null,{"className":"fixed inset-0 -z-10 h-full w-full bg-background bg-[radial-gradient(#2a2a2a_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20 dark:opacity-40"}],["$","$L2",null,{"tasksData":[{"taskName":"async_batch_parse_to_markdown","instruction":"$3","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"async_batch_parse_to_markdown__DbcARHY","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":217.752,"latency_breakdown":{"env_setup":88.04,"agent_setup":41.112,"agent_exec":47.859,"verifier":16.13},"taskName":"async_batch_parse_to_markdown","jobId":"DbcARHY","exec_duration":47.859}]},{"taskName":"build_parse_request_payload","instruction":"$4","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"build_parse_request_payload__zaagmTP","model":"gemini-3-flash","agent":"Pochi","passed":false,"reward":0,"error":false,"latency_sec":245.1,"latency_breakdown":{"env_setup":40.262,"agent_setup":36.272,"agent_exec":129.875,"verifier":16.376},"taskName":"build_parse_request_payload","jobId":"zaagmTP","exec_duration":129.875}]},{"taskName":"build_pdf_structure_inventory","instruction":"$5","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"build_pdf_structure_inventory__VJ6Wvpb","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":278.805,"latency_breakdown":{"env_setup":80.057,"agent_setup":36.587,"agent_exec":129.146,"verifier":16.781},"taskName":"build_pdf_structure_inventory","jobId":"VJ6Wvpb","exec_duration":129.146}]},{"taskName":"download_page_screenshots_from_pdf","instruction":"$6","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"download_page_screenshots_from_p__JUTaa5V","model":"gemini-3-flash","agent":"Pochi","passed":false,"reward":0,"error":false,"latency_sec":626.841,"latency_breakdown":{"env_setup":70.684,"agent_setup":36.616,"agent_exec":487.723,"verifier":16.495},"taskName":"download_page_screenshots_from_p","jobId":"JUTaa5V","exec_duration":487.723}]},{"taskName":"extract_pdf_table_to_json","instruction":"$7","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"extract_pdf_table_to_json__A5q4vvE","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":247.716,"latency_breakdown":{"env_setup":81.538,"agent_setup":38.104,"agent_exec":98.684,"verifier":16.259},"taskName":"extract_pdf_table_to_json","jobId":"A5q4vvE","exec_duration":98.684}]},{"taskName":"extract_resume_to_pydantic_schema","instruction":"$8","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"extract_resume_to_pydantic_schem__zzfNDBf","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":352.481,"latency_breakdown":{"env_setup":199.02,"agent_setup":42.382,"agent_exec":62.871,"verifier":15.866},"taskName":"extract_resume_to_pydantic_schem","jobId":"zzfNDBf","exec_duration":62.871}]},{"taskName":"extract_tables_from_pdf_to_csv","instruction":"$9","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"extract_tables_from_pdf_to_csv__h3xXSTc","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":428.901,"latency_breakdown":{"env_setup":165.261,"agent_setup":62.165,"agent_exec":161.579,"verifier":16.635},"taskName":"extract_tables_from_pdf_to_csv","jobId":"h3xXSTc","exec_duration":161.579}]},{"taskName":"incremental_ingestion_manifest","instruction":"$a","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"incremental_ingestion_manifest__bAk7HsH","model":"gemini-3-flash","agent":"Pochi","passed":false,"reward":0,"error":false,"latency_sec":355.606,"latency_breakdown":{"env_setup":164.57,"agent_setup":34.984,"agent_exec":106.982,"verifier":17.062},"taskName":"incremental_ingestion_manifest","jobId":"bAk7HsH","exec_duration":106.982}]},{"taskName":"parse_and_retrieve_text_from_job","instruction":"$b","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"parse_and_retrieve_text_from_job__rRUSoSE","model":"gemini-3-flash","agent":"Pochi","passed":false,"reward":0,"error":false,"latency_sec":196.869,"latency_breakdown":{"env_setup":78.33,"agent_setup":37.709,"agent_exec":48.907,"verifier":16.529},"taskName":"parse_and_retrieve_text_from_job","jobId":"rRUSoSE","exec_duration":48.907}]},{"taskName":"parse_multipage_pdf_to_per_page_json","instruction":"$c","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"parse_multipage_pdf_to_per_page__NuULeBU","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":348.655,"latency_breakdown":{"env_setup":197.494,"agent_setup":45.08,"agent_exec":52.944,"verifier":17.519},"taskName":"parse_multipage_pdf_to_per_page","jobId":"NuULeBU","exec_duration":52.944}]},{"taskName":"parse_pdf_preserve_link_urls","instruction":"$d","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"parse_pdf_preserve_link_urls__HJxCA6R","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":300.433,"latency_breakdown":{"env_setup":159.313,"agent_setup":63.747,"agent_exec":42.403,"verifier":15.84},"taskName":"parse_pdf_preserve_link_urls","jobId":"HJxCA6R","exec_duration":42.403}]},{"taskName":"parse_pdf_to_markdown","instruction":"$e","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"parse_pdf_to_markdown__wUCDvnz","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":197.097,"latency_breakdown":{"env_setup":59.254,"agent_setup":37.893,"agent_exec":52.568,"verifier":17.025},"taskName":"parse_pdf_to_markdown","jobId":"wUCDvnz","exec_duration":52.568}]},{"taskName":"parse_specific_pages_only","instruction":"$f","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"parse_specific_pages_only__qdhrhW4","model":"gemini-3-flash","agent":"Pochi","passed":false,"reward":0,"error":false,"latency_sec":280.292,"latency_breakdown":{"env_setup":165.996,"agent_setup":29.306,"agent_exec":54.361,"verifier":16.386},"taskName":"parse_specific_pages_only","jobId":"qdhrhW4","exec_duration":54.361}]},{"taskName":"region_aware_client_factory","instruction":"$10","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"region_aware_client_factory__DHWU2nu","model":"gemini-3-flash","agent":"Pochi","passed":false,"reward":0,"error":false,"latency_sec":353.016,"latency_breakdown":{"env_setup":198.23,"agent_setup":44.481,"agent_exec":66.217,"verifier":16.579},"taskName":"region_aware_client_factory","jobId":"DHWU2nu","exec_duration":66.217}]},{"taskName":"summarize_multi_page_pdf_with_html_tables","instruction":"$11","trials":[{"job_name":"2026-05-14__12-43-50","trial_name":"summarize_multi_page_pdf_with_ht__4S8PnfT","model":"gemini-3-flash","agent":"Pochi","passed":false,"reward":0,"error":false,"latency_sec":347.891,"latency_breakdown":{"env_setup":200.356,"agent_setup":42.567,"agent_exec":52.635,"verifier":17.703},"taskName":"summarize_multi_page_pdf_with_ht","jobId":"4S8PnfT","exec_duration":52.635}]}]}]]}],["$L12","$L13"],"$L14"]}],"loading":null,"isPartial":false}
+12:["$","script","script-0",{"src":"/llamacloud-benchmark/pr-preview/pr-2/_next/static/chunks/28c0ea01e9ff9346.js","async":true}]
+13:["$","script","script-1",{"src":"/llamacloud-benchmark/pr-preview/pr-2/_next/static/chunks/be08138953094657.js","async":true}]
+14:["$","$L15",null,{"children":["$","$16",null,{"name":"Next.MetadataOutlet","children":"$@17"}]}]
+17:null
