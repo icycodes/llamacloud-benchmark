@@ -1,0 +1,675 @@
+1:"$Sreact.fragment"
+2:I[42654,["/llamacloud-benchmark/pr-preview/pr-3/_next/static/chunks/babff0e7418ab052.js","/llamacloud-benchmark/pr-preview/pr-3/_next/static/chunks/3ecbb78a8ff87549.js","/llamacloud-benchmark/pr-preview/pr-3/_next/static/chunks/28c0ea01e9ff9346.js","/llamacloud-benchmark/pr-preview/pr-3/_next/static/chunks/be08138953094657.js"],"TasksPageClient"]
+c:I[75049,["/llamacloud-benchmark/pr-preview/pr-3/_next/static/chunks/d2c13bb33c4fcd54.js","/llamacloud-benchmark/pr-preview/pr-3/_next/static/chunks/c21188132e0e0d48.js"],"OutletBoundary"]
+d:"$Sreact.suspense"
+3:T2866,# LlamaCloud Composite Retriever Plan Builder
+
+## Background
+When a team manages multiple LlamaCloud indices (for example, a `slides_index` for meeting decks and a `financial_index` for SEC filings), they typically expose them to an LLM agent via `LlamaCloudCompositeRetriever`. The composite retriever supports two modes: `CompositeRetrievalMode.FULL` (query every sub-index and globally rerank) and `CompositeRetrievalMode.ROUTING` (let an agent pick the best sub-index based on its `description`). In `ROUTING` mode the per-index `description` is critical because that is the only signal the router has, so every sub-index MUST have a non-empty description. Composite retrievers also accept a `rerank_top_n` knob (positive integer) that bounds how many nodes survive reranking.
+
+Production teams almost always commit a YAML config describing the composite retriever and validate it offline before applying it with the SDK. You must build a small, fully offline Python CLI that:
+
+1. Imports `LlamaCloudCompositeRetriever` from `llama_index.indices.managed.llama_cloud` and `CompositeRetrievalMode` from `llama_cloud` at module top-level. These imports prove the SDK is wired up correctly, but they must NOT be called and no network requests may be made.
+2. Reads a YAML config describing the composite retriever and the sub-indices to attach.
+3. Validates the config against the rules below and emits an actionable JSON plan that downstream code (or an agent) can later feed into `LlamaCloudCompositeRetriever(...)` / `composite_retriever.add_index(...)` calls.
+
+## Requirements
+- Implement a Python CLI script `build_plan.py` that imports, at module top-level (verbatim):
+  - `from llama_index.indices.managed.llama_cloud import LlamaCloudCompositeRetriever`
+  - `from llama_cloud import CompositeRetrievalMode`
+  The script MUST NOT instantiate `LlamaCloudCompositeRetriever` or `CompositeRetrievalMode`, and MUST NOT issue any HTTP request.
+- The CLI must accept the following arguments:
+  - `--config` (required): absolute path to a YAML config file (schema described below).
+  - `--output` (required): absolute path of the JSON plan file to write.
+- The YAML config has this exact schema:
+  ```yaml
+  retriever:
+    name: <non-empty string>
+    project_name: <non-empty string>
+    mode: FULL | ROUTING       # case-insensitive in the config; output normalises to upper-case
+    rerank_top_n: <positive integer>
+    create_if_not_exists: <bool>
+  sub_indices:
+    - name: <non-empty string>
+      project_name: <non-empty string>
+      description: <non-empty string>
+  ```
+  - `sub_indices` is a list with at least 1 entry.
+  - `mode` is matched case-insensitively. Any value other than `full`/`FULL` or `routing`/`ROUTING` is an error.
+- The script must validate the config and on any validation failure print exactly one error line to stderr in the format `Error: <message>` and exit with a non-zero status code (and NOT write any output file). The exact error messages required are:
+  - `Error: config file not found: <config_path>` - when `--config` does not exist on disk.
+  - `Error: retriever.name must be a non-empty string`
+  - `Error: retriever.project_name must be a non-empty string`
+  - `Error: retriever.mode must be one of FULL or ROUTING (case-insensitive)`
+  - `Error: retriever.rerank_top_n must be a positive integer`
+  - `Error: sub_indices must be a non-empty list`
+  - `Error: sub_indices[<i>].name must be a non-empty string`
+  - `Error: sub_indices[<i>].project_name must be a non-empty string`
+  - `Error: sub_indices[<i>].description must be a non-empty string` (this rule applies in BOTH modes; descriptions are always required)
+  - `Error: sub_indices contains duplicate (name, project_name) pair: (<name>, <project_name>)`
+  Validation MUST stop and report the FIRST failure encountered, in the listed order. The check order is: file existence -> retriever.name -> retriever.project_name -> retriever.mode -> retriever.rerank_top_n -> sub_indices is non-empty list -> per-entry checks in list order (name -> project_name -> description) -> duplicate pair check after all per-entry checks pass.
+- On success, the script must write a JSON file at `--output` with this exact top-level shape (no extra keys):
+  ```json
+  {
+    "retriever": {
+      "name": "<retriever.name>",
+      "project_name": "<retriever.project_name>",
+      "mode": "FULL" | "ROUTING",
+      "rerank_top_n": <int>,
+      "create_if_not_exists": <bool>
+    },
+    "sub_indices": [
+      {
+        "name": "<name>",
+        "project_name": "<project_name>",
+        "description": "<description>"
+      }
+    ],
+    "summary": {
+      "sub_index_count": <int>,
+      "mode": "FULL" | "ROUTING"
+    }
+  }
+  ```
+  - The `sub_indices` list in the output MUST preserve the original ordering from the YAML config (do NOT sort).
+  - `summary.sub_index_count` MUST equal `len(sub_indices)`.
+  - `mode` in the output MUST be upper-case (`FULL` or `ROUTING`) regardless of the case used in the config.
+  - Write the JSON with `json.dump(..., indent=2)` so the file is human-readable.
+- On success, the script must print exactly one line to stdout and exit `0`:
+  `Composite retriever plan written to <output_path>: name=<retriever.name> mode=<MODE> sub_indices=<N>`
+  where `<MODE>` is the normalised upper-case mode and `<N>` is the integer count of sub-indices.
+
+## Implementation Guide
+1. The project directory `/home/user/composite_planner` already exists and contains a starter `configs/valid.yaml` describing a two-index composite retriever (`slides_index` and `financial_index`). Do NOT modify or delete that file.
+2. Create the script at `/home/user/composite_planner/build_plan.py`.
+3. Use `argparse` for argument parsing and `pyyaml` (`import yaml`) for config parsing. Both packages are pre-installed.
+4. Import the SDK classes at module top-level exactly as listed in the Requirements (these imports are verified by string match).
+5. Run the validation checks in the listed order. For each failure, print `Error: <message>` to `sys.stderr` and `sys.exit(1)`. Do NOT print to stdout in the error path. Do NOT create the output file in the error path.
+6. Normalise `mode` to upper-case (`FULL` or `ROUTING`) when writing the output and the stdout success line.
+7. Write the JSON plan, print the success line, exit `0`.
+
+## Acceptance Criteria
+- Project path: /home/user/composite_planner
+- Script path: /home/user/composite_planner/build_plan.py
+- Command (happy path, FULL mode): `python3 /home/user/composite_planner/build_plan.py --config /home/user/composite_planner/configs/valid.yaml --output /home/user/composite_planner/plan.json`
+  - Exit code: `0`.
+  - Stdout (exact single line): `Composite retriever plan written to /home/user/composite_planner/plan.json: name=Essays Retriever mode=FULL sub_indices=2`
+  - The file `/home/user/composite_planner/plan.json` exists and is valid JSON matching the schema above.
+  - `retriever` equals `{"name": "Essays Retriever", "project_name": "Essays", "mode": "FULL", "rerank_top_n": 5, "create_if_not_exists": true}`.
+  - `sub_indices` has length 2, with index 0 = `{"name": "slides_index", "project_name": "Essays", "description": "Information source for slide shows presented during team meetings"}` and index 1 = `{"name": "financial_index", "project_name": "Essays", "description": "Information source for company financial reports"}` (original order from the YAML preserved).
+  - `summary` equals `{"sub_index_count": 2, "mode": "FULL"}`.
+- Command (routing mode, lowercase in YAML): the user must create a new config at `/home/user/composite_planner/configs/routing.yaml` describing the SAME two sub-indices but with the following retriever block (verbatim values):
+  ```yaml
+  retriever:
+    name: Routing Retriever
+    project_name: Essays
+    mode: routing
+    rerank_top_n: 3
+    create_if_not_exists: false
+  sub_indices:
+    - name: slides_index
+      project_name: Essays
+      description: Information source for slide shows presented during team meetings
+    - name: financial_index
+      project_name: Essays
+      description: Information source for company financial reports
+  ```
+  Then run: `python3 /home/user/composite_planner/build_plan.py --config /home/user/composite_planner/configs/routing.yaml --output /home/user/composite_planner/routing_plan.json`
+  - Exit code: `0`.
+  - Stdout (exact single line): `Composite retriever plan written to /home/user/composite_planner/routing_plan.json: name=Routing Retriever mode=ROUTING sub_indices=2`
+  - The output JSON `retriever.mode` is `"ROUTING"` (upper-cased) and `summary.mode` is `"ROUTING"`.
+- Command (validation error - missing description in routing-style config): the user must create a config at `/home/user/composite_planner/configs/missing_desc.yaml` with a valid retriever block but with the SECOND sub-index missing the `description` field (set it to the empty string `""`):
+  ```yaml
+  retriever:
+    name: Bad Retriever
+    project_name: Essays
+    mode: FULL
+    rerank_top_n: 5
+    create_if_not_exists: true
+  sub_indices:
+    - name: slides_index
+      project_name: Essays
+      description: Information source for slide shows presented during team meetings
+    - name: financial_index
+      project_name: Essays
+      description: ""
+  ```
+  Then run: `python3 /home/user/composite_planner/build_plan.py --config /home/user/composite_planner/configs/missing_desc.yaml --output /home/user/composite_planner/bad_plan.json`
+  - Exit code: non-zero.
+  - Stderr (exact line): `Error: sub_indices[1].description must be a non-empty string`
+  - The file `/home/user/composite_planner/bad_plan.json` MUST NOT be created.
+- Command (validation error - missing config file): `python3 /home/user/composite_planner/build_plan.py --config /home/user/composite_planner/configs/no_such_file.yaml --output /home/user/composite_planner/should_not_exist.json`
+  - Exit code: non-zero.
+  - Stderr (exact line): `Error: config file not found: /home/user/composite_planner/configs/no_such_file.yaml`
+  - The file `/home/user/composite_planner/should_not_exist.json` MUST NOT be created.
+- SDK usage: the script source must contain BOTH of the following verbatim substrings:
+  - `from llama_index.indices.managed.llama_cloud import LlamaCloudCompositeRetriever`
+  - `from llama_cloud import CompositeRetrievalMode`
+
+4:T2065,# LlamaCloud Incremental Ingestion Planner
+
+## Background
+A common production pattern with LlamaCloud is keeping a managed index in sync with a local directory: as files are added, modified, or removed on disk, the equivalent documents in the managed index must be inserted, refreshed, or deleted. Re-uploading every file on every run wastes credits and parsing time, so teams build a small "sync planner" that compares the previous synced state (file paths + content hashes) to the current state on disk and emits an action plan describing exactly which files to ADD, UPDATE, DELETE, or leave UNCHANGED.
+
+You must build a Python CLI that computes such a plan offline. The plan is keyed by `index_name` and `project_name` so it can later be applied with the `LlamaCloudIndex` SDK class (`from llama_index.indices.managed.llama_cloud import LlamaCloudIndex`). To prove the SDK is wired up correctly, the script MUST import that class at module top-level, but it MUST NOT instantiate it, and it MUST NOT make any network calls.
+
+## Requirements
+- Implement a Python CLI script `sync_planner.py` that imports `LlamaCloudIndex` from `llama_index.indices.managed.llama_cloud` at module top-level.
+- The CLI must accept the following arguments:
+  - `--input-dir` (required): absolute path to the local source directory to scan.
+  - `--previous-state` (required): absolute path to a JSON file describing the previously-synced state (schema documented below). The file may not exist on a first run.
+  - `--output` (required): absolute path of the JSON sync plan to write.
+  - `--index-name` (required): the LlamaCloud index name to record in the plan.
+  - `--project-name` (optional, default `Default`): the LlamaCloud project name to record in the plan.
+- The script must enumerate files in `--input-dir` non-recursively and include only files with one of these supported extensions (case-insensitive): `.pdf`, `.docx`, `.pptx`, `.txt`, `.md`, `.html`. All other files MUST be ignored entirely (they must NOT appear in the plan and must NOT trigger DELETE entries).
+- For each included file, compute:
+  - `file_name`: the basename of the file (e.g., `report.md`).
+  - `path`: the absolute path of the file.
+  - `size_bytes`: the integer file size in bytes.
+  - `sha256`: the lowercase hex SHA-256 digest of the file's full byte contents.
+- Compare the current scan against the previous state to classify each file_name:
+  - **ADD**: file_name appears in the current scan but is NOT present in the previous state.
+  - **UPDATE**: file_name appears in BOTH but the `sha256` differs.
+  - **UNCHANGED**: file_name appears in BOTH and the `sha256` matches.
+  - **DELETE**: file_name appears in the previous state but is NOT in the current scan.
+- The previous state JSON file has this exact schema (when it exists):
+  ```json
+  {
+    "index_name": "<string>",
+    "project_name": "<string>",
+    "files": [
+      {"file_name": "<basename>", "sha256": "<lowercase hex>"}
+    ]
+  }
+  ```
+  If `--previous-state` does not exist on disk, treat the previous file list as empty (every current file becomes an ADD).
+- Output JSON schema (exact top-level keys, no extras):
+  ```json
+  {
+    "index_name": "<from --index-name>",
+    "project_name": "<from --project-name>",
+    "actions": {
+      "add":       [ { "file_name": "...", "path": "...", "size_bytes": <int>, "sha256": "..." } ],
+      "update":    [ { "file_name": "...", "path": "...", "size_bytes": <int>, "sha256": "...", "previous_sha256": "..." } ],
+      "unchanged": [ { "file_name": "...", "sha256": "..." } ],
+      "delete":    [ { "file_name": "...", "previous_sha256": "..." } ]
+    },
+    "summary": {
+      "add": <int>, "update": <int>, "unchanged": <int>, "delete": <int>
+    }
+  }
+  ```
+  - Each of the four `actions` lists MUST be sorted alphabetically by `file_name` (case-sensitive `sorted()` order).
+  - Each integer in `summary` MUST equal the length of the corresponding `actions` list.
+  - Write the JSON with `json.dump(..., indent=2)` so it is human-readable.
+- On success, the script must print exactly one line to stdout (then exit `0`):
+  `Sync plan written to <output_path>: add=<A> update=<U> unchanged=<N> delete=<D>`
+  where `<output_path>` is the absolute path from `--output` and `<A>/<U>/<N>/<D>` are the integer counts.
+- If `--input-dir` does not exist or is not a directory, the script MUST:
+  - print the line `Error: input directory not found: <input_dir>` to stderr,
+  - NOT write any output file,
+  - exit with a non-zero status code.
+- The script MUST NOT make any outbound HTTP calls and MUST NOT instantiate `LlamaCloudIndex`. The import statement is enough to demonstrate SDK availability.
+
+## Implementation Guide
+1. The project directory `/home/user/sync_planner` already exists and contains:
+   - `inputs/` with three pre-populated files: `report.md`, `notes.txt`, and `image.jpg`.
+   - `previous_state.json` with a recorded baseline that lists `report.md` (with its current hash) and `archive.txt` (a file that no longer exists on disk).
+   Do NOT modify or delete any of these starter fixtures.
+2. Create the script at `/home/user/sync_planner/sync_planner.py`.
+3. Use `argparse` for argument parsing. Use `hashlib.sha256` for hashing.
+4. Filter files by the allowed extensions (case-insensitive). Skip `image.jpg` (it has an unsupported extension).
+5. Read the previous state if present; otherwise treat as empty. Build a dict keyed by `file_name`.
+6. Compute ADD/UPDATE/UNCHANGED/DELETE classification, sort each list alphabetically by `file_name`, and assemble the output JSON.
+7. Write the JSON using `json.dump(..., indent=2)`. Print the required success line and exit `0`.
+8. Handle the missing-input-directory error by printing to `sys.stderr` and exiting with status `1`.
+
+## Acceptance Criteria
+- Project path: /home/user/sync_planner
+- Script path: /home/user/sync_planner/sync_planner.py
+- Command (happy path): `python3 /home/user/sync_planner/sync_planner.py --input-dir /home/user/sync_planner/inputs --previous-state /home/user/sync_planner/previous_state.json --output /home/user/sync_planner/plan.json --index-name my_index --project-name Default`
+  - Exit code: `0`.
+  - Stdout (exact single line): `Sync plan written to /home/user/sync_planner/plan.json: add=1 update=0 unchanged=1 delete=1`
+  - The file `/home/user/sync_planner/plan.json` exists and matches the JSON schema described above.
+  - `index_name` == `"my_index"`, `project_name` == `"Default"`.
+  - `actions.add` is exactly one entry for `notes.txt` (correct path/size/sha256).
+  - `actions.unchanged` is exactly one entry for `report.md` (correct sha256 of the on-disk file).
+  - `actions.delete` is exactly one entry for `archive.txt` (with `previous_sha256` copied from the previous state).
+  - `actions.update` is the empty list.
+  - `image.jpg` does NOT appear in any of the four action lists.
+  - `summary` equals `{"add": 1, "update": 0, "unchanged": 1, "delete": 1}`.
+- Command (missing previous state, treated as empty): `python3 /home/user/sync_planner/sync_planner.py --input-dir /home/user/sync_planner/inputs --previous-state /home/user/sync_planner/no_such_state.json --output /home/user/sync_planner/initial_plan.json --index-name my_index`
+  - Exit code: `0`.
+  - Stdout (exact single line): `Sync plan written to /home/user/sync_planner/initial_plan.json: add=2 update=0 unchanged=0 delete=0`
+  - `actions.add` contains two entries (`notes.txt` then `report.md`, sorted alphabetically). `actions.update`, `actions.unchanged`, and `actions.delete` are empty lists.
+  - `project_name` defaults to `"Default"`.
+- Command (error path): `python3 /home/user/sync_planner/sync_planner.py --input-dir /home/user/sync_planner/does_not_exist --previous-state /home/user/sync_planner/previous_state.json --output /home/user/sync_planner/should_not_exist.json --index-name my_index`
+  - Exit code: non-zero.
+  - Stderr contains the line: `Error: input directory not found: /home/user/sync_planner/does_not_exist`
+  - The file `/home/user/sync_planner/should_not_exist.json` must NOT be created.
+- SDK usage: the script source must contain (verbatim, string match) `from llama_index.indices.managed.llama_cloud import LlamaCloudIndex` so the LlamaCloud managed-index SDK is demonstrably available in the runtime.
+
+5:T2aac,# LlamaCloud MCP Server Config Builder
+
+## Background
+LlamaCloud can be exposed as a tool to AI agents (Claude Desktop, Cursor, Windsurf, Pochi, etc.) through the Model Context Protocol (MCP). The recommended way to do this is via the official [`@llamaindex/mcp-server-llamacloud`](https://github.com/run-llama/mcp-server-llamacloud) package. The MCP client (e.g., Claude Desktop) reads a JSON config file that declares an `mcpServers` block; inside that block, each MCP server entry describes a `command`, an ordered `args` list, and an `env` dictionary. For LlamaCloud, the `args` are an ordered sequence of `--index <name>`/`--description <text>` pairs (one pair per LlamaCloud managed index to expose), with an optional `--topK <int>` value attached to a specific index. The `env` block MUST include `LLAMA_CLOUD_API_KEY` because the MCP server reads that variable at startup; it MAY also include `LLAMA_CLOUD_PROJECT_NAME` (defaults to `Default` if missing). A well-known friction point is that the LlamaCloud API key is scoped to a single project — pairing the wrong key with the wrong project name produces a 403 from the LlamaCloud API, so teams almost always commit the project name to source control next to the rest of the MCP config.
+
+Production teams describe the LlamaCloud indices to expose in a small YAML manifest, validate it offline, and emit the final Claude/Cursor-compatible `mcpServers` JSON. You must build that fully offline, self-contained CLI utility.
+
+To prove the LlamaCloud SDK is installed and importable, the script MUST import `LlamaCloud` from `llama_cloud.client` at module top level. It MUST NOT instantiate that client and MUST NOT make any outbound HTTP request.
+
+## Requirements
+- Implement a Python CLI script `build_mcp_config.py` that imports, at module top level (verbatim): `from llama_cloud.client import LlamaCloud`. The script MUST NOT instantiate `LlamaCloud` and MUST NOT make any network request.
+- The CLI must accept the following arguments:
+  - `--config` (required): absolute path to a YAML manifest (schema described below).
+  - `--output` (required): absolute path of the JSON MCP config file to write.
+- The YAML config has this exact schema:
+  ```yaml
+  server_name: <non-empty string>          # the key under mcpServers, e.g. "llamacloud"
+  project_name: <non-empty string>         # LlamaCloud project name; written to env.LLAMA_CLOUD_PROJECT_NAME
+  indices:
+    - name: <non-empty string>
+      description: <non-empty string>
+      top_k: <positive integer, optional>
+  ```
+  - `indices` is a non-empty list.
+  - Per-index `name` values must be unique within `indices` (duplicates are an error).
+  - `top_k` is optional; when present it MUST be a positive integer.
+- The script must validate the config and on the FIRST failure print exactly one error line to stderr in the format `Error: <message>` and exit with a non-zero status code (and NOT write any output file). The exact error messages required, checked in this exact order, are:
+  - `Error: config file not found: <config_path>` - when `--config` does not exist on disk.
+  - `Error: server_name must be a non-empty string`
+  - `Error: project_name must be a non-empty string`
+  - `Error: indices must be a non-empty list`
+  - `Error: indices[<i>].name must be a non-empty string`
+  - `Error: indices[<i>].description must be a non-empty string`
+  - `Error: indices[<i>].top_k must be a positive integer`
+  - `Error: indices contains duplicate name: <name>`
+  The check order is: file existence -> `server_name` -> `project_name` -> `indices` is non-empty list -> per-entry checks in list order (`name` -> `description` -> `top_k`) -> duplicate-name check AFTER all per-entry checks pass.
+- On success, the script must write a JSON file at `--output` with this exact top-level shape (no extra keys):
+  ```json
+  {
+    "mcpServers": {
+      "<server_name>": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@llamaindex/mcp-server-llamacloud",
+          "--index", "<index name>",
+          "--description", "<index description>",
+          "--topK", "<int>"          // only present when top_k was set in the YAML for this index
+        ],
+        "env": {
+          "LLAMA_CLOUD_PROJECT_NAME": "<project_name>",
+          "LLAMA_CLOUD_API_KEY": "${LLAMA_CLOUD_API_KEY}"
+        }
+      }
+    }
+  }
+  ```
+  Specifically:
+  - The `args` list MUST start with the literal entries `"-y"` and `"@llamaindex/mcp-server-llamacloud"`, in that order.
+  - After those two entries, the script MUST emit each index from the YAML in the YAML's original order. For each index, append in this order:
+    1. `"--index"`
+    2. the index `name`
+    3. `"--description"`
+    4. the index `description`
+    5. (only if the YAML provided `top_k`) `"--topK"` then the integer top_k value rendered as a string (e.g. `"5"`).
+  - The `args` value for `--topK` MUST be a string (the JSON-encoded decimal of the integer), not a JSON integer, because process arguments are strings.
+  - `env.LLAMA_CLOUD_API_KEY` MUST be the literal string `${LLAMA_CLOUD_API_KEY}` (NOT the value of the environment variable at script runtime). This makes the config portable and lets the MCP client interpolate the secret at launch time.
+  - `env.LLAMA_CLOUD_PROJECT_NAME` MUST be the project name from the YAML (no default substitution: the YAML field is required).
+  - Write the JSON with `json.dump(..., indent=2)` so the file is human-readable.
+- On success, the script must print exactly one line to stdout and exit `0`:
+  `MCP config written to <output_path>: server=<server_name> indices=<N>`
+  where `<output_path>` is the absolute path passed to `--output` and `<N>` is the integer count of indices.
+
+## Implementation Guide
+1. The project directory `/home/user/mcp_config_builder` already exists and contains a starter YAML config at `/home/user/mcp_config_builder/configs/valid.yaml` describing two LlamaCloud indices (`10k-SEC-Tesla` and `10k-SEC-Apple`) for the `Financials` project. The first index sets `top_k: 5`; the second omits `top_k`. Do NOT modify or delete that file.
+2. Create the script at `/home/user/mcp_config_builder/build_mcp_config.py`.
+3. Use `argparse` for argument parsing and `pyyaml` (`import yaml`) for parsing the manifest. Both packages are pre-installed.
+4. Import the SDK class at module top level exactly as listed in the Requirements (this is verified by string match against the script source).
+5. Run the validation checks in the listed order. For each failure, print `Error: <message>` to `sys.stderr` and `sys.exit(1)`. Do NOT print to stdout in the error path. Do NOT create the output file in the error path.
+6. Build the output JSON with the requested shape, write it with `json.dump(..., indent=2)`, print the success line, exit `0`.
+7. Remember: top_k values become STRING args (`"5"`, not `5`), since `args` is a list of process arguments. The MCP CLI flag is exactly `--topK` (camelCase K), NOT `--topk` or `--top-k`.
+
+## Acceptance Criteria
+- Project path: /home/user/mcp_config_builder
+- Script path: /home/user/mcp_config_builder/build_mcp_config.py
+- Command (happy path): `python3 /home/user/mcp_config_builder/build_mcp_config.py --config /home/user/mcp_config_builder/configs/valid.yaml --output /home/user/mcp_config_builder/mcp.json`
+  - Exit code: `0`.
+  - Stdout (exact single line): `MCP config written to /home/user/mcp_config_builder/mcp.json: server=llamacloud indices=2`
+  - The file `/home/user/mcp_config_builder/mcp.json` exists and is valid JSON with the schema described above.
+  - `mcpServers.llamacloud.command` equals `"npx"`.
+  - `mcpServers.llamacloud.args` equals (exact list, in this exact order):
+    `["-y", "@llamaindex/mcp-server-llamacloud", "--index", "10k-SEC-Tesla", "--description", "10k SEC documents from 2023 for Tesla", "--topK", "5", "--index", "10k-SEC-Apple", "--description", "10k SEC documents from 2023 for Apple"]`
+  - `mcpServers.llamacloud.env` equals `{"LLAMA_CLOUD_PROJECT_NAME": "Financials", "LLAMA_CLOUD_API_KEY": "${LLAMA_CLOUD_API_KEY}"}`.
+- Command (validation error - duplicate index name): the user must create a config file at `/home/user/mcp_config_builder/configs/duplicate_name.yaml` with the following exact contents:
+  ```yaml
+  server_name: llamacloud
+  project_name: Financials
+  indices:
+    - name: 10k-SEC-Tesla
+      description: 10k SEC documents from 2023 for Tesla
+    - name: 10k-SEC-Tesla
+      description: Duplicate entry
+  ```
+  Then run: `python3 /home/user/mcp_config_builder/build_mcp_config.py --config /home/user/mcp_config_builder/configs/duplicate_name.yaml --output /home/user/mcp_config_builder/dup_plan.json`
+  - Exit code: non-zero.
+  - Stderr (exact line): `Error: indices contains duplicate name: 10k-SEC-Tesla`
+  - The file `/home/user/mcp_config_builder/dup_plan.json` MUST NOT be created.
+- Command (validation error - invalid top_k): the user must create a config file at `/home/user/mcp_config_builder/configs/bad_topk.yaml` with the following exact contents:
+  ```yaml
+  server_name: llamacloud
+  project_name: Financials
+  indices:
+    - name: 10k-SEC-Tesla
+      description: 10k SEC documents from 2023 for Tesla
+      top_k: 0
+  ```
+  Then run: `python3 /home/user/mcp_config_builder/build_mcp_config.py --config /home/user/mcp_config_builder/configs/bad_topk.yaml --output /home/user/mcp_config_builder/bad_topk_plan.json`
+  - Exit code: non-zero.
+  - Stderr (exact line): `Error: indices[0].top_k must be a positive integer`
+  - The file `/home/user/mcp_config_builder/bad_topk_plan.json` MUST NOT be created.
+- Command (validation error - empty description): the user must create a config file at `/home/user/mcp_config_builder/configs/empty_description.yaml` with the following exact contents:
+  ```yaml
+  server_name: llamacloud
+  project_name: Financials
+  indices:
+    - name: 10k-SEC-Tesla
+      description: ""
+  ```
+  Then run: `python3 /home/user/mcp_config_builder/build_mcp_config.py --config /home/user/mcp_config_builder/configs/empty_description.yaml --output /home/user/mcp_config_builder/empty_desc_plan.json`
+  - Exit code: non-zero.
+  - Stderr (exact line): `Error: indices[0].description must be a non-empty string`
+  - The file `/home/user/mcp_config_builder/empty_desc_plan.json` MUST NOT be created.
+- Command (validation error - missing config file): `python3 /home/user/mcp_config_builder/build_mcp_config.py --config /home/user/mcp_config_builder/configs/no_such_file.yaml --output /home/user/mcp_config_builder/should_not_exist.json`
+  - Exit code: non-zero.
+  - Stderr (exact line): `Error: config file not found: /home/user/mcp_config_builder/configs/no_such_file.yaml`
+  - The file `/home/user/mcp_config_builder/should_not_exist.json` MUST NOT be created.
+- SDK usage: the script source must contain the verbatim substring `from llama_cloud.client import LlamaCloud` so the LlamaCloud SDK is demonstrably available in the runtime.
+
+6:T270b,# LlamaCloud Parse v2 Request Payload Builder
+
+## Background
+LlamaCloud's Parse v2 API requires every parse request to include both a `tier` and a `version`. The four valid tiers are `fast`, `cost_effective`, `agentic`, and `agentic_plus`. The `version` value must be either `latest` (for development) or a pinned dated release in `YYYY-MM-DD` format (for production). Each request can also request specific output sections through an `expand` list whose allowed values are `text`, `markdown`, `items`, and `images_content_metadata`. A well-known gotcha is that the `fast` tier does NOT support markdown output: requesting `markdown` in `expand` for a `fast`-tier job returns a validation error from the LlamaCloud API, so teams catch this client-side before submitting batches.
+
+Production teams typically describe their batch of parse jobs in a YAML manifest, validate the manifest offline, and emit a JSON list of ready-to-submit Parse v2 request payloads. You must build that offline, fully self-contained CLI utility.
+
+The utility must demonstrate that the LlamaCloud SDK is installed and importable by importing `LlamaCloud` from the `llama_cloud` package at module top level. However, it MUST NOT instantiate the client and MUST NOT make any outbound HTTP request.
+
+## Requirements
+- Implement a Python CLI script `build_requests.py` that imports, at module top level (verbatim): `from llama_cloud import LlamaCloud`. The script MUST NOT instantiate `LlamaCloud`, and MUST NOT make any network request.
+- The CLI must accept the following arguments:
+  - `--config` (required): absolute path to a YAML manifest file (schema described below).
+  - `--output` (required): absolute path of the JSON request bundle to write.
+- The YAML config has this exact schema:
+  ```yaml
+  requests:
+    - file_id: <non-empty string>
+      tier: fast | cost_effective | agentic | agentic_plus
+      version: latest | YYYY-MM-DD
+      expand: [<allowed value>, ...]   # optional; default is the empty list
+  ```
+  - `requests` is a non-empty list.
+  - `tier` must be one of exactly four lowercase strings: `fast`, `cost_effective`, `agentic`, `agentic_plus`.
+  - `version` must be either the literal string `latest` OR a date string that matches the regex `^\d{4}-\d{2}-\d{2}$` (any 4-digit year, 2-digit month, 2-digit day separated by single dashes). No further calendar validation is required.
+  - `expand`, when present, must be a list of strings. Allowed values are: `text`, `markdown`, `items`, `images_content_metadata`.
+  - If `expand` is omitted, treat it as an empty list `[]` in the output.
+- The script must validate the config and on the FIRST failure print exactly one error line to stderr in the format `Error: <message>` and exit with a non-zero status code (and NOT write any output file). The exact error messages required are:
+  - `Error: config file not found: <config_path>` - when `--config` does not exist on disk.
+  - `Error: requests must be a non-empty list`
+  - `Error: requests[<i>].file_id must be a non-empty string`
+  - `Error: requests[<i>].tier must be one of: agentic, agentic_plus, cost_effective, fast`
+  - `Error: requests[<i>].version must be 'latest' or a date string in YYYY-MM-DD format`
+  - `Error: requests[<i>].expand must be a list of strings`
+  - `Error: requests[<i>].expand contains unsupported value '<value>'. Allowed: text, markdown, items, images_content_metadata`
+  - `Error: requests[<i>] uses tier 'fast' which does not support 'markdown' in expand`
+  The check order is: file existence -> `requests` is non-empty list -> per-entry checks in list order, and within each entry: `file_id` -> `tier` -> `version` -> `expand` is list of strings -> per-element allowed-value check -> fast/markdown incompatibility check.
+- On success, the script must write a JSON file at `--output` with this exact top-level shape (no extra keys):
+  ```json
+  {
+    "requests": [
+      {
+        "file_id": "<string>",
+        "tier": "<one of the four tiers>",
+        "version": "<latest or YYYY-MM-DD>",
+        "expand": ["<allowed value>", ...]
+      }
+    ],
+    "summary": {
+      "total": <int>,
+      "by_tier": {
+        "fast": <int>,
+        "cost_effective": <int>,
+        "agentic": <int>,
+        "agentic_plus": <int>
+      }
+    }
+  }
+  ```
+  - The order of entries in `requests` MUST preserve the order from the YAML manifest (do NOT sort).
+  - Each entry MUST include all four fields `file_id`, `tier`, `version`, `expand` (with `expand` defaulting to `[]` when omitted in the YAML).
+  - `summary.total` MUST equal `len(requests)`.
+  - `summary.by_tier` MUST include all four keys, each set to the integer count of requests using that tier (0 if unused).
+  - Write the JSON with `json.dump(..., indent=2)` so the file is human-readable.
+- On success, the script must print exactly one line to stdout and exit `0`:
+  `Built <N> Parse v2 requests at <output_path>: fast=<F> cost_effective=<C> agentic=<A> agentic_plus=<P>`
+  where `<N>` is the integer count of requests and `<F>/<C>/<A>/<P>` are the per-tier counts in that exact order.
+
+## Implementation Guide
+1. The project directory `/home/user/parse_requests` already exists and contains a starter YAML config at `/home/user/parse_requests/configs/valid.yaml` describing four requests (one per tier). Do NOT modify or delete that file.
+2. Create the script at `/home/user/parse_requests/build_requests.py`.
+3. Use `argparse` for argument parsing and `pyyaml` (`import yaml`) for parsing the manifest. Both packages are pre-installed.
+4. Import the SDK class at module top level exactly as listed in the Requirements (this is verified by string match against the script source).
+5. Run the validation checks in the listed order. For each failure, print `Error: <message>` to `sys.stderr` and `sys.exit(1)`. Do NOT print to stdout in the error path. Do NOT create the output file in the error path.
+6. Build the output JSON with the requested shape, write it with `json.dump(..., indent=2)`, print the success line, exit `0`.
+7. Use `re.fullmatch(r"\d{4}-\d{2}-\d{2}", value)` (or equivalent) for the date format check. The literal string `latest` is accepted as-is.
+
+## Acceptance Criteria
+- Project path: /home/user/parse_requests
+- Script path: /home/user/parse_requests/build_requests.py
+- Command (happy path): `python3 /home/user/parse_requests/build_requests.py --config /home/user/parse_requests/configs/valid.yaml --output /home/user/parse_requests/plan.json`
+  - Exit code: `0`.
+  - Stdout (exact single line): `Built 4 Parse v2 requests at /home/user/parse_requests/plan.json: fast=1 cost_effective=1 agentic=1 agentic_plus=1`
+  - The file `/home/user/parse_requests/plan.json` exists and is valid JSON with the schema described above.
+  - `requests` has length 4. In the original YAML order, the entries are:
+    - Index 0: `{"file_id": "file_aaa", "tier": "agentic", "version": "latest", "expand": ["text", "markdown"]}`
+    - Index 1: `{"file_id": "file_bbb", "tier": "agentic_plus", "version": "2026-01-08", "expand": ["markdown", "items"]}`
+    - Index 2: `{"file_id": "file_ccc", "tier": "fast", "version": "latest", "expand": ["text"]}`
+    - Index 3: `{"file_id": "file_ddd", "tier": "cost_effective", "version": "latest", "expand": []}`
+  - `summary` equals `{"total": 4, "by_tier": {"fast": 1, "cost_effective": 1, "agentic": 1, "agentic_plus": 1}}`.
+- Command (validation error - bad tier): the user must create a config file at `/home/user/parse_requests/configs/bad_tier.yaml` with the following exact contents:
+  ```yaml
+  requests:
+    - file_id: file_xxx
+      tier: premium
+      version: latest
+      expand: [markdown]
+  ```
+  Then run: `python3 /home/user/parse_requests/build_requests.py --config /home/user/parse_requests/configs/bad_tier.yaml --output /home/user/parse_requests/bad_tier_plan.json`
+  - Exit code: non-zero.
+  - Stderr (exact line): `Error: requests[0].tier must be one of: agentic, agentic_plus, cost_effective, fast`
+  - The file `/home/user/parse_requests/bad_tier_plan.json` MUST NOT be created.
+- Command (validation error - fast tier with markdown): the user must create a config file at `/home/user/parse_requests/configs/fast_markdown.yaml` with the following exact contents:
+  ```yaml
+  requests:
+    - file_id: file_yyy
+      tier: fast
+      version: latest
+      expand: [text, markdown]
+  ```
+  Then run: `python3 /home/user/parse_requests/build_requests.py --config /home/user/parse_requests/configs/fast_markdown.yaml --output /home/user/parse_requests/fast_markdown_plan.json`
+  - Exit code: non-zero.
+  - Stderr (exact line): `Error: requests[0] uses tier 'fast' which does not support 'markdown' in expand`
+  - The file `/home/user/parse_requests/fast_markdown_plan.json` MUST NOT be created.
+- Command (validation error - bad version): the user must create a config file at `/home/user/parse_requests/configs/bad_version.yaml` with the following exact contents:
+  ```yaml
+  requests:
+    - file_id: file_zzz
+      tier: agentic
+      version: jan-8-2026
+      expand: [markdown]
+  ```
+  Then run: `python3 /home/user/parse_requests/build_requests.py --config /home/user/parse_requests/configs/bad_version.yaml --output /home/user/parse_requests/bad_version_plan.json`
+  - Exit code: non-zero.
+  - Stderr (exact line): `Error: requests[0].version must be 'latest' or a date string in YYYY-MM-DD format`
+  - The file `/home/user/parse_requests/bad_version_plan.json` MUST NOT be created.
+- Command (validation error - missing config file): `python3 /home/user/parse_requests/build_requests.py --config /home/user/parse_requests/configs/no_such_file.yaml --output /home/user/parse_requests/should_not_exist.json`
+  - Exit code: non-zero.
+  - Stderr (exact line): `Error: config file not found: /home/user/parse_requests/configs/no_such_file.yaml`
+  - The file `/home/user/parse_requests/should_not_exist.json` MUST NOT be created.
+- SDK usage: the script source must contain the verbatim substring `from llama_cloud import LlamaCloud`.
+
+7:T193b,# LlamaParse Offline Parse Plan Builder
+
+## Background
+Before sending documents to LlamaParse for production parsing, teams routinely build a local pre-flight "parse plan" so they can audit which files will be uploaded, compute content hashes for change detection, and verify that the SDK is wired up correctly. A common friction point with LlamaParse is forgetting to provide `extra_info={"file_name": ...}` when feeding raw bytes into the parser; the parser uses the extension contained in `file_name` to pick the correct parsing strategy. Building a manifest up front prevents this entire class of error.
+
+You must build a small, fully offline Python CLI utility that uses the `llama_cloud_services.LlamaParse` SDK class to capture the parser configuration, then scans an input directory to produce a JSON parse plan. The script must NOT make any network calls.
+
+## Requirements
+- Implement a Python CLI script `parse_plan.py` that instantiates `LlamaParse` from the `llama_cloud_services` package and uses its configuration attributes to populate the output plan.
+- The CLI must accept the following arguments:
+  - `--input-dir` (required): path to a directory of source documents.
+  - `--output` (required): path to the JSON plan file to write.
+  - `--result-type` (optional, default `markdown`): forwarded to `LlamaParse(result_type=...)`. Must accept one of `markdown` or `text`.
+  - `--num-workers` (optional, integer, default `2`): forwarded to `LlamaParse(num_workers=...)`.
+  - `--language` (optional, default `en`): forwarded to `LlamaParse(language=...)`.
+- The script must instantiate the parser like this (no other arguments are needed):
+  ```python
+  parser = LlamaParse(
+      api_key="llx-dummy-offline-key",
+      result_type=args.result_type,
+      num_workers=args.num_workers,
+      language=args.language,
+  )
+  ```
+  The literal `api_key="llx-dummy-offline-key"` is required because no network calls are made; it merely satisfies the SDK constructor.
+- The script must enumerate files in `--input-dir` non-recursively and include only files with one of these supported extensions (case-insensitive match): `.pdf`, `.docx`, `.pptx`, `.txt`, `.md`, `.html`.
+- For each included file, the script must compute:
+  - `file_name`: the basename of the file (e.g., `notes.md`).
+  - `path`: the absolute path of the file.
+  - `size_bytes`: integer file size in bytes from the filesystem.
+  - `sha256`: lowercase hex digest of the file's full byte contents using SHA-256.
+  - `extra_info`: a dict literally equal to `{"file_name": <basename>}` (this is the exact shape LlamaParse requires for byte-stream parsing).
+- The script must produce a JSON file at `--output` with this exact top-level shape (no extra keys):
+  ```json
+  {
+    "parser_config": {
+      "result_type": "<resolved result_type>",
+      "num_workers": <resolved num_workers>,
+      "language": "<resolved language>"
+    },
+    "files": [
+      {
+        "file_name": "<basename>",
+        "path": "<absolute path>",
+        "size_bytes": <int>,
+        "sha256": "<lowercase hex digest>",
+        "extra_info": {"file_name": "<basename>"}
+      }
+    ]
+  }
+  ```
+- The `files` array MUST be sorted alphabetically by `file_name` (case-sensitive `sorted()` order).
+- On success, the script must print exactly one line to stdout in this exact format and then exit with status `0`:
+  `Parse plan created with <N> files at <output_path>`
+  where `<N>` is the integer count of files included and `<output_path>` is the absolute output path as provided by `--output`.
+- If `--input-dir` does not exist or is not a directory, the script must:
+  - print the message `Error: input directory not found: <input_dir>` to stderr,
+  - NOT write any output file,
+  - exit with a non-zero status code.
+- The script MUST NOT make any outbound HTTP calls.
+
+## Implementation Guide
+1. The project directory `/home/user/parse_planner` already exists and contains an `inputs/` subdirectory pre-populated with sample files. Do NOT delete or modify those files.
+2. Create the script at `/home/user/parse_planner/parse_plan.py`.
+3. Use `argparse` for argument parsing.
+4. Import the SDK class with: `from llama_cloud_services import LlamaParse`.
+5. Instantiate the parser exactly as shown in the Requirements section, then read back `parser.result_type`, `parser.num_workers`, and `parser.language` to populate the `parser_config` block. If these attributes are enum members, coerce them to their underlying string values (e.g., `getattr(parser.result_type, 'value', parser.result_type)`).
+6. Scan the input directory non-recursively with `os.listdir` (or `pathlib.Path.iterdir`), filter to the allowed extensions, compute the per-file fields, and sort by `file_name`.
+7. Write the JSON with `json.dump(..., indent=2)` so it is human-readable.
+8. Print the success line and exit `0`. For the missing-directory error, print to `sys.stderr` and `sys.exit(1)`.
+
+## Acceptance Criteria
+- Project path: /home/user/parse_planner
+- Script path: /home/user/parse_planner/parse_plan.py
+- Command (happy path): `python3 /home/user/parse_planner/parse_plan.py --input-dir /home/user/parse_planner/inputs --output /home/user/parse_planner/plan.json --result-type markdown --num-workers 3 --language en`
+  - Exit code: `0`.
+  - Stdout (exact line): `Parse plan created with 2 files at /home/user/parse_planner/plan.json`
+  - The file `/home/user/parse_planner/plan.json` exists and is valid JSON with the schema described above.
+  - `parser_config` equals `{"result_type": "markdown", "num_workers": 3, "language": "en"}`.
+  - `files` has exactly 2 entries, sorted by `file_name`, covering `data.txt` and `notes.md`. The unsupported `image.jpg` MUST be omitted.
+  - Each file entry has the correct `path`, on-disk `size_bytes`, lowercase hex `sha256`, and `extra_info` equal to `{"file_name": <basename>}`.
+- Command (error path): `python3 /home/user/parse_planner/parse_plan.py --input-dir /home/user/parse_planner/does_not_exist --output /home/user/parse_planner/should_not_exist.json`
+  - Exit code: non-zero.
+  - Stderr contains the line: `Error: input directory not found: /home/user/parse_planner/does_not_exist`
+  - The file `/home/user/parse_planner/should_not_exist.json` must NOT be created.
+- SDK usage: the script source must import `LlamaParse` from `llama_cloud_services` and must instantiate `LlamaParse(...)` (string match for both `from llama_cloud_services import LlamaParse` and `LlamaParse(`).
+
+8:T10b0,# Region-Aware LlamaCloud Client Configurator
+
+## Background
+LlamaCloud is offered in two distinct regions: North America (NA) and the European Union (EU). Each region has its own API endpoint, and users must explicitly point the SDK client to the EU endpoint via the `base_url` parameter to avoid silent 401/403 authentication errors. This is a well-known friction point for teams operating across regions.
+
+You must build a small Python CLI utility that constructs a `LlamaCloud` client (from the `llama-cloud` Python SDK) using the correct regional endpoint and writes a structured report describing the resolved configuration.
+
+## Requirements
+- Implement a Python CLI script `region_setup.py` that uses the `llama_cloud.client.LlamaCloud` SDK class.
+- The CLI must accept two arguments:
+  - `--region` (required): one of `na` or `eu` (case-insensitive).
+  - `--output` (required): the path to a JSON file where the configuration report will be written.
+- The script must map the region string to the correct LlamaCloud API endpoint:
+  - `na` -> `https://api.cloud.llamaindex.ai`
+  - `eu` -> `https://api.cloud.eu.llamaindex.ai`
+- The script must instantiate a `LlamaCloud` client using the `LLAMA_CLOUD_API_KEY` environment variable as the token and the resolved `base_url`.
+- After instantiation, the script must write a JSON object to the `--output` path with the following exact shape:
+  ```json
+  {
+    "region": "NA" | "EU",
+    "base_url": "https://api.cloud.llamaindex.ai" | "https://api.cloud.eu.llamaindex.ai",
+    "client_initialized": true
+  }
+  ```
+  The `region` field MUST be the uppercase code (`NA` or `EU`).
+- The script must print a single line to stdout in this exact format (using the resolved values):
+  `Configured LlamaCloud client for region=<NA|EU> base_url=<resolved_url>`
+- If `--region` is anything other than `na`/`eu` (case-insensitive), the script MUST exit with a non-zero status code and print an error message to stderr in this exact format: `Error: unsupported region '<value>'. Use 'na' or 'eu'.`
+- The script MUST NOT make any outbound HTTP calls. The verification environment does not validate against the real LlamaCloud servers.
+
+## Implementation Guide
+1. Create the project directory `/home/user/llamacloud_region`.
+2. Inside it, create `region_setup.py`. Use Python's `argparse` for argument parsing.
+3. Import the SDK:
+   ```python
+   from llama_cloud.client import LlamaCloud
+   ```
+4. Map the lowercase region to the proper base URL and uppercase code.
+5. Instantiate the client:
+   ```python
+   client = LlamaCloud(token=os.environ.get("LLAMA_CLOUD_API_KEY", ""), base_url=base_url)
+   ```
+6. Write the JSON report to the `--output` path.
+7. Print the required confirmation line to stdout and exit with status `0`.
+8. For an invalid region argument, write the error to stderr and exit with status `1`.
+
+## Acceptance Criteria
+- Project path: /home/user/llamacloud_region
+- Script path: /home/user/llamacloud_region/region_setup.py
+- Command (NA): `python3 /home/user/llamacloud_region/region_setup.py --region na --output /home/user/llamacloud_region/na_report.json`
+  - Exit code: `0`
+  - Stdout must contain exactly: `Configured LlamaCloud client for region=NA base_url=https://api.cloud.llamaindex.ai`
+  - The file `/home/user/llamacloud_region/na_report.json` must exist and contain JSON with `region` set to `"NA"`, `base_url` set to `"https://api.cloud.llamaindex.ai"`, and `client_initialized` set to `true`.
+- Command (EU): `python3 /home/user/llamacloud_region/region_setup.py --region EU --output /home/user/llamacloud_region/eu_report.json`
+  - Exit code: `0`
+  - Stdout must contain exactly: `Configured LlamaCloud client for region=EU base_url=https://api.cloud.eu.llamaindex.ai`
+  - The file `/home/user/llamacloud_region/eu_report.json` must exist and contain JSON with `region` set to `"EU"`, `base_url` set to `"https://api.cloud.eu.llamaindex.ai"`, and `client_initialized` set to `true`.
+- Command (invalid): `python3 /home/user/llamacloud_region/region_setup.py --region apac --output /tmp/should_not_exist.json`
+  - Exit code: non-zero (e.g., `1`).
+  - Stderr must contain: `Error: unsupported region 'apac'. Use 'na' or 'eu'.`
+  - The output file `/tmp/should_not_exist.json` must NOT be created.
+
+0:{"buildId":"d9JATwUsZ3TcDamXbTzm5","rsc":["$","$1","c",{"children":[["$","div",null,{"className":"min-h-screen bg-background text-foreground font-sans selection:bg-primary/20","children":[["$","div",null,{"className":"fixed inset-0 -z-10 h-full w-full bg-background bg-[radial-gradient(#2a2a2a_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20 dark:opacity-40"}],["$","$L2",null,{"tasksData":[{"taskName":"composite_retriever_plan_builder","instruction":"$3","trials":[{"job_name":"2026-05-14__13-31-42","trial_name":"composite_retriever_plan_builder__99Rmbp7","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":449.371,"latency_breakdown":{"env_setup":133.262,"agent_setup":20.834,"agent_exec":276.655,"verifier":6.734},"taskName":"composite_retriever_plan_builder","jobId":"99Rmbp7","exec_duration":276.655}]},{"taskName":"incremental_ingestion_planner","instruction":"$4","trials":[{"job_name":"2026-05-14__13-31-42","trial_name":"incremental_ingestion_planner__vE8D5ge","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":204.421,"latency_breakdown":{"env_setup":14.554,"agent_setup":23.014,"agent_exec":142.06,"verifier":12.866},"taskName":"incremental_ingestion_planner","jobId":"vE8D5ge","exec_duration":142.06}]},{"taskName":"mcp_server_config_builder","instruction":"$5","trials":[{"job_name":"2026-05-14__13-31-42","trial_name":"mcp_server_config_builder__DF2PceJ","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":273.264,"latency_breakdown":{"env_setup":133.098,"agent_setup":23.933,"agent_exec":100.676,"verifier":3.575},"taskName":"mcp_server_config_builder","jobId":"DF2PceJ","exec_duration":100.676}]},{"taskName":"parse_job_request_builder","instruction":"$6","trials":[{"job_name":"2026-05-14__13-31-42","trial_name":"parse_job_request_builder__tfm5WRv","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":177.179,"latency_breakdown":{"env_setup":8.697,"agent_setup":19.568,"agent_exec":134.037,"verifier":3.148},"taskName":"parse_job_request_builder","jobId":"tfm5WRv","exec_duration":134.037}]},{"taskName":"parse_plan_builder","instruction":"$7","trials":[{"job_name":"2026-05-14__13-31-42","trial_name":"parse_plan_builder__mLQo9xu","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":233.266,"latency_breakdown":{"env_setup":133.029,"agent_setup":21.647,"agent_exec":62.165,"verifier":4.339},"taskName":"parse_plan_builder","jobId":"mLQo9xu","exec_duration":62.165}]},{"taskName":"regional_llamacloud_client","instruction":"$8","trials":[{"job_name":"2026-05-14__13-31-42","trial_name":"regional_llamacloud_client__YTcGbxs","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":362.362,"latency_breakdown":{"env_setup":132.857,"agent_setup":22.019,"agent_exec":193.136,"verifier":2.267},"taskName":"regional_llamacloud_client","jobId":"YTcGbxs","exec_duration":193.136}]}]}]]}],["$L9","$La"],"$Lb"]}],"loading":null,"isPartial":false}
+9:["$","script","script-0",{"src":"/llamacloud-benchmark/pr-preview/pr-3/_next/static/chunks/28c0ea01e9ff9346.js","async":true}]
+a:["$","script","script-1",{"src":"/llamacloud-benchmark/pr-preview/pr-3/_next/static/chunks/be08138953094657.js","async":true}]
+b:["$","$Lc",null,{"children":["$","$d",null,{"name":"Next.MetadataOutlet","children":"$@e"}]}]
+e:null
