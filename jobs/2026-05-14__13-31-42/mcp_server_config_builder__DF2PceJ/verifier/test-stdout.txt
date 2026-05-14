@@ -1,0 +1,19 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 8 items
+
+tests/test_final_state.py ........                                       [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_exists
+PASSED tests/test_final_state.py::test_sdk_import_string_present
+PASSED tests/test_final_state.py::test_happy_path_run
+PASSED tests/test_final_state.py::test_happy_path_output_structure
+PASSED tests/test_final_state.py::test_validation_error_duplicate_name
+PASSED tests/test_final_state.py::test_validation_error_bad_topk
+PASSED tests/test_final_state.py::test_validation_error_empty_description
+PASSED tests/test_final_state.py::test_validation_error_missing_config_file
+============================== 8 passed in 2.68s ===============================

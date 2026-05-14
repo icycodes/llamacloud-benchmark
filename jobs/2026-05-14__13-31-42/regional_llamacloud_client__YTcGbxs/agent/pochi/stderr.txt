@@ -1,0 +1,838 @@
+[37m2026-05-14 05:34:21.323[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37mnative:1[39m[0m[0m[1m[37m	Pochi[39m[22m[0m[0m	pochi v0.6.8
+[37m2026-05-14 05:34:21.567[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:519633[39m[0m[0m[1m[37m	loadAgents[39m[22m[0m[0m	Loaded 6 custom agents (6 valid, 0 invalid)
+[37m2026-05-14 05:34:21.574[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:519634[39m[0m[0m[1m[37m	loadSkills[39m[22m[0m[0m	Loaded 2 skills (2 valid, 0 invalid)
+[37m2026-05-14 05:34:21.688[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:444677[39m[0m[0m[1m[37m	PochiVendor[39m[22m[0m[0m	JWT is expiring or missing, fetching a new one
+[37m2026-05-14 05:34:24.966[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:416517[39m[0m[0m[1m[37m	MCPHub[39m[22m[0m[0m	MCP servers configuration changed via signal:
+[37m2026-05-14 05:34:24.967[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:416629[39m[0m[0m[1m[37m	MCPHub[39m[22m[0m[0m	Build MCPHub Status
+[37m2026-05-14 05:34:25.192[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37mnative:7[39m[0m[0m[1m[37m	Pochi[39m[22m[0m[0m	Starting task runner...
+[37m2026-05-14 05:34:25.297[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:507614[39m[0m[0m[1m[37m	generateTaskTitle[39m[22m[0m[0m	Generating task title, old: null, new: # Region-Aware LlamaCloud Client Configurator
+[37m2026-05-14 05:34:40.600[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:507614[39m[0m[0m[1m[37m	generateTaskTitle[39m[22m[0m[0m	Generating task title, old: # Region-Aware LlamaCloud Client Configurator, new: Build a region-aware LlamaCloud client configurator CLI utility
+[37m2026-05-14 05:35:17.736[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:474589[39m[0m[0m[1m[37m	FileStateCache[39m[22m[0m[0m	withReadFileCache: path="/usr/local/lib/python3.12/dist-packages/llama_cloud/__init__.py" resolvedPath="/usr/local/lib/python3.12/dist-packages/llama_cloud/__init__.py" isVirtual=false cacheExists=true shouldCache=true startLine=undefined endLine=undefined
+[37m2026-05-14 05:35:17.737[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:474589[39m[0m[0m[1m[37m	FileStateCache[39m[22m[0m[0m	withReadFileCache: existingState=undefined
+[37m2026-05-14 05:35:17.739[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:518725[39m[0m[0m[1m[37m	FileStateCache[39m[22m[0m[0m	withReadFileCache: populating cache for "/usr/local/lib/python3.12/dist-packages/llama_cloud/__init__.py" mtime=1778729683000 contentLen=2820
+[37m2026-05-14 05:36:16.432[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:474589[39m[0m[0m[1m[37m	FileStateCache[39m[22m[0m[0m	withReadFileCache: path="/usr/local/lib/python3.12/dist-packages/llama_cloud/_client.py" resolvedPath="/usr/local/lib/python3.12/dist-packages/llama_cloud/_client.py" isVirtual=false cacheExists=true shouldCache=true startLine=1 endLine=undefined
+[37m2026-05-14 05:36:16.432[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:474589[39m[0m[0m[1m[37m	FileStateCache[39m[22m[0m[0m	withReadFileCache: existingState=undefined
+[37m2026-05-14 05:36:16.435[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:518725[39m[0m[0m[1m[37m	FileStateCache[39m[22m[0m[0m	withReadFileCache: populating cache for "/usr/local/lib/python3.12/dist-packages/llama_cloud/_client.py" mtime=1778729683000 contentLen=32632
+[37m2026-05-14 05:36:23.532[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:462742[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	searchFiles /usr/local/lib/python3.12/dist-packages/llama_cloud token [90mundefined[39m
+[37m2026-05-14 05:36:23.534[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:462742[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	command "/usr/bin/rg" --json --case-sensitive --binary --sortr modified 'token' '/usr/local/lib/python3.12/dist-packages/llama_cloud'
+[37m2026-05-14 05:36:23.563[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/shared/__pycache__/cloud_box_data_source.cpython-312.pyc"},"lines":{"bytes":"KQLaD2RldmVsb3Blcl90b2tlbtoDY2Nn2hhhdXRoZW50aWNhdGlvbl9tZWNoYW5pc21O2go="},"line_number":130,"absolute_offset":369,"submatches":[{"match":{"text":"token"},"start":14,"end":19}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.564[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/beta/directories/__pycache__/file_list_params.cpython-312.pyc"},"lines":{"bytes":"cGFnZV90b2tlbtoK"},"line_number":107,"absolute_offset":443,"submatches":[{"match":{"text":"token"},"start":5,"end":10}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.565[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/beta/__pycache__/directory_list_params.cpython-312.pyc"},"lines":{"bytes":"cGFnZV90b2tlbtoK"},"line_number":101,"absolute_offset":404,"submatches":[{"match":{"text":"token"},"start":5,"end":10}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.565[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/beta/__pycache__/sheet_list_params.cpython-312.pyc"},"lines":{"bytes":"cGFnZV90b2tlbtoK"},"line_number":126,"absolute_offset":708,"submatches":[{"match":{"text":"token"},"start":5,"end":10}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.565[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/beta/__pycache__/agent_data_aggregate_params.cpython-312.pyc"},"lines":{"bytes":"cGFnZV90b2tlbk4pBNoIX19uYW1lX1/aCg=="},"line_number":148,"absolute_offset":792,"submatches":[{"match":{"text":"token"},"start":5,"end":10}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.565[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/beta/__pycache__/split_list_params.cpython-312.pyc"},"lines":{"bytes":"cGFnZV90b2tlbtoK"},"line_number":116,"absolute_offset":657,"submatches":[{"match":{"text":"token"},"start":5,"end":10}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.566[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/beta/__pycache__/agent_data_search_params.cpython-312.pyc"},"lines":{"bytes":"cGFnZV90b2tlbk4pBNoIX19uYW1lX1/aCg=="},"line_number":140,"absolute_offset":715,"submatches":[{"match":{"text":"token"},"start":5,"end":10}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.566[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/beta/__pycache__/extracted_data.cpython-312.pyc"},"lines":{"bytes":"2gdmaWxlX2lkejZUaGUgbmFtZSBvZiB0aGUgZmlsZSB0aGF0IHdhcyB1c2VkIHRvIGV4dHJhY3QgdGhlIGRhdGHaCWZpbGVfbmFtZXo2VGhlIGhhc2ggb2YgdGhlIGZpbGUgdGhhdCB3YXMgdXNlZCB0byBleHRyYWN0IHRoZSBkYXRh2glmaWxlX2hhc2h6SkFkZGl0aW9uYWwgbWV0YWRhdGEgYWJvdXQgdGhlIGV4dHJhY3RlZCBkYXRhLCBzdWNoIGFzIGVycm9ycywgdG9rZW5zLCBldGMu+hhPcHRpb25hbFtEaWN0W3N0ciwgQW55XV3aCG1ldGFkYXRhVCkB2gNwcmVjAgo="},"line_number":2199,"absolute_offset":11397,"submatches":[{"match":{"text":"token"},"start":207,"end":212}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.566[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/shared_params/__pycache__/cloud_notion_page_data_source.cpython-312.pyc"},"lines":{"bytes":"eg1SZXF1aXJlZFtzdHJd2hFpbnRlZ3JhdGlvbl90b2tlbtoDc3Ry2go="},"line_number":97,"absolute_offset":305,"submatches":[{"match":{"text":"token"},"start":29,"end":34}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.567[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/shared_params/__pycache__/cloud_box_data_source.cpython-312.pyc"},"lines":{"bytes":"eitSZXF1aXJlZFtMaXRlcmFsWydkZXZlbG9wZXJfdG9rZW4nLCAnY2NnJ11d2hhhdXRoZW50aWNhdGlvbl9tZWNoYW5pc23aA3N0ctoK"},"line_number":112,"absolute_offset":357,"submatches":[{"match":{"text":"token"},"start":30,"end":35}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.567[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/shared_params/__pycache__/cloud_box_data_source.cpython-312.pyc"},"lines":{"bytes":"Y2xhc3NfbmFtZXoNT3B0aW9uYWxbc3RyXdoJY2xpZW50X2lk2g1jbGllbnRfc2VjcmV02g9kZXZlbG9wZXJfdG9rZW7aDWVudGVycHJpc2VfaWTaCWZvbGRlcl9pZNoEYm9vbNoXc3VwcG9ydHNfYWNjZXNzX2NvbnRyb2zaB3VzZXJfaWROKQTaCF9fbmFtZV9f2go="},"line_number":113,"absolute_offset":435,"submatches":[{"match":{"text":"token"},"start":63,"end":68}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.567[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/shared_params/__pycache__/cloud_milvus_vector_store.cpython-312.pyc"},"lines":{"bytes":"ehpDbG91ZCBNaWx2dXMgVmVjdG9yIFN0b3JlLnoNUmVxdWlyZWRbc3RyXdoDdXJpeg1PcHRpb25hbFtzdHJd2gV0b2tlbtoDc3Ry2go="},"line_number":97,"absolute_offset":310,"submatches":[{"match":{"text":"token"},"start":65,"end":70}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.567[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/shared_params/__pycache__/cloud_slack_data_source.cpython-312.pyc"},"lines":{"bytes":"eg1SZXF1aXJlZFtzdHJd2gtzbGFja190b2tlbnoNT3B0aW9uYWxbc3RyXdoLY2hhbm5lbF9pZHPaEGNoYW5uZWxfcGF0dGVybnPaA3N0ctoK"},"line_number":113,"absolute_offset":348,"submatches":[{"match":{"text":"token"},"start":23,"end":28}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.567[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/shared_params/__pycache__/cloud_jira_data_source_v2.cpython-312.pyc"},"lines":{"bytes":"c2VydmVyX3VybHoNT3B0aW9uYWxbc3RyXdoJYXBpX3Rva2VuehFMaXRlcmFsWycyJywgJzMnXdoLYXBpX3ZlcnNpb27aA3N0ctoK"},"line_number":137,"absolute_offset":549,"submatches":[{"match":{"text":"token"},"start":31,"end":36}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.568[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/shared_params/__pycache__/cloud_confluence_data_source.cpython-312.pyc"},"lines":{"bytes":"c2VydmVyX3VybHoNT3B0aW9uYWxbc3RyXdoJYXBpX3Rva2Vu2gNzdHLaCg=="},"line_number":135,"absolute_offset":484,"submatches":[{"match":{"text":"token"},"start":31,"end":36}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.568[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/shared_params/__pycache__/cloud_astra_db_vector_store.cpython-312.pyc"},"lines":{"bytes":"ICAgIHoNUmVxdWlyZWRbc3RyXdoFdG9rZW7aDGFwaV9lbmRwb2ludNoPY29sbGVjdGlvbl9uYW1leg1SZXF1aXJlZFtpbnRd2hNlbWJlZGRpbmdfZGltZW5zaW9u2gNzdHLaCg=="},"line_number":118,"absolute_offset":918,"submatches":[{"match":{"text":"token"},"start":21,"end":26}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.568[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/shared_params/__pycache__/cloud_jira_data_source.cpython-312.pyc"},"lines":{"bytes":"ei5DbG91ZCBKaXJhIERhdGEgU291cmNlIGludGVncmF0aW5nIEppcmFSZWFkZXIueg1SZXF1aXJlZFtzdHJd2hhhdXRoZW50aWNhdGlvbl9tZWNoYW5pc23aBXF1ZXJ5eg1PcHRpb25hbFtzdHJd2glhcGlfdG9rZW7aA3N0ctoK"},"line_number":109,"absolute_offset":339,"submatches":[{"match":{"text":"token"},"start":117,"end":122}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.568[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/classifier/__pycache__/job_get_results_response.cpython-312.pyc"},"lines":{"bytes":"ek9SZXNwb25zZSBtb2RlbCBmb3IgdGhlIGNsYXNzaWZ5IGVuZHBvaW50IGZvbGxvd2luZyBBSVAtMTMyIHBhZ2luYXRpb24gc3RhbmRhcmQu2gVpdGVtc07aD25leHRfcGFnZV90b2tlbtoK"},"line_number":340,"absolute_offset":1247,"submatches":[{"match":{"text":"token"},"start":101,"end":106}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.569[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/classifier/__pycache__/job_list_params.cpython-312.pyc"},"lines":{"bytes":"cGFnZV90b2tlbtoK"},"line_number":91,"absolute_offset":323,"submatches":[{"match":{"text":"token"},"start":5,"end":10}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.569[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/advanced_mode_transform_config.cpython-312.pyc"},"lines":{"bytes":"2gV0b2tlbnIWCg=="},"line_number":389,"absolute_offset":1553,"submatches":[{"match":{"text":"token"},"start":2,"end":7}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.569[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/classify_list_params.cpython-312.pyc"},"lines":{"bytes":"cGFnZV90b2tlbtoK"},"line_number":122,"absolute_offset":694,"submatches":[{"match":{"text":"token"},"start":5,"end":10}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.569[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/file_query_params.cpython-312.pyc"},"lines":{"bytes":"cGFnZV90b2tlbk4pBNoIX19uYW1lX1/aCg=="},"line_number":118,"absolute_offset":470,"submatches":[{"match":{"text":"token"},"start":5,"end":10}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.569[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/hugging_face_inference_api_embedding.cpython-312.pyc"},"lines":{"bytes":"TtoFdG9rZW7aCg=="},"line_number":187,"absolute_offset":589,"submatches":[{"match":{"text":"token"},"start":3,"end":8}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.569[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/extract_list_params.cpython-312.pyc"},"lines":{"bytes":"cGFnZV90b2tlbtoK"},"line_number":139,"absolute_offset":825,"submatches":[{"match":{"text":"token"},"start":5,"end":10}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.570[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/bedrock_embedding_param.cpython-312.pyc"},"lines":{"bytes":"ehFEaWN0W3N0ciwgb2JqZWN0XdoRYWRkaXRpb25hbF9rd2FyZ3N6DU9wdGlvbmFsW3N0cl3aEWF3c19hY2Nlc3Nfa2V5X2lk2hVhd3Nfc2VjcmV0X2FjY2Vzc19rZXnaEWF3c19zZXNzaW9uX3Rva2Vu2gNzdHLaCg=="},"line_number":125,"absolute_offset":381,"submatches":[{"match":{"text":"token"},"start":109,"end":114}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.570[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/bedrock_embedding.cpython-312.pyc"},"lines":{"bytes":"TtoRYWRkaXRpb25hbF9rd2FyZ3PaEWF3c19hY2Nlc3Nfa2V5X2lk2hVhd3Nfc2VjcmV0X2FjY2Vzc19rZXnaEWF3c19zZXNzaW9uX3Rva2Vu2go="},"line_number":175,"absolute_offset":517,"submatches":[{"match":{"text":"token"},"start":76,"end":81}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.570[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/hugging_face_inference_api_embedding_param.cpython-312.pyc"},"lines":{"bytes":"ehZVbmlvbltzdHIsIGJvb2wsIE5vbmVd2gV0b2tlbtoDc3Ry2go="},"line_number":129,"absolute_offset":421,"submatches":[{"match":{"text":"token"},"start":26,"end":31}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.570[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/vertex_text_embedding_param.cpython-312.pyc"},"lines":{"bytes":"ehdSZXF1aXJlZFtPcHRpb25hbFtzdHJdXdoMY2xpZW50X2VtYWlseg1SZXF1aXJlZFtzdHJd2ghsb2NhdGlvbtoLcHJpdmF0ZV9rZXnaDnByaXZhdGVfa2V5X2lk2gdwcm9qZWN02gl0b2tlbl91cml6EURpY3Rbc3RyLCBvYmplY3Rd2hFhZGRpdGlvbmFsX2t3YXJnc9oDc3Ry2go="},"line_number":126,"absolute_offset":411,"submatches":[{"match":{"text":"token"},"start":104,"end":109}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.570[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/extract_job_usage.cpython-312.pyc"},"lines":{"bytes":"ehlFeHRyYWN0aW9uIHVzYWdlIG1ldHJpY3MuTtoTbnVtX2RvY3VtZW50X3Rva2Vuc9oRbnVtX291dHB1dF90b2tlbnPaE251bV9wYWdlc19leHRyYWN0ZWQpCg=="},"line_number":100,"absolute_offset":267,"submatches":[{"match":{"text":"token"},"start":43,"end":48},{"match":{"text":"token"},"start":62,"end":67}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.571[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/file_query_response.cpython-312.pyc"},"lines":{"bytes":"ehhQYWdpbmF0ZWQgbGlzdCBvZiBmaWxlcy7aBWl0ZW1zTtoPbmV4dF9wYWdlX3Rva2Vu2go="},"line_number":238,"absolute_offset":975,"submatches":[{"match":{"text":"token"},"start":46,"end":51}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.571[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/vertex_text_embedding.cpython-312.pyc"},"lines":{"bytes":"TtoMY2xpZW50X2VtYWls2ghsb2NhdGlvbtoLcHJpdmF0ZV9rZXnaDnByaXZhdGVfa2V5X2lk2gdwcm9qZWN02gl0b2tlbl91cmnaEWFkZGl0aW9uYWxfa3dhcmdz2go="},"line_number":175,"absolute_offset":529,"submatches":[{"match":{"text":"token"},"start":65,"end":70}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.571[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/parsing_list_params.cpython-312.pyc"},"lines":{"bytes":"cGFnZV90b2tlbtoK"},"line_number":118,"absolute_offset":663,"submatches":[{"match":{"text":"token"},"start":5,"end":10}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.571[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/file_list_params.cpython-312.pyc"},"lines":{"bytes":"cGFnZV90b2tlbtoK"},"line_number":115,"absolute_offset":491,"submatches":[{"match":{"text":"token"},"start":5,"end":10}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.572[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/extract_v2_job_query_response.cpython-312.pyc"},"lines":{"bytes":"eiJQYWdpbmF0ZWQgbGlzdCBvZiBleHRyYWN0aW9uIGpvYnMu2gVpdGVtc07aD25leHRfcGFnZV90b2tlbtoK"},"line_number":105,"absolute_offset":316,"submatches":[{"match":{"text":"token"},"start":56,"end":61}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.572[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/types/__pycache__/configuration_list_params.cpython-312.pyc"},"lines":{"bytes":"cGFnZV90b2tlbnppT3B0aW9uYWxbTGlzdFtMaXRlcmFsWydzcGxpdF92MScsICdleHRyYWN0X3YyJywgJ2NsYXNzaWZ5X3YyJywgJ3BhcnNlX3YyJywgJ3NwcmVhZHNoZWV0X3YxJywgJ3Vua25vd24nXV1d2gxwcm9kdWN0X3R5cGXaCg=="},"line_number":106,"absolute_offset":421,"submatches":[{"match":{"text":"token"},"start":5,"end":10}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.572[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/resources/__pycache__/configurations.cpython-312.pyc"},"lines":{"bytes":"cGFnZV90b2tlbtoMcHJvZHVjdF90eXBlcjUK"},"line_number":1160,"absolute_offset":6001,"submatches":[{"match":{"text":"token"},"start":5,"end":10}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:36:23.573[39m[0m[0m	[31m[1mERROR[22m[39m[0m[0m	[37m$bunfs/root/pochi:518769[39m[0m[0m[1m[37m	RipgrepUtils[39m[22m[0m[0m	Failed to parse rg JSON output line: {"type":"match","data":{"path":{"text":"/usr/local/lib/python3.12/dist-packages/llama_cloud/__pycache__/pagination.cpython-312.pyc"},"lines":{"bytes":"TtoPbmV4dF9wYWdlX3Rva2VuciAK"},"line_number":3921,"absolute_offset":9719,"submatches":[{"match":{"text":"token"},"start":13,"end":18}]}}
+
+[97m[101m[1m TypeError [22m[49m[39m[0m[0m undefined is not an object (evaluating 'matchData.lines.text.replace'), 462770, 42, 462770, 42, /$bunfs/root/pochi[0m[0m
+error stack:
+  • [33mpochi[39m[0m[0m	searchFilesWithRipgrep[0m[0m
+	[37m$bunfs/root/pochi:462770[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async <anonymous>[0m[0m
+	[37m$bunfs/root/pochi:518769[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async executeToolCall2[0m[0m
+	[37m$bunfs/root/pochi:518887[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async processToolCalls[0m[0m
+	[37m$bunfs/root/pochi:519249[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async process[0m[0m
+	[37m$bunfs/root/pochi:519190[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async step[0m[0m
+	[37m$bunfs/root/pochi:519136[39m[0m[0m
+  • [33mpochi[39m[0m[0m	async run[0m[0m
+	[37m$bunfs/root/pochi:519052[39m[0m[0m
+  • [33m[39m[0m[0m	[0m[0m
+	[37m[39m[0m[0m
+  • [33mnative[39m[0m[0m	processTicksAndRejections[0m[0m
+	[37mnative:7[39m[0m[0m[0m[0m
+[37m2026-05-14 05:37:09.136[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:474589[39m[0m[0m[1m[37m	FileStateCache[39m[22m[0m[0m	withReadFileCache: path="/home/user/llamacloud_region/region_setup.py" resolvedPath="/home/user/llamacloud_region/region_setup.py" isVirtual=false cacheExists=true shouldCache=true startLine=undefined endLine=undefined
+[37m2026-05-14 05:37:09.137[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:474589[39m[0m[0m[1m[37m	FileStateCache[39m[22m[0m[0m	withReadFileCache: existingState={startLine=undefined, endLine=undefined, timestamp=1778736991613}
+[37m2026-05-14 05:37:09.140[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:518725[39m[0m[0m[1m[37m	FileStateCache[39m[22m[0m[0m	withReadFileCache: populating cache for "/home/user/llamacloud_region/region_setup.py" mtime=1778736991613 contentLen=1691
+[37m2026-05-14 05:37:32.794[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37mnative:7[39m[0m[0m[1m[37m	Pochi[39m[22m[0m[0m	Task runner finished successfully.
+[37m2026-05-14 05:37:32.794[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37mnative:7[39m[0m[0m[1m[37m	Pochi[39m[22m[0m[0m	Shutting down...
+[37m2026-05-14 05:37:32.808[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37mnative:7[39m[0m[0m[1m[37m	Pochi[39m[22m[0m[0m	Shutdown completed. Process will exit.
+[37m2026-05-14 05:37:32.809[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m[39m[0m[0m[1m[37m	Pochi[39m[22m[0m[0m	Process exiting with code 0

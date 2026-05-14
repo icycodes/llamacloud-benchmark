@@ -1,0 +1,106 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 9,
+            "passed": 9,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778737158591,
+            "stop": 1778737170575
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_imports_llama_cloud_managed_index",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778737158618,
+                "stop": 1778737158618,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_happy_path_run_stdout_and_exit_code",
+                "status": "passed",
+                "duration": 1450,
+                "start": 1778737158619,
+                "stop": 1778737160069,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_happy_path_plan_structure",
+                "status": "passed",
+                "duration": 1503,
+                "start": 1778737160069,
+                "stop": 1778737161572,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_happy_path_add_entry_for_notes_txt",
+                "status": "passed",
+                "duration": 1509,
+                "start": 1778737161573,
+                "stop": 1778737163082,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_happy_path_unchanged_entry_for_report_md",
+                "status": "passed",
+                "duration": 1520,
+                "start": 1778737163082,
+                "stop": 1778737164602,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_happy_path_delete_entry_for_archive_txt",
+                "status": "passed",
+                "duration": 1460,
+                "start": 1778737164602,
+                "stop": 1778737166062,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_happy_path_update_list_empty_and_unsupported_excluded",
+                "status": "passed",
+                "duration": 1459,
+                "start": 1778737166062,
+                "stop": 1778737167521,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_missing_previous_state_run",
+                "status": "passed",
+                "duration": 1451,
+                "start": 1778737167521,
+                "stop": 1778737168972,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_missing_input_directory_error_path",
+                "status": "passed",
+                "duration": 1603,
+                "start": 1778737168972,
+                "stop": 1778737170575,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

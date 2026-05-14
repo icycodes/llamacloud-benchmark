@@ -1,0 +1,18 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 7 items
+
+tests/test_final_state.py .......                                        [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_exists
+PASSED tests/test_final_state.py::test_script_imports_llama_cloud_sdk
+PASSED tests/test_final_state.py::test_happy_path_run
+PASSED tests/test_final_state.py::test_bad_tier_validation
+PASSED tests/test_final_state.py::test_fast_tier_markdown_validation
+PASSED tests/test_final_state.py::test_bad_version_validation
+PASSED tests/test_final_state.py::test_missing_config_validation
+============================== 7 passed in 2.22s ===============================
