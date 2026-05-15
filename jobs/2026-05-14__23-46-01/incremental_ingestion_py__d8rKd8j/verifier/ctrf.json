@@ -1,0 +1,100 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 8,
+            "passed": 7,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778774288665,
+            "stop": 1778774303913
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_exits_zero",
+                "status": "passed",
+                "duration": 9779,
+                "start": 1778774288745,
+                "stop": 1778774298524,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_stdout_contains_ingested_summary",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778774298524,
+                "stop": 1778774298526,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_index_exists_on_llamacloud",
+                "status": "passed",
+                "duration": 847,
+                "start": 1778774298526,
+                "stop": 1778774299373,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_new_files_attached_to_same_pipeline",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 1549,
+                "start": 1778774299373,
+                "stop": 1778774300922,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "run_script = CompletedProcess(args=['python3', 'ingest.py', '--initial-dir', '/home/user/myproject/initial_docs', '--new-dir', '/ho...a582dd-4265-4be0-ad2c-4531ba7bca7a\\nIngested 2 file(s) into harbor-inc-incremental_ingestion_py__d8rKd8j\\n', stderr='')\n\n    def test_new_files_attached_to_same_pipeline(run_script):\n        \"\"\"The new files must be uploaded into the SAME pipeline created from the initial batch.\"\"\"\n        api_key = os.environ.get(\"LLAMA_CLOUD_API_KEY\")\n        assert api_key, \"LLAMA_CLOUD_API_KEY env var is required for verification.\"\n    \n        pipelines = _list_pipelines(api_key)\n        expected = _expected_index_name()\n        matching = [p for p in pipelines if p.get(\"name\") == expected]\n        assert len(matching) == 1, (\n            f\"Expected exactly one pipeline named {expected!r} in project 'Default'; \"\n            f\"found {len(matching)}.\"\n        )\n        pipeline_id = matching[0][\"id\"]\n    \n        files = _list_pipeline_files(api_key, pipeline_id)\n        assert isinstance(files, list), (\n            f\"Expected pipeline files response to be a JSON array, got: {files!r}\"\n        )\n        # The initial batch contains 1 document and the new batch contains 2 files,\n        # so the pipeline must have at least 3 files attached.\n>       assert len(files) >= 3, (\n            f\"Expected pipeline {expected!r} to have at least 3 files attached \"\n            f\"(1 initial + 2 incremental); got {len(files)}: {files!r}\"\n        )\nE       AssertionError: Expected pipeline 'harbor-inc-incremental_ingestion_py__d8rKd8j' to have at least 3 files attached (1 initial + 2 incremental); got 2: [{'id': '96bd3850-219d-4338-96a5-d718223ff9a0', 'name': 'leadership.txt', 'external_file_id': '8de3d55b-edb2-4036-a7ce-836c52607b2e', 'file_size': 92, 'file_type': 'txt', 'project_id': 'b420cea9-2ed0-451d-8ebc-617151ec45f6', 'last_modified_at': '2026-05-14T15:58:18.142874Z', 'file_id': 'b6843ba1-e773-4bd2-a483-28aee8f73d34', 'pipeline_id': '91a582dd-4265-4be0-ad2c-4531ba7bca7a', 'resource_info': {'id': '8de3d55b-edb2-4036-a7ce-836c52607b2e', 'file_size': 92, 'last_modified_at': '2026-05-14T15:58:18'}, 'permission_info': None, 'custom_metadata': {}, 'data_source_id': None, 'config_hash': {'parsing_config_hash': '1cf69f2e629a4217fe33ce9a02065259b359dc49ba52f592eb', 'embedding_config_hash': '2ad2e188cded9622db27e8566a3dec31f3f0a099f291446bcd', 'transform_config_hash': '84032cd089f78343a74e25f97a30c5f7419a67f43d65ada2f1'}, 'indexed_page_count': 1, 'status': 'SUCCESS', 'status_updated_at': '2026-05-14T15:58:20.108406', 'created_at': '2026-05-14T15:58:17.721052Z', 'updated_at': '2026-05-14T15:58:20.108406Z'}, {'id': 'ff658c3f-b63e-47b4-adf4-8c7549f8573a', 'name': 'headcount.txt', 'external_file_id': 'f1391d29-48cf-4be6-8047-2ce50eda789e', 'file_size': 79, 'file_type': 'txt', 'project_id': 'b420cea9-2ed0-451d-8ebc-617151ec45f6', 'last_modified_at': '2026-05-14T15:58:17.456663Z', 'file_id': 'af8774f0-3283-4aae-be1b-e0675698381e', 'pipeline_id': '91a582dd-4265-4be0-ad2c-4531ba7bca7a', 'resource_info': {'id': 'f1391d29-48cf-4be6-8047-2ce50eda789e', 'file_size': 79, 'last_modified_at': '2026-05-14T15:58:17'}, 'permission_info': None, 'custom_metadata': {}, 'data_source_id': None, 'config_hash': {'parsing_config_hash': '1cf69f2e629a4217fe33ce9a02065259b359dc49ba52f592eb', 'embedding_config_hash': '2ad2e188cded9622db27e8566a3dec31f3f0a099f291446bcd', 'transform_config_hash': '84032cd089f78343a74e25f97a30c5f7419a67f43d65ada2f1'}, 'indexed_page_count': 1, 'status': 'SUCCESS', 'status_updated_at': '2026-05-14T15:58:19.170165', 'created_at': '2026-05-14T15:58:16.926786Z', 'updated_at': '2026-05-14T15:58:19.170165Z'}]\nE       assert 2 >= 3\nE        +  where 2 = len([{'config_hash': {'embedding_config_hash': '2ad2e188cded9622db27e8566a3dec31f3f0a099f291446bcd', 'parsing_config_hash'...419a67f43d65ada2f1'}, 'created_at': '2026-05-14T15:58:16.926786Z', 'custom_metadata': {}, 'data_source_id': None, ...}])\n\ntests/test_final_state.py:134: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_structure",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778774300922,
+                "stop": 1778774300923,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_uses_required_apis",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778774300923,
+                "stop": 1778774300924,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_fails_on_missing_initial_dir",
+                "status": "passed",
+                "duration": 1446,
+                "start": 1778774300924,
+                "stop": 1778774302370,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_fails_on_missing_new_dir",
+                "status": "passed",
+                "duration": 1541,
+                "start": 1778774302371,
+                "stop": 1778774303912,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

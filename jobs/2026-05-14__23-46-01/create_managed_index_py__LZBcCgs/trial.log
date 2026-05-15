@@ -1,0 +1,125 @@
+Skipping image OS validation for hb__create_managed_index_py: docker inspect returned 1
+Running command: apt-get update && apt-get install -y curl ripgrep
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Running command: echo create_managed_index_py__LZBcCgs > /logs/artifacts/trial_id
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# Create and Query a LlamaCloud Managed Index (Python)
+
+## Background
+You are working in `/home/user/myproject`, which already contains a small `docs/` folder with a single text file describing the fictional company **Acme Widgets Corporation**. Your job is to build a Python command-line utility that uses the [LlamaIndex managed index integration](https://docs.llamaindex.ai/en/stable/api_reference/indices/llama_cloud/) (the `llama-index-indices-managed-llama-cloud` package) to create a new managed index on **LlamaCloud**, ingest the documents, and run a natural-language query against the index.
+
+The SDK is already installed in the environment and the `LLAMA_CLOUD_API_KEY` environment variable is configured. You do NOT need to handle authentication explicitly — the SDK reads the API key from the environment automatically.
+
+## Parallel-Run Safety
+Many trials may run concurrently and share the same LlamaCloud account, so every external resource you create on LlamaCloud **MUST** be uniquely named. The harness writes the current `trial_id` to the file `/logs/artifacts/trial_id` before the task starts. Read that file and use the value to disambiguate your index name (see Requirements).
+
+## Requirements
+- Implement a Python CLI named `build_index.py` at `/home/user/myproject/build_index.py`.
+- The script must accept exactly three command-line arguments:
+  - `--data-dir <path>`: path to a local directory whose files should be loaded into the index.
+  - `--query <text>`: a natural-language query string.
+  - `--output <path>`: the path where the query response text should be written (UTF-8 text file).
+- Read `trial_id` from `/logs/artifacts/trial_id` (the file is a single line). Strip any trailing whitespace/newline.
+- Build the **index name** as `harbor-rag-${trial_id}` (literal prefix `harbor-rag-` followed by the trimmed `trial_id`).
+- Use `SimpleDirectoryReader` from `llama_index.core` to load documents from `--data-dir`.
+- Use `LlamaCloudIndex.from_documents(...)` from `llama_index.indices.managed.llama_cloud` to create a new managed index with:
+  - `name="harbor-rag-${trial_id}"`
+  - `project_name="Default"`
+  - `verbose=True`
+- After the index is created, build a query engine via `index.as_query_engine()` and run the user-supplied query against it.
+- Write the textual response (the `response` object converted to `str(...)`) to the `--output` file (UTF-8).
+- Print exactly one line to stdout: `Index name: harbor-rag-${trial_id}` where `${trial_id}` is replaced by the trimmed value from `/logs/artifacts/trial_id`.
+- The script must exit with status code `0` on success and a non-zero status code when `--data-dir` does not exist or contains no files.
+
+## Implementation Guide
+1. Parse `--data-dir`, `--query`, and `--output` using `argparse` (standard library).
+2. Open `/logs/artifacts/trial_id`, read its content, and strip whitespace to obtain `trial_id`.
+3. Validate that `--data-dir` exists and is a directory; if not, exit with a non-zero status code.
+4. Load documents:
+   ```python
+   from llama_index.core import SimpleDirectoryReader
+   documents = SimpleDirectoryReader(<data-dir>).load_data()
+   ```
+5. Create the managed index:
+   ```python
+   from llama_index.indices.managed.llama_cloud import LlamaCloudIndex
+   index = LlamaCloudIndex.from_documents(
+       documents,
+       name=f"harbor-rag-{trial_id}",
+       project_name="Default",
+       verbose=True,
+   )
+   ```
+6. Run the query:
+   ```python
+   query_engine = index.as_query_engine()
+   response = query_engine.query(<query>)
+   ```
+7. Write `str(response)` to `--output`.
+8. Print the line `Index name: harbor-rag-<trial_id>`.
+9. Return exit code 0.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Script path: /home/user/myproject/build_index.py
+- Command: `python3 build_index.py --data-dir <data_dir> --query <query> --output <output_path>`
+- Input argument format: `--data-dir <path_to_directory>`, `--query <query_string>`, `--output <path_to_text_file>`.
+- Expected command stdout: includes exactly one line `Index name: harbor-rag-<trial_id>` where `<trial_id>` is read (and stripped) from `/logs/artifacts/trial_id`.
+- A new LlamaCloud index/pipeline named `harbor-rag-<trial_id>` must exist in the `Default` project after the script runs.
+- The `--output` file must be created and must contain a non-empty answer to the query.
+- The script must use `LlamaCloudIndex.from_documents` from the `llama_index.indices.managed.llama_cloud` module with `project_name="Default"`.
+- The script must exit with a non-zero status code when `--data-dir` does not exist.
+
+
+EOF
+Command outputs captured
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured

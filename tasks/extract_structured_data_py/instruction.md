@@ -1,0 +1,52 @@
+# Extract Structured Data from a Document with LlamaExtract (Python)
+
+## Background
+You are working in `/home/user/myproject`, which already contains a small text file named `candidate.txt` describing a job candidate. Your job is to build a Python command-line utility that uses the [LlamaCloud Python SDK](https://developers.llamaindex.ai/llamaparse/extract/sdk/) (the `llama-cloud` package, version 2.1 or newer) and the managed **LlamaExtract** service to extract structured fields from `candidate.txt` into a JSON file.
+
+The SDK is already installed in the environment and the `LLAMA_CLOUD_API_KEY` environment variable is configured. You do NOT need to handle authentication explicitly — the SDK reads the API key from the environment automatically.
+
+LlamaExtract is asynchronous: you submit a job and must poll for completion. The completed job exposes the extracted data under `job.extract_result`.
+
+## Requirements
+- Implement a Python CLI named `extract.py` at `/home/user/myproject/extract.py`.
+- The script must accept exactly two command-line arguments:
+  - `--input <path>`: the path to the local input file (typically `candidate.txt`).
+  - `--output <path>`: the path where the extracted result should be written as JSON.
+- The script must use the **`llama-cloud`** Python SDK (`from llama_cloud import LlamaCloud`).
+- Define the extraction schema with **Pydantic** as a model named `Candidate` containing exactly these fields, in this order:
+  - `name: str` — Full name of the candidate.
+  - `email: str` — Email address of the candidate.
+  - `skills: list[str]` — Technical skills listed for the candidate.
+- Upload the input file with `purpose="extract"`, then create an extraction job using:
+  - `data_schema=Candidate.model_json_schema()`
+  - `extraction_target="per_doc"`
+  - `tier="agentic"`
+- Poll the job until its `status` is one of `COMPLETED`, `FAILED`, or `CANCELLED`. Use `client.extract.get(job.id)` to refresh.
+- If the job finished with `status == "COMPLETED"`, write `job.extract_result` to the `--output` path as a JSON file (UTF-8, with `indent=2`).
+- After a successful run, print a single line to stdout in the exact format: `Extracted candidate: <name>` where `<name>` is taken from the extracted result.
+- The script must exit with status code `0` on success and a non-zero status code if the extraction job did not complete successfully (e.g., `FAILED` or `CANCELLED`).
+
+## Implementation Guide
+1. Initialize the project at `/home/user/myproject`.
+2. Parse `--input` and `--output` using `argparse` (standard library).
+3. Define the `Candidate` Pydantic model with the three required fields.
+4. Instantiate `LlamaCloud()` — it reads `LLAMA_CLOUD_API_KEY` from the environment.
+5. Upload the input file using `client.files.create(file=<input_path>, purpose="extract")` and capture the returned file object.
+6. Submit the extraction job with `client.extract.create(file_input=<file_id>, configuration={...})` using the configuration dict described above.
+7. Poll the job with a short delay (e.g., `time.sleep(2)`) until `job.status` is terminal. Refresh with `client.extract.get(job.id)`.
+8. On `COMPLETED`, serialize `job.extract_result` to JSON and write it to `--output`.
+9. Print `Extracted candidate: <name>` where `<name>` is the `name` field from `job.extract_result`.
+10. Return exit code 0. On any non-`COMPLETED` terminal status, exit with a non-zero code.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Script path: /home/user/myproject/extract.py
+- Command: `python3 extract.py --input <input_path> --output <output_json_path>`
+- Input argument format: `--input <path_to_text_or_pdf>` and `--output <path_to_output_json_file>`
+- Expected stdout: includes exactly one line `Extracted candidate: <name>` where `<name>` is the candidate's full name from the extracted result.
+- The output JSON file must be created at the path specified by `--output` and must contain the extracted fields `name`, `email`, and `skills`.
+- The script must use the `llama-cloud` Python SDK with `extraction_target="per_doc"` and `tier="agentic"`.
+- The Pydantic schema must be passed to the SDK via `model_json_schema()` and submitted as `data_schema` inside the `configuration` parameter.
+- The script must succeed (exit code 0) when given a valid input file and a valid `LLAMA_CLOUD_API_KEY`.
+- The script must exit with a non-zero status code when the extraction job ends in a non-`COMPLETED` terminal state.
+

@@ -1,0 +1,139 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 11,
+            "passed": 6,
+            "failed": 5,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778774296224,
+            "stop": 1778774315100
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_exits_zero",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 14300,
+                "start": 1778774296313,
+                "stop": 1778774310613,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "run_script = CompletedProcess(args=['python3', 'composite.py', '--products-dir', '/home/user/myproject/products', '--support-dir', ...                                        ^^^^^^^^^^^^^^^^^\\nAttributeError: \\'Omit\\' object has no attribute \\'get\\'\\n')\n\n    def test_script_exits_zero(run_script):\n>       assert run_script.returncode == 0, (\n            \"Expected composite.py to exit with code 0, \"\n            f\"got {run_script.returncode}. stdout={run_script.stdout!r} \"\n            f\"stderr={run_script.stderr!r}\"\n        )\nE       AssertionError: Expected composite.py to exit with code 0, got 1. stdout='Find your index at https://cloud.llamaindex.ai/project/b420cea9-2ed0-451d-8ebc-617151ec45f6/deploy/f25b876e-dcdf-4789-a47b-cd4f237ca5b4\\nFind your index at https://cloud.llamaindex.ai/project/b420cea9-2ed0-451d-8ebc-617151ec45f6/deploy/61b0ac39-9cd4-467b-909b-73b49c350109\\n' stderr='Traceback (most recent call last):\\n  File \"/home/user/myproject/composite.py\", line 95, in <module>\\n    main()\\n  File \"/home/user/myproject/composite.py\", line 82, in main\\n    nodes = composite_retriever.retrieve(args.query)\\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \"/usr/local/lib/python3.12/dist-packages/llama_index_instrumentation/dispatcher.py\", line 413, in wrapper\\n    result = func(*args, **kwargs)\\n             ^^^^^^^^^^^^^^^^^^^^^\\n  File \"/usr/local/lib/python3.12/dist-packages/llama_index/core/base/base_retriever.py\", line 216, in retrieve\\n    nodes = self._retrieve(query_bundle)\\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\\n  File \"/usr/local/lib/python3.12/dist-packages/llama_index_instrumentation/dispatcher.py\", line 413, in wrapper\\n    result = func(*args, **kwargs)\\n             ^^^^^^^^^^^^^^^^^^^^^\\n  File \"/usr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/composite_retriever.py\", line 207, in _retrieve\\n    rerank_config = ReRankConfigParam(top_n=rerank_top_n, type=rerank_config.get(\"type\", \"system_default\"))\\n                                                               ^^^^^^^^^^^^^^^^^\\nAttributeError: \\'Omit\\' object has no attribute \\'get\\'\\n'\nE       assert 1 == 0\nE        +  where 1 = CompletedProcess(args=['python3', 'composite.py', '--products-dir', '/home/user/myproject/products', '--support-dir', ...                                        ^^^^^^^^^^^^^^^^^\\nAttributeError: \\'Omit\\' object has no attribute \\'get\\'\\n').returncode\n\ntests/test_final_state.py:72: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_stdout_contains_retriever_name",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 9,
+                "start": 1778774310613,
+                "stop": 1778774310622,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "run_script = CompletedProcess(args=['python3', 'composite.py', '--products-dir', '/home/user/myproject/products', '--support-dir', ...                                        ^^^^^^^^^^^^^^^^^\\nAttributeError: \\'Omit\\' object has no attribute \\'get\\'\\n')\n\n    def test_stdout_contains_retriever_name(run_script):\n        expected_line = f\"Retriever name: {_composite_retriever_name()}\"\n        stdout_lines = [line.strip() for line in run_script.stdout.splitlines()]\n>       assert expected_line in stdout_lines, (\n            f\"Expected stdout to contain the line {expected_line!r}, \"\n            f\"got stdout lines: {stdout_lines!r}\"\n        )\nE       AssertionError: Expected stdout to contain the line 'Retriever name: harbor-composite-composite_retriever_py__EzehBSD', got stdout lines: ['Find your index at https://cloud.llamaindex.ai/project/b420cea9-2ed0-451d-8ebc-617151ec45f6/deploy/f25b876e-dcdf-4789-a47b-cd4f237ca5b4', 'Find your index at https://cloud.llamaindex.ai/project/b420cea9-2ed0-451d-8ebc-617151ec45f6/deploy/61b0ac39-9cd4-467b-909b-73b49c350109']\nE       assert 'Retriever name: harbor-composite-composite_retriever_py__EzehBSD' in ['Find your index at https://cloud.llamaindex.ai/project/b420cea9-2ed0-451d-8ebc-617151ec45f6/deploy/f25b876e-dcdf-478... https://cloud.llamaindex.ai/project/b420cea9-2ed0-451d-8ebc-617151ec45f6/deploy/61b0ac39-9cd4-467b-909b-73b49c350109']\n\ntests/test_final_state.py:82: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_products_index_exists_on_llamacloud",
+                "status": "passed",
+                "duration": 851,
+                "start": 1778774310623,
+                "stop": 1778774311474,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_support_index_exists_on_llamacloud",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778774311475,
+                "stop": 1778774311476,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_composite_retriever_exists_with_two_pipelines",
+                "status": "passed",
+                "duration": 673,
+                "start": 1778774311477,
+                "stop": 1778774312150,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_file_exists_and_non_empty",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 13,
+                "start": 1778774312150,
+                "stop": 1778774312163,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "run_script = CompletedProcess(args=['python3', 'composite.py', '--products-dir', '/home/user/myproject/products', '--support-dir', ...                                        ^^^^^^^^^^^^^^^^^\\nAttributeError: \\'Omit\\' object has no attribute \\'get\\'\\n')\n\n    def test_output_file_exists_and_non_empty(run_script):\n>       assert os.path.isfile(OUTPUT_FILE), (\n            f\"Expected output file {OUTPUT_FILE} to be created by composite.py.\"\n        )\nE       AssertionError: Expected output file /home/user/myproject/nodes.txt to be created by composite.py.\nE       assert False\nE        +  where False = <function isfile at 0x7ed8c1c7c220>('/home/user/myproject/nodes.txt')\nE        +    where <function isfile at 0x7ed8c1c7c220> = <module 'posixpath' (frozen)>.isfile\nE        +      where <module 'posixpath' (frozen)> = os.path\n\ntests/test_final_state.py:174: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_output_file_lines_start_with_score",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 8,
+                "start": 1778774312163,
+                "stop": 1778774312171,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "run_script = CompletedProcess(args=['python3', 'composite.py', '--products-dir', '/home/user/myproject/products', '--support-dir', ...                                        ^^^^^^^^^^^^^^^^^\\nAttributeError: \\'Omit\\' object has no attribute \\'get\\'\\n')\n\n    def test_output_file_lines_start_with_score(run_script):\n>       with open(OUTPUT_FILE, \"r\", encoding=\"utf-8\") as f:\nE       FileNotFoundError: [Errno 2] No such file or directory: '/home/user/myproject/nodes.txt'\n\ntests/test_final_state.py:185: FileNotFoundError",
+                "message": "The test failed in the call phase"
+            },
+            {
+                "name": "test_final_state.py::test_output_file_contains_temperature_answer",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 6,
+                "start": 1778774312171,
+                "stop": 1778774312177,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "run_script = CompletedProcess(args=['python3', 'composite.py', '--products-dir', '/home/user/myproject/products', '--support-dir', ...                                        ^^^^^^^^^^^^^^^^^\\nAttributeError: \\'Omit\\' object has no attribute \\'get\\'\\n')\n\n    def test_output_file_contains_temperature_answer(run_script):\n        \"\"\"The Model X100 specs (175 degrees) should appear in the retrieved chunks.\"\"\"\n>       with open(OUTPUT_FILE, \"r\", encoding=\"utf-8\") as f:\nE       FileNotFoundError: [Errno 2] No such file or directory: '/home/user/myproject/nodes.txt'\n\ntests/test_final_state.py:199: FileNotFoundError",
+                "message": "The test failed in the call phase"
+            },
+            {
+                "name": "test_final_state.py::test_script_imports_and_calls",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778774312177,
+                "stop": 1778774312178,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_fails_on_missing_products_dir",
+                "status": "passed",
+                "duration": 1475,
+                "start": 1778774312178,
+                "stop": 1778774313653,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_fails_on_missing_support_dir",
+                "status": "passed",
+                "duration": 1446,
+                "start": 1778774313654,
+                "stop": 1778774315100,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

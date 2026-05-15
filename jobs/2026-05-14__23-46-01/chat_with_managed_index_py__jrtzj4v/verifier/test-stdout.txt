@@ -1,0 +1,21 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 10 items
+
+tests/test_final_state.py ..........                                     [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_exits_zero
+PASSED tests/test_final_state.py::test_stdout_contains_chat_session_line
+PASSED tests/test_final_state.py::test_index_exists_on_llamacloud
+PASSED tests/test_final_state.py::test_output_file_is_valid_json
+PASSED tests/test_final_state.py::test_output_index_name_matches
+PASSED tests/test_final_state.py::test_output_messages_match_input
+PASSED tests/test_final_state.py::test_response1_contains_founding_year
+PASSED tests/test_final_state.py::test_response2_uses_conversation_memory
+PASSED tests/test_final_state.py::test_script_uses_managed_chat_engine
+PASSED tests/test_final_state.py::test_script_fails_on_missing_data_dir
+============================= 10 passed in 12.61s ==============================

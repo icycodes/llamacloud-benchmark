@@ -1,0 +1,88 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 7,
+            "passed": 7,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778774047251,
+            "stop": 1778774059838
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_exits_zero",
+                "status": "passed",
+                "duration": 10268,
+                "start": 1778774047326,
+                "stop": 1778774057594,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_stdout_contains_index_name",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778774057595,
+                "stop": 1778774057596,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_index_exists_on_llamacloud",
+                "status": "passed",
+                "duration": 752,
+                "start": 1778774057597,
+                "stop": 1778774058349,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_file_exists_and_non_empty",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778774058350,
+                "stop": 1778774058351,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_file_contains_founding_year",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778774058352,
+                "stop": 1778774058353,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_imports_managed_index",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778774058354,
+                "stop": 1778774058355,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_fails_on_missing_data_dir",
+                "status": "passed",
+                "duration": 1482,
+                "start": 1778774058356,
+                "stop": 1778774059838,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}
