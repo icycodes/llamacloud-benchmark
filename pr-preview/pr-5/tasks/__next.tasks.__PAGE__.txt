@@ -1,0 +1,635 @@
+1:"$Sreact.fragment"
+2:I[42654,["/llamacloud-benchmark/pr-preview/pr-5/_next/static/chunks/babff0e7418ab052.js","/llamacloud-benchmark/pr-preview/pr-5/_next/static/chunks/3ecbb78a8ff87549.js","/llamacloud-benchmark/pr-preview/pr-5/_next/static/chunks/28c0ea01e9ff9346.js","/llamacloud-benchmark/pr-preview/pr-5/_next/static/chunks/be08138953094657.js"],"TasksPageClient"]
+10:I[75049,["/llamacloud-benchmark/pr-preview/pr-5/_next/static/chunks/d2c13bb33c4fcd54.js","/llamacloud-benchmark/pr-preview/pr-5/_next/static/chunks/c21188132e0e0d48.js"],"OutletBoundary"]
+11:"$Sreact.suspense"
+3:T1a9f,# Classify a Folder of Documents with LlamaClassify (Python)
+
+## Background
+You are building a small intake automation prototype on **LlamaCloud** that needs to triage incoming business documents into three categories: **invoices**, **receipts**, and **contracts**. Instead of writing hand-tuned regexes, you will use **LlamaClassify** — the natural-language document classification service exposed by the official `llama-cloud` Python SDK — to label each document with a `type`, `confidence`, and `reasoning`.
+
+LlamaClassify is invoked via the `client.classifier.classify(...)` convenience method on a `llama_cloud.LlamaCloud` client. You pass a list of classification rules (each is a `{type, description}` natural-language rule), the API uploads-and-jobs are handled for you, and the response contains one classification result per file.
+
+The `llama-cloud` Python SDK is already installed in the environment, the `LLAMA_CLOUD_API_KEY` environment variable is set, and three sample PDFs are pre-staged in `/home/user/myproject/docs/`:
+- `invoice.pdf` — a one-page invoice with an `INVOICE` header, an invoice number `INV-2024-0042`, a bill-to section, and a line-item table with subtotal, tax, and total.
+- `receipt.pdf` — a short single-page point-of-sale receipt from `Corner Cafe` showing two purchased items and a total amount.
+- `contract.pdf` — a one-page legal-style document headed `SERVICES AGREEMENT` between two parties, with clauses on `Scope of Work`, `Term`, and `Governing Law`.
+
+Because this task may run multiple times concurrently against the shared LlamaCloud account, you must read the `trial_id` from `/logs/artifacts/trial_id` and tag the output artifacts with it. LlamaClassify itself is stateless per request (no global resource needs to carry the trial id), so only your output files have to include it.
+
+## Requirements
+Write a Python script at `/home/user/myproject/classify_docs.py` that:
+- Reads the `trial_id` value from `/logs/artifacts/trial_id`.
+- Discovers every `*.pdf` file under `/home/user/myproject/docs/` (it should find at least the three pre-staged files).
+- Uploads each PDF to LlamaCloud with `client.files.create(file=..., purpose="classify")` to obtain a `file_id` for each file.
+- Calls `client.classifier.classify(...)` **once** with the list of all uploaded `file_id`s and **three** natural-language rules covering:
+  - `type="invoice"` — documents with an invoice number, bill-to section, and line-item totals.
+  - `type="receipt"` — short point-of-sale receipts with merchant, items, and a total.
+  - `type="contract"` — legal agreements with parties, clauses, and signature blocks.
+  Use the default `mode="FAST"` (text-based classification is sufficient for this fixture).
+- Writes a JSON document to `/home/user/myproject/output.json` with the **exact** top-level shape:
+  ```json
+  {
+    "trial_id": "<trial_id>",
+    "total_files": <N>,
+    "results": [
+      {
+        "file_name": "invoice.pdf",
+        "type": "invoice",
+        "confidence": 0.97,
+        "reasoning": "<short string>"
+      },
+      ...
+    ]
+  }
+  ```
+  where:
+  - `trial_id` is the value read from `/logs/artifacts/trial_id`.
+  - `total_files` is the number of PDFs that were classified (an integer ≥ 3 for the staged fixture).
+  - `results` is a list with one entry per file. Each entry must contain at minimum the keys `file_name` (the basename of the source PDF, e.g. `"invoice.pdf"`), `type` (one of `invoice` / `receipt` / `contract`), `confidence` (a number), and `reasoning` (a non-empty string).
+- Writes a plain-text log to `/home/user/myproject/output.log` containing at minimum these lines (one fact per line):
+  - `trial_id: <trial_id>`
+  - `total_files: <N>` — same integer as `total_files` in `output.json`.
+  - `invoice.pdf: invoice`
+  - `receipt.pdf: receipt`
+  - `contract.pdf: contract`
+  The three filename lines must use the format `<file_name>: <classified_type>` and must reflect the actual labels predicted by the service for each fixture PDF.
+
+## Implementation Hints
+- Instantiate the synchronous client with `from llama_cloud import LlamaCloud` followed by `client = LlamaCloud()`. The SDK reads `LLAMA_CLOUD_API_KEY` from the environment automatically.
+- Use `pathlib.Path("/home/user/myproject/docs").glob("*.pdf")` (or equivalent) to discover the input PDFs, sort the resulting list for deterministic ordering, and remember the mapping from each `file_id` back to its source filename — you will need it when writing `output.json` and `output.log`.
+- Open each file in binary mode (e.g. `open(path, "rb")`) and pass it to `client.files.create(file=..., purpose="classify")`. The returned object exposes `.id`.
+- The `client.classifier.classify(...)` convenience method handles job submission and polling for you; it returns a result with an `items` attribute. Each `item` exposes `.file_id` and (when successful) `.result` with `.type`, `.confidence`, and `.reasoning`. Always check that `item.result` is not `None` before using it.
+- Write JSON with `json.dump(obj, f, indent=2)` so the file is human-readable, and write the log with simple `\n`-separated lines.
+- The script must run end to end with `python3 classify_docs.py` from `/home/user/myproject` and exit with status code `0`.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/classify_docs.py`
+- Command: `python3 classify_docs.py` (run from `/home/user/myproject`)
+- The script must exit with return code `0`.
+- Output files created by the script:
+  - `/home/user/myproject/output.json` — must be valid JSON with the top-level shape described above:
+    - `trial_id` (string) equal to the value at `/logs/artifacts/trial_id`.
+    - `total_files` (integer) equal to the number of `*.pdf` files under `/home/user/myproject/docs/` (≥ 3).
+    - `results` (list) with one entry per PDF; each entry contains the keys `file_name`, `type`, `confidence`, and `reasoning`.
+    - For each of the three fixture files, the entry whose `file_name` equals `invoice.pdf` must have `type == "invoice"`, the entry whose `file_name` equals `receipt.pdf` must have `type == "receipt"`, and the entry whose `file_name` equals `contract.pdf` must have `type == "contract"`. Comparisons are case-insensitive and whitespace-trimmed on the `type` value.
+  - `/home/user/myproject/output.log` — must contain:
+    - A line in the format `trial_id: <trial_id>` where `<trial_id>` is the exact value at `/logs/artifacts/trial_id`.
+    - A line in the format `total_files: <N>` where `<N>` parses as an integer ≥ 3.
+    - A line `invoice.pdf: invoice` (case-insensitive match on the type).
+    - A line `receipt.pdf: receipt` (case-insensitive match on the type).
+    - A line `contract.pdf: contract` (case-insensitive match on the type).
+
+4:T1642,# Cross-Index Retrieval with `LlamaCloudCompositeRetriever`
+
+## Background
+You are building a small Retrieval-Augmented Generation (RAG) prototype on **LlamaCloud** that needs to answer questions whose evidence is spread across **two separate managed indices**. LlamaCloud exposes a dedicated `LlamaCloudCompositeRetriever` class that lets you query several `LlamaCloudIndex` instances together and rerank the unioned nodes server-side, without needing a separate LLM API key (we use `CompositeRetrievalMode.FULL`).
+
+The Python SDKs `llama-index-core` and `llama-cloud-services` are already installed in the environment. The LlamaCloud account is already provisioned and the API key is exposed via the environment variable `LLAMA_CLOUD_API_KEY`. The default project name to use is `Default`.
+
+Two pre-staged, plain-text corpora exist on disk:
+
+- `/home/user/myproject/docs_astronomy/` contains a file describing a fictional internal initiative named **Project Aurora**, whose stated mission is to *catalog every star in the Milky Way*.
+- `/home/user/myproject/docs_cooking/` contains a short **Honey Lemon Tea** recipe that boils 250 ml of water with honey and lemon juice.
+
+Because this task may run multiple times concurrently against the same LlamaCloud project, every externally visible name **MUST be unique per trial run**: read the `trial_id` from `/logs/artifacts/trial_id` and append it as a suffix to every base name listed below.
+
+## Requirements
+Write a Python script at `/home/user/myproject/build_composite.py` that:
+- Reads the `trial_id` value from `/logs/artifacts/trial_id`.
+- Builds two **separate** managed `LlamaCloudIndex` instances against project `Default`, using documents loaded from the two pre-staged folders:
+  - From `/home/user/myproject/docs_astronomy/` create an index named `harbor-cmp-astro-<trial_id>`.
+  - From `/home/user/myproject/docs_cooking/` create an index named `harbor-cmp-cook-<trial_id>`.
+- Creates a `LlamaCloudCompositeRetriever` in the same project with:
+  - `name = "harbor-cmp-retriever-<trial_id>"`,
+  - `create_if_not_exists = True`,
+  - `mode = CompositeRetrievalMode.FULL`,
+  - `rerank_top_n = 5`.
+- Attaches **both** indices to the composite retriever via `add_index(...)`. Provide a short, distinguishing `description` for each (for example, `"Astronomy notes about Project Aurora"` and `"Cooking recipes including Honey Lemon Tea"`).
+- Uses the composite retriever to retrieve nodes for **two** queries (in this exact order):
+  1. `astronomy_query`: `What is the mission of Project Aurora?`
+  2. `cooking_query`: `How do you make Honey Lemon Tea?`
+- Writes a Markdown summary to `/home/user/myproject/output.md` containing the headings below (in this order) and the **full text of the top-1 retrieved node** under each sub-heading:
+  - `# LlamaCloud Composite Retrieval Result`
+  - `## Astronomy Query Top Node`
+  - `## Cooking Query Top Node`
+- Writes a plain-text log to `/home/user/myproject/output.log` containing at minimum the following five lines (one fact per line), using the actual `trial_id` value:
+  - `trial_id: <trial_id>`
+  - `astro_index_name: harbor-cmp-astro-<trial_id>`
+  - `cook_index_name: harbor-cmp-cook-<trial_id>`
+  - `composite_retriever_name: harbor-cmp-retriever-<trial_id>`
+  - `astro_num_retrieved: <Na>` and `cook_num_retrieved: <Nc>` where each is a positive integer giving the number of nodes returned for that query.
+
+## Implementation Hints
+- Import `LlamaCloudIndex` and `LlamaCloudCompositeRetriever` from `llama_cloud_services` (they are re-exported there), and `CompositeRetrievalMode` from `llama_cloud`.
+- Use `from llama_index.core import SimpleDirectoryReader` to load each folder into a list of `Document` objects.
+- `LlamaCloudIndex.from_documents(documents, name=..., project_name="Default", api_key=...)` blocks until ingestion is finished and returns a ready-to-use index.
+- The composite retriever's `.retrieve(query)` method returns a list of `NodeWithScore` objects; each has `.node.get_content()` (or `.node.text`) and `.score` attributes. Use the node with the highest score as the "top-1" node.
+- The script must run end to end with `python3 build_composite.py` from `/home/user/myproject` and exit with status code `0`.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/build_composite.py`
+- Command: `python3 build_composite.py` (run from `/home/user/myproject`)
+- The script must exit with return code `0`.
+- Two managed LlamaCloud indices must exist in project `Default` after the script runs, with names exactly equal to `harbor-cmp-astro-<trial_id>` and `harbor-cmp-cook-<trial_id>`, where `<trial_id>` is the value of `/logs/artifacts/trial_id`.
+- Output files created by the script:
+  - `/home/user/myproject/output.md` — non-empty Markdown that contains, in order:
+    - The heading `# LlamaCloud Composite Retrieval Result`.
+    - The sub-heading `## Astronomy Query Top Node` followed by text that mentions both `Project Aurora` and the phrase `catalog every star in the Milky Way` (case-insensitive).
+    - The sub-heading `## Cooking Query Top Node` followed by text that mentions both `honey` and `lemon` (case-insensitive).
+  - `/home/user/myproject/output.log` — must contain lines matching:
+    - `trial_id: <trial_id>` where `<trial_id>` equals the value in `/logs/artifacts/trial_id`.
+    - `astro_index_name: harbor-cmp-astro-<trial_id>`
+    - `cook_index_name: harbor-cmp-cook-<trial_id>`
+    - `composite_retriever_name: harbor-cmp-retriever-<trial_id>`
+    - `astro_num_retrieved: <Na>` where `<Na>` is a positive integer (>= 1).
+    - `cook_num_retrieved: <Nc>` where `<Nc>` is a positive integer (>= 1).
+
+5:T1a2d,# Extract Structured Invoice Data with LlamaExtract (Python)
+
+## Background
+You are building a small invoice-ingestion prototype for an accounts-payable workflow on **LlamaCloud**. Instead of using LlamaParse to get Markdown and then parsing fields yourself, you will use **LlamaExtract** — the schema-driven structured-extraction service exposed by the official `llama-cloud` Python SDK — to extract a typed JSON object directly from an invoice PDF using a **Pydantic schema** that you define.
+
+LlamaExtract is invoked via `client.extract.create(...)` on a `llama_cloud.LlamaCloud` client. You pass a JSON schema (derived from a Pydantic model via `Model.model_json_schema()`) under `configuration.data_schema` and the service returns one structured object per document under `job.extract_result`.
+
+The `llama-cloud` Python SDK and `pydantic` are already installed in the environment, the `LLAMA_CLOUD_API_KEY` environment variable is set, and a sample invoice PDF is pre-staged at `/home/user/myproject/invoice.pdf`. The invoice is a one-page document with the following content (you may rely on these specific values when designing your schema and verification):
+
+- Header: `INVOICE`
+- `Invoice Number: INV-2024-0042`
+- `Invoice Date: 2024-03-15`
+- `Vendor: Acme Corporation` (with address)
+- `Bill To: Globex Industries`
+- A three-row line-item table with columns `Description`, `Quantity`, `Unit Price (USD)`, `Amount (USD)`:
+  - `Widget Type A`, `10`, `25.00`, `250.00`
+  - `Service Hours - Onsite Support`, `8`, `120.00`, `960.00`
+  - `Annual Maintenance Plan`, `1`, `500.00`, `500.00`
+- `Subtotal: 1710.00`
+- `Tax (8%): 136.80`
+- `Total: 1846.80`
+
+Because this task may run multiple times concurrently, you must read the `trial_id` from `/logs/artifacts/trial_id` and tag the output artifacts with it. LlamaExtract itself is stateless per request (no global resource needs to carry the trial id), so only your output files have to include it.
+
+## Requirements
+Write a Python script at `/home/user/myproject/extract_invoice.py` that:
+- Reads the `trial_id` value from `/logs/artifacts/trial_id`.
+- Defines a **Pydantic** schema for the invoice. The model **MUST** include at least the following fields with reasonable types and field descriptions:
+  - `invoice_number` (string)
+  - `invoice_date` (string in `YYYY-MM-DD` form is acceptable)
+  - `vendor_name` (string)
+  - `customer_name` (string)
+  - `subtotal` (number)
+  - `tax` (number)
+  - `total` (number)
+  - `line_items` — a list of nested objects, each with at least `description` (string), `quantity` (number), `unit_price` (number), and `amount` (number).
+- Uploads `/home/user/myproject/invoice.pdf` to LlamaCloud with `client.files.create(file=..., purpose="extract")`.
+- Submits an extraction job with `client.extract.create(file_input=<file_id>, configuration={"data_schema": Invoice.model_json_schema(), "extraction_target": "per_doc", "tier": "agentic"})`.
+- Polls the job (e.g. with `client.extract.get(job.id)`) until the status reaches a terminal state. The job must end in status `COMPLETED`; if it ends in `FAILED` or `CANCELLED`, the script must raise an error and exit non-zero.
+- Writes the structured extraction result as a single JSON document to `/home/user/myproject/invoice.json` with the exact top-level shape:
+  ```json
+  {
+    "trial_id": "<trial_id>",
+    "job_id": "<the LlamaExtract job id>",
+    "status": "COMPLETED",
+    "data": { /* the extracted invoice object (the single per-doc result) */ }
+  }
+  ```
+  where `data` is the single per-document extraction result returned by the service (it must be a JSON object, **not** wrapped in a list, even though `job.extract_result` may itself be a list of per-document results).
+- Writes a plain-text log to `/home/user/myproject/output.log` containing at minimum these four lines (one fact per line):
+  - `trial_id: <trial_id>`
+  - `job_status: COMPLETED`
+  - `invoice_number: <the extracted invoice number>`
+  - `total: <the extracted total as a decimal number>`
+
+## Implementation Hints
+- Import the synchronous client with `from llama_cloud import LlamaCloud` and the schema base with `from pydantic import BaseModel, Field`. The client picks up `LLAMA_CLOUD_API_KEY` from the environment automatically.
+- `client.extract.create(...)` returns a job object that exposes `.id`, `.status`, and (once finished) `.extract_result`. Status moves through `PENDING` -> `RUNNING` -> `COMPLETED`. Poll with `client.extract.get(job.id)` until `status` is in `{"COMPLETED", "FAILED", "CANCELLED"}`; sleep ~2 seconds between polls.
+- `job.extract_result` is typically a list of per-document objects (because the API supports per-page / per-doc extraction); pick the **first** per-doc result for this single-document task and store **that object** under the `data` key (do not store the whole list).
+- Convert the Pydantic model to a JSON schema using `Invoice.model_json_schema()`.
+- The script must run end to end with `python3 extract_invoice.py` from `/home/user/myproject` and exit with status code `0`.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/extract_invoice.py`
+- Command: `python3 extract_invoice.py` (run from `/home/user/myproject`)
+- The script must exit with return code `0`.
+- Output files created by the script:
+  - `/home/user/myproject/invoice.json` — must be valid JSON with the top-level shape described above:
+    - `trial_id` (string) equal to the value at `/logs/artifacts/trial_id`.
+    - `job_id` (non-empty string).
+    - `status` (string) equal to `COMPLETED`.
+    - `data` (object, not a list) — the single per-doc extraction result. It must:
+      - Have an `invoice_number` field that equals (case-insensitive) `INV-2024-0042`.
+      - Have a `vendor_name` field whose value contains the substring `Acme` (case-insensitive).
+      - Have a `customer_name` field whose value contains the substring `Globex` (case-insensitive).
+      - Have a `total` field whose numeric value is within `0.05` of `1846.80`.
+      - Have a `line_items` field that is a list with **at least 3** entries; the concatenation of all `description` fields (case-insensitive) must contain each of `Widget Type A`, `Onsite Support`, and `Annual Maintenance`.
+  - `/home/user/myproject/output.log` — must contain:
+    - A line in the format `trial_id: <trial_id>` where `<trial_id>` is the exact value at `/logs/artifacts/trial_id`.
+    - A line in the format `job_status: COMPLETED`.
+    - A line in the format `invoice_number: INV-2024-0042` (case-insensitive match on the value).
+    - A line in the format `total: <amount>` where `<amount>` parses as a decimal number within `0.05` of `1846.80`.
+
+6:T165a,# Extract Tables from a Financial PDF with LlamaParse (Python)
+
+## Background
+You are building a small data-extraction prototype on **LlamaCloud** for a financial-analysis workflow. The team does not want the full Markdown of a quarterly report; they only want the **tables**, page by page, in a structured JSON file that another service can consume.
+
+LlamaCloud's parsing service is exposed through the official Python SDK `llama-cloud` (entry class `LlamaCloud` from `llama_cloud`). Unlike a naive PDF text extractor, LlamaParse preserves table structure and returns per-page Markdown — including pipe-style Markdown tables — when called with `expand=["markdown"]` and `output_options.markdown.tables.output_tables_as_markdown=True`.
+
+The `llama-cloud` Python SDK is already installed, the `LLAMA_CLOUD_API_KEY` environment variable is set, and a multi-page sample report is pre-staged at `/home/user/myproject/report.pdf`. The report is titled `FY2024 Quarterly Performance Report` and contains **two tables**:
+- Page 1 has a `Revenue by Product` table with columns `Product`, `Q1 Revenue (USD)`, `Q2 Revenue (USD)` and rows for `Widget A`, `Widget B`, `Service Plan`.
+- Page 2 has a `Regional Sales` table with columns `Region`, `Q1 Units`, `Q2 Units` and rows for `North America`, `Europe`, `Asia Pacific`.
+
+Because this task may run multiple times concurrently against the same LlamaCloud account, you must read the `trial_id` from `/logs/artifacts/trial_id` and tag the output artifacts with it (the parsing service itself is stateless for a single parse call, so no global resource needs to carry the trial id — only your output files do).
+
+## Requirements
+Write a Python script at `/home/user/myproject/extract_tables.py` that:
+- Reads the `trial_id` value from `/logs/artifacts/trial_id`.
+- Uses the `llama_cloud` Python SDK to upload `/home/user/myproject/report.pdf` and then runs a parse job that returns per-page Markdown.
+- Extracts, for every page returned by LlamaParse, any **Markdown tables** present on that page (a Markdown table is a contiguous block of lines that start with `|` and includes a header-separator row like `|---|---|---|`).
+- Writes a single JSON file to `/home/user/myproject/tables.json` with the exact top-level shape:
+  ```json
+  {
+    "trial_id": "<trial_id>",
+    "num_pages": <integer>,
+    "num_tables": <integer>,
+    "tables": [
+      {"page": <integer>, "markdown": "<the markdown table as a single string, including the header separator row>"},
+      ...
+    ]
+  }
+  ```
+  where:
+  - `trial_id` is the exact value read from `/logs/artifacts/trial_id`.
+  - `num_pages` is the total number of pages returned by LlamaParse.
+  - `num_tables` is the length of the `tables` array.
+  - Each entry in `tables` corresponds to one Markdown table found on the document, in document order. `page` is 1-indexed and matches the LlamaParse page numbering.
+- Writes a plain-text log to `/home/user/myproject/output.log` containing at minimum these three lines (one fact per line):
+  - `trial_id: <trial_id>`
+  - `num_pages: <N>` — total pages returned by LlamaParse.
+  - `num_tables: <M>` — number of Markdown tables found.
+- The script must run end to end with `python3 extract_tables.py` from `/home/user/myproject` and exit with status code `0`.
+
+## Implementation Hints
+- The modern Python SDK entrypoint is `from llama_cloud import LlamaCloud` and then `client = LlamaCloud()`. The client reads `LLAMA_CLOUD_API_KEY` from the environment automatically.
+- Upload the PDF with `client.files.create(file="./report.pdf", purpose="parse")` and grab `file.id`.
+- Run a synchronous parse with `client.parsing.parse(file_id=file.id, tier="agentic", version="latest", expand=["markdown"], output_options={"markdown": {"tables": {"output_tables_as_markdown": True}}})`. The call blocks until the job finishes and returns a result object whose `.markdown.pages` field is a list of objects with `.page_number` and `.markdown` attributes.
+- A simple way to identify a Markdown table inside a page's Markdown string is: find a block of consecutive non-blank lines that all start with `|` and contains at least one line whose cells are made of dashes (the header-separator row like `|---|---|`).
+- Use `json.dump(...)` with `indent=2` (or any valid JSON formatting) when writing `tables.json`.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/extract_tables.py`
+- Command: `python3 extract_tables.py` (run from `/home/user/myproject`)
+- The script must exit with return code `0`.
+- Output files created by the script:
+  - `/home/user/myproject/tables.json` — must be valid JSON with the top-level shape described above:
+    - `trial_id` (string) equal to the value at `/logs/artifacts/trial_id`.
+    - `num_pages` (integer, >= 1).
+    - `num_tables` (integer, >= 2 — the report contains at least two tables).
+    - `tables` (array) with `num_tables` entries; each entry has integer `page` (>= 1) and string `markdown` that:
+      - Contains at least one line starting with `|`.
+      - Contains a Markdown header-separator row matching the pattern `\|\s*[-: ]+\s*\|` (i.e., a `|---|---|`-style row).
+    - Across all `tables[*].markdown` strings combined, the following substrings must appear (case-insensitive):
+      - `Widget A`
+      - `Service Plan`
+      - `North America`
+      - `Asia Pacific`
+  - `/home/user/myproject/output.log` — must contain:
+    - A line matching `trial_id: <trial_id>` where `<trial_id>` equals the value in `/logs/artifacts/trial_id`.
+    - A line matching `num_pages: <N>` where `<N>` is a positive integer (>= 1).
+    - A line matching `num_tables: <M>` where `<M>` is a positive integer (>= 2).
+
+7:T1b3e,# Incremental File Ingestion into an Existing LlamaCloud Managed Index
+
+## Background
+You are extending a small Retrieval-Augmented Generation (RAG) prototype on **LlamaCloud**, the managed RAG-as-a-Service platform from LlamaIndex. The prototype already has a baseline managed `LlamaCloudIndex` built from a small "initial" corpus. New documents arrive over time and the team does NOT want to rebuild the whole index each time — they want to *incrementally* add the new files to the same managed index and continue retrieving against it.
+
+The Python SDK `llama-index-indices-managed-llama-cloud` (which exposes `LlamaCloudIndex`) is already installed. The LlamaCloud account is already provisioned, and the API key is available in the environment variable `LLAMA_CLOUD_API_KEY`. The default project name to use is `Default`.
+
+Two pre-staged plain-text corpora exist on disk:
+
+- `/home/user/myproject/docs_initial/` — contains exactly **one** file (`project_aurora.txt`) describing a fictional internal initiative named **Project Aurora**, whose stated mission is to *catalog every star in the Milky Way*.
+- `/home/user/myproject/docs_new/` — contains exactly **one** file (`project_borealis.txt`) describing a different fictional initiative named **Project Borealis**, whose stated mission is to *map every ocean current on Earth*.
+
+Because this task may run multiple times concurrently against the same LlamaCloud project, your managed index name **MUST be unique per trial run**: read the `trial_id` from `/logs/artifacts/trial_id` and append it as a suffix to the base name `harbor-inc-idx`.
+
+## Requirements
+Write a Python script at `/home/user/myproject/incremental_ingest.py` that:
+- Reads the `trial_id` value from `/logs/artifacts/trial_id`.
+- Phase 1 — **Initial build**: Loads every file in `/home/user/myproject/docs_initial/` as a list of LlamaIndex `Document` objects (e.g. via `SimpleDirectoryReader`) and creates a **new** managed `LlamaCloudIndex` from those documents using:
+  - `name = "harbor-inc-idx-<trial_id>"` (substituting the actual `trial_id`)
+  - `project_name = "Default"`
+  - Authentication via the `LLAMA_CLOUD_API_KEY` environment variable
+  Wait for ingestion to finish (`LlamaCloudIndex.from_documents(...)` does this synchronously by default).
+- Phase 2 — **Incremental ingestion**: For every file path under `/home/user/myproject/docs_new/`, upload that file into the **already created** managed index using the SDK method `index.upload_file(file_path=..., wait_for_ingestion=True)`. Do **NOT** rebuild the index. Do **NOT** call `from_documents` again with the combined corpora.
+- Phase 3 — **Retrieval**: Use the index's retriever (`index.as_retriever(...)`) to run two retrievals against the *same* index, in this order:
+  1. `aurora_query`: `What is the mission of Project Aurora?`
+  2. `borealis_query`: `What is the mission of Project Borealis?`
+  For each query, identify the top-1 retrieved node (the `NodeWithScore` with the highest `.score`).
+- Writes a Markdown summary to `/home/user/myproject/output.md` containing, **in this order**, the following Markdown sections:
+  - A top heading `# LlamaCloud Incremental Ingestion Result`.
+  - A sub-heading `## Aurora Query Top Node` followed by the full text of the top-1 retrieved node for the Aurora query.
+  - A sub-heading `## Borealis Query Top Node` followed by the full text of the top-1 retrieved node for the Borealis query.
+- Writes a plain-text log to `/home/user/myproject/output.log` containing at minimum the following lines (one fact per line):
+  - `trial_id: <trial_id>` — the value read from `/logs/artifacts/trial_id`.
+  - `index_name: harbor-inc-idx-<trial_id>` — the exact managed-index name created on LlamaCloud.
+  - `num_initial_files: <Ni>` — the number of files loaded from `/home/user/myproject/docs_initial/` and used to build the index (must be `>= 1`).
+  - `num_new_files_uploaded: <Nu>` — the number of files uploaded from `/home/user/myproject/docs_new/` into the existing index via `upload_file` (must be `>= 1`).
+  - `aurora_num_retrieved: <Na>` — the number of nodes returned by the Aurora retrieval (a positive integer).
+  - `borealis_num_retrieved: <Nb>` — the number of nodes returned by the Borealis retrieval (a positive integer).
+
+## Implementation Hints
+- Import `LlamaCloudIndex` from `llama_index.indices.managed.llama_cloud` and `SimpleDirectoryReader` from `llama_index.core`.
+- The SDK reads `LLAMA_CLOUD_API_KEY` automatically from the environment; you can also pass `api_key=...` explicitly if you prefer.
+- The base name for the index is fixed (`harbor-inc-idx`); only the trial-id suffix changes per run. The full name **must** equal `harbor-inc-idx-<trial_id>`.
+- To incrementally add a file to an already-created `LlamaCloudIndex`, call `index.upload_file(file_path="/abs/path/to/file.txt", wait_for_ingestion=True)`. This uploads the file and waits until the managed pipeline finishes ingesting it. Do this once per file in `docs_new/`.
+- `index.as_retriever()` returns a retriever whose `.retrieve(query)` method yields a list of `NodeWithScore` objects; each has `.node.get_content()` (or `.node.text`) and `.score` attributes.
+- The script must run end to end with `python3 incremental_ingest.py` from `/home/user/myproject` and exit with status code `0`.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/incremental_ingest.py`
+- Command: `python3 incremental_ingest.py` (run from `/home/user/myproject`)
+- The script must exit with return code `0`.
+- A managed LlamaCloud index named exactly `harbor-inc-idx-<trial_id>` must exist in project `Default` after the script runs, where `<trial_id>` is the value of `/logs/artifacts/trial_id`.
+- Output files created by the script:
+  - `/home/user/myproject/output.md` — non-empty Markdown that contains, in order:
+    - The heading `# LlamaCloud Incremental Ingestion Result`.
+    - The sub-heading `## Aurora Query Top Node` followed by text that mentions both `Project Aurora` and the phrase `catalog every star in the Milky Way` (case-insensitive substring matches are acceptable).
+    - The sub-heading `## Borealis Query Top Node` followed by text that mentions both `Project Borealis` and the phrase `map every ocean current on Earth` (case-insensitive substring matches are acceptable).
+  - `/home/user/myproject/output.log` — must contain:
+    - A line matching `trial_id: <trial_id>` where `<trial_id>` equals the value in `/logs/artifacts/trial_id`.
+    - A line matching `index_name: harbor-inc-idx-<trial_id>`.
+    - A line matching `num_initial_files: <Ni>` where `<Ni>` is a positive integer (>= 1).
+    - A line matching `num_new_files_uploaded: <Nu>` where `<Nu>` is a positive integer (>= 1).
+    - A line matching `aurora_num_retrieved: <Na>` where `<Na>` is a positive integer (>= 1).
+    - A line matching `borealis_num_retrieved: <Nb>` where `<Nb>` is a positive integer (>= 1).
+
+8:T1286,# Build a Managed LlamaCloud Index and Retrieve Nodes
+
+## Background
+You are building a small Retrieval-Augmented Generation (RAG) prototype on **LlamaCloud**, the managed RAG-as-a-Service platform from LlamaIndex. Your job is to create a managed `LlamaCloudIndex` from a tiny local document collection, then use that index's **retriever** (not a full LLM-backed query engine) to fetch the most relevant chunk for a specific question. Using the retriever — rather than a query engine — avoids needing a separate LLM API key and exercises the core LlamaCloud managed retrieval path end to end.
+
+The Python SDK `llama-index-indices-managed-llama-cloud` is already installed. The LlamaCloud account is already provisioned, and the API key is available in the environment variable `LLAMA_CLOUD_API_KEY`. The default project name to use is `Default`. A small set of plain-text documents is pre-staged in `/home/user/myproject/docs/` and includes a file describing a fictional internal initiative named **Project Aurora**, whose stated mission is to *catalog every star in the Milky Way*.
+
+Because this task may run multiple times concurrently against the same LlamaCloud project, your managed index name **MUST be unique per trial run**: append the `trial_id` from `/logs/artifacts/trial_id` as a suffix to the base name `harbor-mgr-idx`.
+
+## Requirements
+Write a Python script at `/home/user/myproject/build_and_retrieve.py` that:
+- Reads the `trial_id` value from `/logs/artifacts/trial_id`.
+- Loads every file in `/home/user/myproject/docs/` as a list of LlamaIndex `Document` objects (e.g. via `SimpleDirectoryReader`).
+- Creates a **new** managed `LlamaCloudIndex` from those documents using:
+  - `name = "harbor-mgr-idx-<trial_id>"` (substituting the actual `trial_id`)
+  - `project_name = "Default"`
+  - Authentication via the `LLAMA_CLOUD_API_KEY` environment variable
+- Waits for indexing to finish so that retrieval is possible (the SDK's `from_documents` constructor handles this synchronously by default).
+- Uses the index's retriever (`index.as_retriever(...)`) to retrieve the most relevant nodes for the query:
+
+  > `What is the mission of Project Aurora?`
+
+- Writes a Markdown summary to `/home/user/myproject/output.md` that contains:
+  - A top heading `# LlamaCloud Retrieval Result`.
+  - The full text of the **top-1** retrieved node (i.e., the node with the highest similarity score) under a sub-heading `## Top Node`.
+- Writes a plain-text log to `/home/user/myproject/output.log` that contains at minimum the following three lines (one fact per line):
+  - `trial_id: <trial_id>` — the value read from `/logs/artifacts/trial_id`.
+  - `index_name: harbor-mgr-idx-<trial_id>` — the exact managed-index name created on LlamaCloud.
+  - `num_retrieved: <N>` — where `<N>` is the number of nodes returned by the retriever (a positive integer).
+
+## Implementation Hints
+- Import `LlamaCloudIndex` from `llama_index.indices.managed.llama_cloud` and `SimpleDirectoryReader` from `llama_index.core`.
+- The SDK reads `LLAMA_CLOUD_API_KEY` automatically from the environment; you can also pass `api_key=...` explicitly if you prefer.
+- The base name for the index is fixed (`harbor-mgr-idx`); only the trial-id suffix changes per run. The full name **must** equal `harbor-mgr-idx-<trial_id>`.
+- `index.as_retriever()` returns a retriever whose `.retrieve(query)` method yields a list of `NodeWithScore` objects; each has `.node.get_content()` (or `.node.text`) and `.score` attributes.
+- The script must run end to end with `python3 build_and_retrieve.py` from `/home/user/myproject` and exit with status code `0`.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/build_and_retrieve.py`
+- Command: `python3 build_and_retrieve.py` (run from `/home/user/myproject`)
+- The script must exit with return code `0`.
+- A managed LlamaCloud index named exactly `harbor-mgr-idx-<trial_id>` must exist in project `Default` after the script runs, where `<trial_id>` is the value of `/logs/artifacts/trial_id`.
+- Output files created by the script:
+  - `/home/user/myproject/output.md` — non-empty Markdown that contains:
+    - The heading `# LlamaCloud Retrieval Result`.
+    - The sub-heading `## Top Node`.
+    - Text that mentions both `Project Aurora` and the phrase `catalog every star in the Milky Way` (case-insensitive matches are acceptable for these phrases).
+  - `/home/user/myproject/output.log` — must contain:
+    - A line matching `trial_id: <trial_id>` where `<trial_id>` equals the value in `/logs/artifacts/trial_id`.
+    - A line matching `index_name: harbor-mgr-idx-<trial_id>`.
+    - A line matching `num_retrieved: <N>` where `<N>` is a positive integer (>= 1).
+
+9:Tb20,# Parse a PDF to Markdown with LlamaParse
+
+## Background
+You are tasked with using **LlamaParse** (a managed parsing service from LlamaCloud, accessed through the `llama-cloud-services` Python SDK) to convert a PDF document into clean Markdown that downstream RAG pipelines can index. LlamaParse is exposed via the `LlamaParse` class and produces markdown output that preserves headings and tables much better than naive PDF text extraction.
+
+The LlamaCloud account has already been provisioned and the API key is available in the environment variable `LLAMA_CLOUD_API_KEY`. A sample PDF named `sample.pdf` is already present in the project directory. It is a short business-style report whose first heading reads `Quarterly Sales Report` and which contains a small table of products and revenues.
+
+## Requirements
+- Write a Python script `parse_doc.py` in `/home/user/myproject` that:
+  - Reads the `trial_id` value from the file `/logs/artifacts/trial_id`.
+  - Uses `LlamaParse` from `llama_cloud_services` (synchronous mode, markdown result) to parse `/home/user/myproject/sample.pdf`.
+  - Writes the combined markdown text to `/home/user/myproject/output.md`.
+  - Writes a plain-text log to `/home/user/myproject/output.log` containing at minimum these two lines:
+    - `trial_id: <trial_id>` — where `<trial_id>` is the value read from `/logs/artifacts/trial_id`.
+    - `pages_parsed: <N>` — where `<N>` is the number of pages (or document objects) returned by LlamaParse.
+
+## Implementation Hints
+- Install or rely on the pre-installed `llama-cloud-services` package and import `LlamaParse` from `llama_cloud_services`.
+- Instantiate the parser with `result_type="markdown"` so that each returned document carries markdown text.
+- The classic `load_data(file_path)` entry point returns a list of `Document`-like objects; concatenate their `text` (or `get_content()`) fields with blank lines between them to produce a single markdown file.
+- Make sure your script reads `LLAMA_CLOUD_API_KEY` from the environment (the SDK picks it up automatically).
+- The script must be executable with `python3 parse_doc.py` from `/home/user/myproject`.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/parse_doc.py`
+- Command: `python3 parse_doc.py` (run from `/home/user/myproject`)
+- Output files created by the script:
+  - `/home/user/myproject/output.md` — non-empty markdown text that contains the phrase `Quarterly Sales Report`.
+  - `/home/user/myproject/output.log` — must contain:
+    - A line in the format `trial_id: <trial_id>` where `<trial_id>` is the exact value read from `/logs/artifacts/trial_id`.
+    - A line in the format `pages_parsed: <N>` where `<N>` is a positive integer.
+- The script must run end to end without raising an exception; the script's exit code must be `0`.
+
+a:Te7f,# Parse a PDF to Markdown with LlamaParse (TypeScript)
+
+## Background
+You are tasked with using **LlamaParse** (LlamaCloud's managed document parsing service) from a **TypeScript / Node.js** script to convert a PDF into clean Markdown that downstream RAG pipelines can index. LlamaParse is exposed via the official `@llamaindex/llama-cloud` Node SDK and produces page-by-page Markdown that preserves headings and tables much better than naive PDF text extraction.
+
+The Node.js v24 runtime and the `@llamaindex/llama-cloud` SDK are already installed globally in the environment. The LlamaCloud account has already been provisioned and the API key is available in the environment variable `LLAMA_CLOUD_API_KEY`. A sample PDF named `sample.pdf` is pre-staged at `/home/user/myproject/sample.pdf`. It is a short business-style report whose first heading reads `Quarterly Sales Report` and which contains a small table of products and revenues.
+
+This task is the **TypeScript counterpart** to the Python LlamaParse workflow: same input PDF, same SDK behavior, same expected output files — but written and executed as a TypeScript program.
+
+## Requirements
+- Write a TypeScript program at `/home/user/myproject/parse_doc.ts` that:
+  - Reads the `trial_id` value from the file `/logs/artifacts/trial_id`.
+  - Uses the `LlamaCloud` client from `@llamaindex/llama-cloud` to upload `/home/user/myproject/sample.pdf` as a `parse` file, then runs a parse job (e.g. `client.parsing.parse({ ... })`) that returns Markdown output (request `expand: ['markdown']`).
+  - Concatenates the Markdown of every parsed page into one single string and writes it to `/home/user/myproject/output.md`.
+  - Writes a plain-text log to `/home/user/myproject/output.log` containing at minimum these two lines:
+    - `trial_id: <trial_id>` — the value read from `/logs/artifacts/trial_id`.
+    - `pages_parsed: <N>` — the number of pages returned by LlamaParse (a positive integer).
+- The script must be runnable end to end with `npx tsx parse_doc.ts` from `/home/user/myproject`.
+
+## Implementation Hints
+- Import the SDK with `import LlamaCloud from '@llamaindex/llama-cloud'` and create a client with `new LlamaCloud()` — it reads `LLAMA_CLOUD_API_KEY` from the environment automatically.
+- Upload the PDF using `client.files.create({ file: fs.createReadStream('./sample.pdf'), purpose: 'parse' })` to obtain a file id, then call `client.parsing.parse({ file_id, tier: 'agentic', version: 'latest', expand: ['markdown'] })`. The SDK blocks until the job completes.
+- The Markdown output is structured as `result.markdown.pages`, an array of `{ page_number, markdown }` objects. Join the per-page `markdown` strings (with blank lines or `---` separators) to produce the full document.
+- Use `fs.writeFileSync` (or `fs.promises.writeFile`) to write `output.md` and `output.log`.
+- Top-level `await` works under `tsx` (no need to wrap in an `async main()` function), but wrapping in `main()` is also acceptable.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/parse_doc.ts`
+- Command: `npx tsx parse_doc.ts` (run from `/home/user/myproject`)
+- The script must run to completion and exit with status code `0`.
+- Output files created by the script:
+  - `/home/user/myproject/output.md` — non-empty Markdown text that contains the phrase `Quarterly Sales Report` (case-insensitive substring match is acceptable).
+  - `/home/user/myproject/output.log` — must contain:
+    - A line in the format `trial_id: <trial_id>` where `<trial_id>` is the exact value read from `/logs/artifacts/trial_id`.
+    - A line in the format `pages_parsed: <N>` where `<N>` is a positive integer (>= 1).
+
+b:T16fd,# Parse a Multi-Page PDF to Structured JSON with LlamaParse (Python)
+
+## Background
+You are extending a RAG ingestion pipeline that needs **page-aware, layout-rich** parsing output from **LlamaParse** (LlamaCloud's managed document parsing service, exposed by the `llama-cloud-services` Python SDK). Unlike a plain-Markdown export, LlamaParse's **JSON result mode** returns one structured record per page (with the per-page text, per-page Markdown, layout items, image references, etc.). This per-page JSON is what downstream code uses to build page-scoped nodes, image documents, and bounding-box-aware citations.
+
+The `llama-cloud-services` Python SDK (which provides `LlamaParse`) is already installed in the environment. The LlamaCloud account is already provisioned and the API key is available in the environment variable `LLAMA_CLOUD_API_KEY`. A multi-page sample PDF named `manual.pdf` is pre-staged at `/home/user/myproject/manual.pdf`. It is a small three-page **Operations Manual** test fixture whose pages have the following distinct top-level headings (in order):
+
+1. Page 1 — `Operations Manual` (with an introductory paragraph)
+2. Page 2 — `Equipment List` (with a short bulleted list of items)
+3. Page 3 — `Maintenance Schedule` (with a small table of intervals)
+
+Because this task may run multiple times concurrently against the shared LlamaCloud account, you must read the `trial_id` from `/logs/artifacts/trial_id` and tag the output artifacts with it. LlamaParse itself is stateless per request (no global resource needs to carry the trial id), so only your output files have to include it.
+
+## Requirements
+Write a Python script at `/home/user/myproject/parse_to_json.py` that:
+- Reads the `trial_id` value from `/logs/artifacts/trial_id`.
+- Uses `LlamaParse` from `llama_cloud_services` to parse `/home/user/myproject/manual.pdf` in **JSON result mode** (i.e., call the parser's JSON-result entry point so you get per-page structured records, not a single concatenated Markdown string).
+- Builds a JSON document and writes it to `/home/user/myproject/parsed.json` with the **exact** top-level shape:
+  ```json
+  {
+    "trial_id": "<trial_id>",
+    "source_file": "manual.pdf",
+    "num_pages": <N>,
+    "pages": [
+      {
+        "page_number": 1,
+        "text": "<page-1 plain text>",
+        "md": "<page-1 markdown>"
+      },
+      {
+        "page_number": 2,
+        "text": "...",
+        "md": "..."
+      },
+      ...
+    ]
+  }
+  ```
+  where:
+  - `trial_id` is the value read from `/logs/artifacts/trial_id`.
+  - `source_file` is the basename of the parsed file (`manual.pdf`).
+  - `num_pages` is an integer >= 3 (the fixture has three pages).
+  - `pages` is a list with at least three entries, in page order. Each entry must contain at minimum the keys `page_number` (1-based integer), `text` (a non-empty string of the page's plain text), and `md` (a non-empty string of the page's Markdown).
+- Writes a plain-text log to `/home/user/myproject/output.log` containing at minimum these three lines (one fact per line):
+  - `trial_id: <trial_id>` — the value read from `/logs/artifacts/trial_id`.
+  - `source_file: manual.pdf`
+  - `num_pages: <N>` — same integer as `num_pages` in `parsed.json`.
+
+## Implementation Hints
+- Import the parser with `from llama_cloud_services import LlamaParse` (alternatively `from llama_parse import LlamaParse` if you prefer the standalone package — both expose the same class). The SDK automatically picks up `LLAMA_CLOUD_API_KEY` from the environment.
+- Two equivalent ways to get per-page JSON output:
+  - Call the JSON-result helper: `parser.get_json_result("/home/user/myproject/manual.pdf")`. This returns a list (one entry per parsed file); each entry has a `pages` field — a list of per-page dicts whose keys typically include `page`, `text`, `md`, `items`, `images`, `width`, `height`.
+  - Or call `result = parser.parse("/home/user/myproject/manual.pdf")` and read its `.pages` attribute; each page object exposes `.text` and `.md`.
+- Use `json.dump(obj, f, indent=2, ensure_ascii=False)` to write the structured output; use `\n`-separated lines for the log file.
+- The script must run end to end with `python3 parse_to_json.py` from `/home/user/myproject` and exit with status code `0`.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/parse_to_json.py`
+- Command: `python3 parse_to_json.py` (run from `/home/user/myproject`)
+- The script must exit with return code `0`.
+- Output files created by the script:
+  - `/home/user/myproject/parsed.json` — must be valid JSON with the top-level shape described above:
+    - `trial_id` (string) equal to the value at `/logs/artifacts/trial_id`.
+    - `source_file` (string) equal to `manual.pdf` (case-insensitive match acceptable).
+    - `num_pages` (integer) equal to the length of the `pages` list and >= 3.
+    - `pages` (list) with at least three entries. Each entry is a dict with the keys `page_number` (1-based integer), `text` (non-empty string), and `md` (non-empty string). The first three entries must have `page_number` values of `1`, `2`, `3` (in that order).
+    - The concatenation of every page's `text` field (case-insensitive) must contain all three of: `Operations Manual`, `Equipment List`, and `Maintenance Schedule`.
+    - The concatenation of every page's `md` field (case-insensitive) must also contain all three of: `Operations Manual`, `Equipment List`, and `Maintenance Schedule`.
+  - `/home/user/myproject/output.log` — must contain:
+    - A line in the format `trial_id: <trial_id>` where `<trial_id>` is the exact value at `/logs/artifacts/trial_id`.
+    - A line in the format `source_file: manual.pdf` (case-insensitive match on the value).
+    - A line in the format `num_pages: <N>` where `<N>` is an integer >= 3 and equals the `num_pages` value in `parsed.json`.
+
+c:T198e,# End-to-End RAG with LlamaCloud Query Engine and OpenAI Synthesis
+
+## Background
+You are building a small Retrieval-Augmented Generation (RAG) prototype on **LlamaCloud**, the managed RAG-as-a-Service platform from LlamaIndex. The existing managed-retrieval tests in this evaluation suite only exercise the bare retriever path; this task instead exercises the **full RAG pipeline** by using `LlamaCloudIndex.as_query_engine(...)` together with an LLM. The query engine pulls the most relevant chunks from a managed `LlamaCloudIndex` and then asks an LLM to **synthesize a natural-language answer** from those chunks, also exposing the source nodes that backed the answer.
+
+The Python SDKs `llama-index-core`, `llama-index-indices-managed-llama-cloud`, and `llama-index-llms-openai` are already installed in the environment. The LlamaCloud account is already provisioned and the API key is exposed via the environment variable `LLAMA_CLOUD_API_KEY`. An OpenAI API key is exposed via `OPENAI_API_KEY` so the query engine can call a real LLM for response synthesis. The default LlamaCloud project name to use is `Default`.
+
+A small pre-staged plain-text corpus exists at `/home/user/myproject/docs/`. The corpus contains a file describing a fictional internal initiative named **Project Aurora**, whose stated mission is to *catalog every star in the Milky Way* within the next decade. The corpus also contains two distractor documents (an unrelated company overview and an unrelated honey-lemon-tea recipe) so that retrieval is non-trivial.
+
+Because this task may run multiple times concurrently against the same LlamaCloud project, your managed-index name **MUST be unique per trial run**: read `trial_id` from `/logs/artifacts/trial_id` and append it as a suffix to the base index name `harbor-qe-idx`.
+
+## Requirements
+Write a Python script at `/home/user/myproject/run_query_engine.py` that:
+- Reads the `trial_id` value from `/logs/artifacts/trial_id`.
+- Loads every file in `/home/user/myproject/docs/` as LlamaIndex `Document` objects (for example via `SimpleDirectoryReader`).
+- Creates a **new** managed `LlamaCloudIndex` from those documents using:
+  - `name = "harbor-qe-idx-<trial_id>"` (substituting the actual `trial_id`),
+  - `project_name = "Default"`,
+  - authentication via the `LLAMA_CLOUD_API_KEY` environment variable.
+  - The constructor must block until ingestion is finished so the index is queryable.
+- Builds a query engine from that index using `index.as_query_engine(llm=<OpenAI LLM>)` where the LLM is a `llama_index.llms.openai.OpenAI` instance configured with model `gpt-4o-mini`. The query engine must use the configured OpenAI LLM for response synthesis (do **NOT** disable response synthesis).
+- Issues the following query against the query engine and captures both the synthesized response text **and** the underlying source nodes:
+
+  > `What is the mission of Project Aurora?`
+
+- Writes a Markdown report to `/home/user/myproject/output.md` that contains the following sections in this order:
+  - A top heading `# LlamaCloud Query Engine Result`.
+  - A sub-heading `## Question` followed by the exact question text on the next line.
+  - A sub-heading `## Answer` followed by the LLM-synthesized response (the full response text, not just a snippet).
+  - A sub-heading `## Source Nodes` followed by at least one source-node block. For each source node, emit the source-node text under the `## Source Nodes` heading. The combined content under this heading **must** include text that mentions both `Project Aurora` and `catalog every star in the Milky Way` (case-insensitive).
+- Writes a plain-text log to `/home/user/myproject/output.log` containing at minimum the following lines (one fact per line), using the actual `trial_id` value:
+  - `trial_id: <trial_id>`
+  - `index_name: harbor-qe-idx-<trial_id>`
+  - `llm_model: gpt-4o-mini`
+  - `num_source_nodes: <N>` where `<N>` is a positive integer (>= 1) giving the number of source nodes the query engine returned.
+  - `answer_length: <L>` where `<L>` is the character length of the synthesized answer (a positive integer).
+
+## Implementation Hints
+- Import `LlamaCloudIndex` from `llama_index.indices.managed.llama_cloud`, `SimpleDirectoryReader` from `llama_index.core`, and `OpenAI` from `llama_index.llms.openai`.
+- `LlamaCloudIndex.from_documents(documents, name=..., project_name="Default")` reads `LLAMA_CLOUD_API_KEY` from the environment and returns a ready-to-use index.
+- `index.as_query_engine(llm=OpenAI(model="gpt-4o-mini"))` returns a query engine whose `.query(question)` method returns a `Response` object with `.response` (the synthesized answer string) and `.source_nodes` (a list of `NodeWithScore` objects, each with `.node.get_content()`/`.node.text` and `.score`).
+- The script must run end to end with `python3 run_query_engine.py` from `/home/user/myproject` and exit with status code `0`.
+- The combined source-node text written under `## Source Nodes` is what the verifier checks for the `Project Aurora` and `catalog every star in the Milky Way` substrings — the synthesized answer itself is **not** required to contain those exact phrases.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/run_query_engine.py`
+- Command: `python3 run_query_engine.py` (run from `/home/user/myproject`)
+- The script must exit with return code `0`.
+- A managed LlamaCloud index named exactly `harbor-qe-idx-<trial_id>` must exist in project `Default` after the script runs, where `<trial_id>` is the value of `/logs/artifacts/trial_id`.
+- Output files created by the script:
+  - `/home/user/myproject/output.md` — non-empty Markdown that contains, in order:
+    - The top heading `# LlamaCloud Query Engine Result`.
+    - The sub-heading `## Question` followed by the text `What is the mission of Project Aurora?` on a subsequent line.
+    - The sub-heading `## Answer` followed by a non-empty answer body.
+    - The sub-heading `## Source Nodes` followed by content that contains, somewhere in the section, both the case-insensitive substrings `Project Aurora` and `catalog every star in the Milky Way`.
+  - `/home/user/myproject/output.log` — must contain lines matching:
+    - `trial_id: <trial_id>` where `<trial_id>` equals the value in `/logs/artifacts/trial_id`.
+    - `index_name: harbor-qe-idx-<trial_id>`.
+    - `llm_model: gpt-4o-mini`.
+    - `num_source_nodes: <N>` where `<N>` is a positive integer (>= 1).
+    - `answer_length: <L>` where `<L>` is a positive integer (>= 1).
+
+0:{"buildId":"GOYV2IX0Wf5pZHfliEwx3","rsc":["$","$1","c",{"children":[["$","div",null,{"className":"min-h-screen bg-background text-foreground font-sans selection:bg-primary/20","children":[["$","div",null,{"className":"fixed inset-0 -z-10 h-full w-full bg-background bg-[radial-gradient(#2a2a2a_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20 dark:opacity-40"}],["$","$L2",null,{"tasksData":[{"taskName":"classify_documents_py","instruction":"$3","trials":[{"job_name":"2026-05-15__16-51-09","trial_name":"classify_documents_py__fS3zHSH","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":349.866,"latency_breakdown":{"env_setup":205.631,"agent_setup":19.547,"agent_exec":76.163,"verifier":15.187},"taskName":"classify_documents_py","jobId":"fS3zHSH","exec_duration":76.163}]},{"taskName":"composite_retriever_py","instruction":"$4","trials":[{"job_name":"2026-05-15__16-51-09","trial_name":"composite_retriever_py__rDzocSG","model":"gemini-3-flash","agent":"Pochi","passed":false,"reward":0,"error":false,"latency_sec":309.057,"latency_breakdown":{"env_setup":67.851,"agent_setup":20.34,"agent_exec":183.005,"verifier":22.129},"taskName":"composite_retriever_py","jobId":"rDzocSG","exec_duration":183.005}]},{"taskName":"extract_invoice_schema_py","instruction":"$5","trials":[{"job_name":"2026-05-15__16-51-09","trial_name":"extract_invoice_schema_py__9M2ZjFT","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":352.68,"latency_breakdown":{"env_setup":200.934,"agent_setup":22.361,"agent_exec":88.262,"verifier":7.312},"taskName":"extract_invoice_schema_py","jobId":"9M2ZjFT","exec_duration":88.262}]},{"taskName":"extract_pdf_tables_py","instruction":"$6","trials":[{"job_name":"2026-05-15__16-51-09","trial_name":"extract_pdf_tables_py__miMyrML","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":316.322,"latency_breakdown":{"env_setup":178.073,"agent_setup":19.724,"agent_exec":95.415,"verifier":4.303},"taskName":"extract_pdf_tables_py","jobId":"miMyrML","exec_duration":95.415}]},{"taskName":"incremental_ingestion_py","instruction":"$7","trials":[{"job_name":"2026-05-15__16-51-09","trial_name":"incremental_ingestion_py__ps7XhJJ","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":200.883,"latency_breakdown":{"env_setup":83.699,"agent_setup":20.314,"agent_exec":62.607,"verifier":20.368},"taskName":"incremental_ingestion_py","jobId":"ps7XhJJ","exec_duration":62.607}]},{"taskName":"managed_index_retrieve_py","instruction":"$8","trials":[{"job_name":"2026-05-15__16-51-09","trial_name":"managed_index_retrieve_py__CmyaZKV","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":397.339,"latency_breakdown":{"env_setup":170.644,"agent_setup":20.28,"agent_exec":153.071,"verifier":21.665},"taskName":"managed_index_retrieve_py","jobId":"CmyaZKV","exec_duration":153.071}]},{"taskName":"parse_pdf_to_markdown","instruction":"$9","trials":[{"job_name":"2026-05-15__16-51-09","trial_name":"parse_pdf_to_markdown__rLkFSxe","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":301.241,"latency_breakdown":{"env_setup":175.494,"agent_setup":21.426,"agent_exec":81.227,"verifier":5.858},"taskName":"parse_pdf_to_markdown","jobId":"rLkFSxe","exec_duration":81.227}]},{"taskName":"parse_pdf_to_markdown_ts","instruction":"$a","trials":[{"job_name":"2026-05-15__16-51-09","trial_name":"parse_pdf_to_markdown_ts__BWDhSVv","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":584.045,"latency_breakdown":{"env_setup":205.48,"agent_setup":20.692,"agent_exec":65.146,"verifier":4.913},"taskName":"parse_pdf_to_markdown_ts","jobId":"BWDhSVv","exec_duration":65.146}]},{"taskName":"parse_to_json_layout_py","instruction":"$b","trials":[{"job_name":"2026-05-15__16-51-09","trial_name":"parse_to_json_layout_py__2VoLnH7","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":321.03,"latency_breakdown":{"env_setup":205.561,"agent_setup":20.624,"agent_exec":70.749,"verifier":5.033},"taskName":"parse_to_json_layout_py","jobId":"2VoLnH7","exec_duration":70.749}]},{"taskName":"query_engine_synthesize_py","instruction":"$c","trials":[{"job_name":"2026-05-15__16-51-09","trial_name":"query_engine_synthesize_py__mxmNrpB","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":215.637,"latency_breakdown":{"env_setup":100.961,"agent_setup":20.152,"agent_exec":62.811,"verifier":16.889},"taskName":"query_engine_synthesize_py","jobId":"mxmNrpB","exec_duration":62.811}]}]}]]}],["$Ld","$Le"],"$Lf"]}],"loading":null,"isPartial":false}
+d:["$","script","script-0",{"src":"/llamacloud-benchmark/pr-preview/pr-5/_next/static/chunks/28c0ea01e9ff9346.js","async":true}]
+e:["$","script","script-1",{"src":"/llamacloud-benchmark/pr-preview/pr-5/_next/static/chunks/be08138953094657.js","async":true}]
+f:["$","$L10",null,{"children":["$","$11",null,{"name":"Next.MetadataOutlet","children":"$@12"}]}]
+12:null
