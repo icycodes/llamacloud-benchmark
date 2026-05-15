@@ -1,0 +1,21 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 10 items
+
+tests/test_final_state.py ..........                                     [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_manifest_has_required_top_level_keys
+PASSED tests/test_final_state.py::test_manifest_trial_id_matches_artifact
+PASSED tests/test_final_state.py::test_manifest_page_count_is_three
+PASSED tests/test_final_state.py::test_manifest_pages_array_has_three_sorted_entries
+PASSED tests/test_final_state.py::test_each_page_text_contains_marker_and_amount[1]
+PASSED tests/test_final_state.py::test_each_page_text_contains_marker_and_amount[2]
+PASSED tests/test_final_state.py::test_each_page_text_contains_marker_and_amount[3]
+PASSED tests/test_final_state.py::test_log_contains_trial_id_line
+PASSED tests/test_final_state.py::test_log_contains_page_count_line
+PASSED tests/test_final_state.py::test_log_job_id_matches_manifest
+============================== 10 passed in 4.50s ==============================

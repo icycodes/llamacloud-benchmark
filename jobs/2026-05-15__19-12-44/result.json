@@ -1,0 +1,63 @@
+{
+    "id": "a112ead2-badb-4276-8386-87116d29f37e",
+    "started_at": "2026-05-15T19:12:44.554442",
+    "updated_at": "2026-05-15T19:42:28.895467",
+    "finished_at": "2026-05-15T19:42:28.895467",
+    "n_total_trials": 16,
+    "stats": {
+        "n_completed_trials": 16,
+        "n_errored_trials": 2,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "pochi__gemini-3-flash__tasks": {
+                "n_trials": 16,
+                "n_errors": 2,
+                "metrics": [
+                    {
+                        "mean": 0.1875
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "0.0": [
+                            "delete_document_py__q8aRg3P",
+                            "managed_index_query_py__evXd6mt",
+                            "metadata_filter_retrieval_py__9Y983VK",
+                            "parse_pdf_to_markdown_ts__ukGTsXS",
+                            "parse_target_pages_py__fVZ7RYK",
+                            "update_document_py__bqJg9td",
+                            "parse_tables_to_csv_py__S9r9nWT",
+                            "managed_index_query_ts__vyEmTqM",
+                            "parse_pdf_to_markdown_py__SFUEHSS",
+                            "save_page_screenshots_py__tpjeYXk",
+                            "extract_invoice_data_py__TF3Rn2i",
+                            "parse_with_custom_prompt_py__Nh7Upet",
+                            "incremental_ingestion_py__3CTFMCT"
+                        ],
+                        "1.0": [
+                            "parse_to_json_pages_py__6kCYFUc",
+                            "parse_bytes_with_filename_py__7QTp9cR",
+                            "extract_structured_data_py__YWMQWA3"
+                        ]
+                    }
+                },
+                "exception_stats": {
+                    "NonZeroAgentExitCodeError": [
+                        "parse_tables_to_csv_py__S9r9nWT"
+                    ],
+                    "AgentTimeoutError": [
+                        "managed_index_query_ts__vyEmTqM"
+                    ]
+                }
+            }
+        },
+        "n_input_tokens": 0,
+        "n_cache_tokens": 0,
+        "n_output_tokens": 335048,
+        "cost_usd": null
+    }
+}

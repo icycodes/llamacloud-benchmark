@@ -1,0 +1,55 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 3,
+            "passed": 2,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778843886988,
+            "stop": 1778843911311
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_log_contains_index_name_line",
+                "status": "passed",
+                "duration": 24009,
+                "start": 1778843887001,
+                "stop": 1778843911010,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_retrieved_capital",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778843911011,
+                "stop": 1778843911013,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_llama_cloud_pipeline_exists",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 298,
+                "start": 1778843911013,
+                "stop": 1778843911311,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "expected_index_name = 'harbor-managed-index-managed_index_query_py__evXd6mt'\nscript_output = 'Index name: harbor-managed-index-managed_index_query_py__evXd6mt\\nRetrieved Context:\\nAtlantis Fact Sheet\\n\\nThe capi... famous for its silver phoenix mascot.\\nThe country celebrates Founding Day every spring with parades and fireworks.\\n'\n\n    def test_llama_cloud_pipeline_exists(expected_index_name: str, script_output: str):\n        \"\"\"Use the LlamaCloud SDK to verify the managed index actually exists on the platform.\"\"\"\n        # Touch the fixture so the script has already run before we query the API.\n        assert script_output\n    \n        token = os.environ.get(\"LLAMA_CLOUD_API_KEY\")\n        assert token, \"LLAMA_CLOUD_API_KEY is not set in the verifier environment.\"\n    \n>       from llama_cloud.client import LlamaCloud\nE       ModuleNotFoundError: No module named 'llama_cloud.client'\n\ntests/test_final_state.py:116: ModuleNotFoundError",
+                "message": "The test failed in the call phase"
+            }
+        ]
+    }
+}

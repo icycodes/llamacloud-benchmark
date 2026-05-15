@@ -1,0 +1,43 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 14 items
+
+tests/test_final_state.py .............F                                 [100%]
+
+=================================== FAILURES ===================================
+___________________ test_parse_job_completed_on_llama_cloud ____________________
+
+script_run = ('Trial id: save_page_screenshots_py__tpjeYXk\nParse job id: pjb-xa9cnfbxpjky7ujq8h3tx2lwk8tn\nScreenshot count: 3\nSaved: page_01.png\nSaved: page_02.png\nSaved: page_03.png\n', 'pjb-xa9cnfbxpjky7ujq8h3tx2lwk8tn')
+
+    def test_parse_job_completed_on_llama_cloud(script_run):
+        """Use the LlamaCloud Python SDK to confirm the parse job referenced in the log."""
+        _, job_id = script_run
+    
+        token = os.environ.get("LLAMA_CLOUD_API_KEY")
+        assert token, "LLAMA_CLOUD_API_KEY is not set in the verifier environment."
+    
+        from llama_cloud import LlamaCloud
+    
+>       client = LlamaCloud(token=token)
+E       TypeError: LlamaCloud.__init__() got an unexpected keyword argument 'token'
+
+tests/test_final_state.py:179: TypeError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_uses_llama_cloud_sdk
+PASSED tests/test_final_state.py::test_script_configures_screenshot_output
+PASSED tests/test_final_state.py::test_script_requests_images_content_metadata
+PASSED tests/test_final_state.py::test_screenshot_directory_exists
+PASSED tests/test_final_state.py::test_screenshot_directory_contains_only_expected_files
+PASSED tests/test_final_state.py::test_screenshot_file_is_valid_png[page_01.png]
+PASSED tests/test_final_state.py::test_screenshot_file_is_valid_png[page_02.png]
+PASSED tests/test_final_state.py::test_screenshot_file_is_valid_png[page_03.png]
+PASSED tests/test_final_state.py::test_log_contains_trial_id
+PASSED tests/test_final_state.py::test_log_contains_screenshot_count
+PASSED tests/test_final_state.py::test_log_reports_each_saved_file[page_01.png]
+PASSED tests/test_final_state.py::test_log_reports_each_saved_file[page_02.png]
+PASSED tests/test_final_state.py::test_log_reports_each_saved_file[page_03.png]
+FAILED tests/test_final_state.py::test_parse_job_completed_on_llama_cloud - T...
+========================= 1 failed, 13 passed in 9.84s =========================

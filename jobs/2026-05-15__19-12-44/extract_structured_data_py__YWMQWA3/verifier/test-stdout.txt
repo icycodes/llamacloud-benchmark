@@ -1,0 +1,22 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 11 items
+
+tests/test_final_state.py ...........                                    [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_uses_llama_cloud_and_pydantic
+PASSED tests/test_final_state.py::test_extract_script_runs_successfully
+PASSED tests/test_final_state.py::test_output_json_has_required_top_level_keys
+PASSED tests/test_final_state.py::test_output_json_invoice_number
+PASSED tests/test_final_state.py::test_output_json_customer_name
+PASSED tests/test_final_state.py::test_output_json_customer_email
+PASSED tests/test_final_state.py::test_output_json_total_amount
+PASSED tests/test_final_state.py::test_output_json_line_items_count_and_keys
+PASSED tests/test_final_state.py::test_output_json_line_item_names_present
+PASSED tests/test_final_state.py::test_output_json_widget_a_row_values
+PASSED tests/test_final_state.py::test_output_log_lines
+============================= 11 passed in 13.07s ==============================

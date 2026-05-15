@@ -1,0 +1,161 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 13,
+            "passed": 12,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778845072627,
+            "stop": 1778845076613
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_exists",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778845072646,
+                "stop": 1778845072647,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_uses_llama_cloud_sdk",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778845072647,
+                "stop": 1778845072648,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_wires_custom_prompt",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778845072648,
+                "stop": 1778845072648,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_markdown_contains_line_item",
+                "status": "passed",
+                "duration": 3929,
+                "start": 1778845072648,
+                "stop": 1778845076577,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::item_name::['Big Mac Meal', 'Snack Oreo McFlurry', 'Happy Meal 6 Pc']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_markdown_contains_line_item",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778845076577,
+                "stop": 1778845076579,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::item_name::['Big Mac Meal', 'Snack Oreo McFlurry', 'Happy Meal 6 Pc']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_markdown_contains_line_item",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778845076579,
+                "stop": 1778845076581,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::item_name::['Big Mac Meal', 'Snack Oreo McFlurry', 'Happy Meal 6 Pc']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_markdown_contains_line_item_price",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778845076581,
+                "stop": 1778845076582,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::price::['8.99', '2.69', '4.89']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_markdown_contains_line_item_price",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778845076583,
+                "stop": 1778845076585,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::price::['8.99', '2.69', '4.89']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_markdown_contains_line_item_price",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778845076585,
+                "stop": 1778845076587,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::price::['8.99', '2.69', '4.89']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_markdown_contains_final_total",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778845076587,
+                "stop": 1778845076589,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_trial_id_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778845076589,
+                "stop": 1778845076590,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_custom_prompt_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778845076591,
+                "stop": 1778845076592,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_parse_job_completed_on_llama_cloud",
+                "status": "failed",
+                "duration": 20,
+                "start": 1778845076592,
+                "stop": 1778845076612,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "log_text = 'Trial id: parse_with_custom_prompt_py__Nh7Upet\\nCustom prompt: Extract ONLY the line items (item name and price) and ...or tax. The output should contain ONLY the line items and the Total.\\nParse job id: pjb-dl94a8w1oot1kg1rki6pgp8fzozp\\n'\n\n    @pytest.fixture(scope=\"module\")\n    def parse_job_id(log_text: str) -> str:\n        pattern = re.compile(r\"^Parse job id:\\s*([0-9a-fA-F-]+)\\s*$\", re.MULTILINE)\n        match = pattern.search(log_text)\n>       assert match is not None, (\n            f\"Expected a 'Parse job id: <job_id>' line in {OUTPUT_LOG}.\\n\"\n            f\"Log content (first 500 chars): {log_text[:500]!r}\"\n        )\nE       AssertionError: Expected a 'Parse job id: <job_id>' line in /home/user/prompted_parse_task/output.log.\nE         Log content (first 500 chars): 'Trial id: parse_with_custom_prompt_py__Nh7Upet\\nCustom prompt: Extract ONLY the line items (item name and price) and the final Total from this receipt. DO NOT include any other information such as the merchant header, address, phone number, promotional text, survey codes, subtotal, or tax. The output should contain ONLY the line items and the Total.\\nParse job id: pjb-dl94a8w1oot1kg1rki6pgp8fzozp\\n'\nE       assert None is not None\n\ntests/test_final_state.py:173: AssertionError"
+            }
+        ]
+    }
+}

@@ -1,0 +1,33 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 5 items
+
+tests/test_final_state.py F....                                          [100%]
+
+=================================== FAILURES ===================================
+_____________ test_output_markdown_contains_requested_page_markers _____________
+
+script_outputs = ('Marker-Bravo-Page-One\n\n# Section 1: Background\n\nThis is the background section that describes the context of the...e parsed by the executor.\n\n', 'Trial id: parse_target_pages_py__fVZ7RYK\nTarget pages: 1,3\nParsed pages count: 2\n')
+
+    def test_output_markdown_contains_requested_page_markers(script_outputs):
+        md_text, _ = script_outputs
+        for marker in INCLUDED_MARKERS:
+>           assert marker in md_text, (
+                f"Expected the parsed markdown to contain '{marker}' (from one of the "
+                f"two requested pages), but it was not found in {OUTPUT_MD}. "
+                f"First 800 chars: {md_text[:800]!r}"
+            )
+E           AssertionError: Expected the parsed markdown to contain 'Marker-Delta-Page-Three' (from one of the two requested pages), but it was not found in /home/user/parse_pages_task/output.md. First 800 chars: 'Marker-Bravo-Page-One\n\n# Section 1: Background\n\nThis is the background section that describes the context of the demo report. It is one of the pages that must be parsed by the executor.\n\n\n\n\n\n\n# Section 3: Results\n\nThis is the results section. It contains the key findings of the demo report and is one of the pages that must be parsed by the executor.\n\n'
+E           assert 'Marker-Delta-Page-Three' in 'Marker-Bravo-Page-One\n\n# Section 1: Background\n\nThis is the background section that describes the context of the ...tion. It contains the key findings of the demo report and is one of the pages that must be parsed by the executor.\n\n'
+
+tests/test_final_state.py:112: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_output_markdown_excludes_skipped_page_markers
+PASSED tests/test_final_state.py::test_log_contains_trial_id_line
+PASSED tests/test_final_state.py::test_log_contains_target_pages_line
+PASSED tests/test_final_state.py::test_log_contains_parsed_pages_count_two
+FAILED tests/test_final_state.py::test_output_markdown_contains_requested_page_markers
+========================= 1 failed, 4 passed in 4.76s ==========================

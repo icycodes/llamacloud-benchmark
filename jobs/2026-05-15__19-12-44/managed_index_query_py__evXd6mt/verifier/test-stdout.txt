@@ -1,0 +1,32 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 3 items
+
+tests/test_final_state.py ..F                                            [100%]
+
+=================================== FAILURES ===================================
+_______________________ test_llama_cloud_pipeline_exists _______________________
+
+expected_index_name = 'harbor-managed-index-managed_index_query_py__evXd6mt'
+script_output = 'Index name: harbor-managed-index-managed_index_query_py__evXd6mt\nRetrieved Context:\nAtlantis Fact Sheet\n\nThe capi... famous for its silver phoenix mascot.\nThe country celebrates Founding Day every spring with parades and fireworks.\n'
+
+    def test_llama_cloud_pipeline_exists(expected_index_name: str, script_output: str):
+        """Use the LlamaCloud SDK to verify the managed index actually exists on the platform."""
+        # Touch the fixture so the script has already run before we query the API.
+        assert script_output
+    
+        token = os.environ.get("LLAMA_CLOUD_API_KEY")
+        assert token, "LLAMA_CLOUD_API_KEY is not set in the verifier environment."
+    
+>       from llama_cloud.client import LlamaCloud
+E       ModuleNotFoundError: No module named 'llama_cloud.client'
+
+tests/test_final_state.py:116: ModuleNotFoundError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_log_contains_index_name_line
+PASSED tests/test_final_state.py::test_log_contains_retrieved_capital
+FAILED tests/test_final_state.py::test_llama_cloud_pipeline_exists - ModuleNo...
+========================= 1 failed, 2 passed in 24.32s =========================

@@ -1,0 +1,59 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 9 items
+
+tests/test_final_state.py .......FF                                      [100%]
+
+=================================== FAILURES ===================================
+__________________ test_extract_job_completed_on_llama_cloud ___________________
+
+script_run = ('{\n  "invoice_number": "INV-2024-7842",\n  "vendor_name": "Pochi Industries Ltd.",\n  "customer_name": "Atlantis Trading Co.",\n  "total_amount": 6480.0,\n  "currency": "USD"\n}', 'Extract job id: ext-cix0u3wtjc33nye7r8wjiz30weg4\n')
+
+    def test_extract_job_completed_on_llama_cloud(script_run):
+        """Use the LlamaCloud SDK to confirm the recorded job exists and COMPLETED."""
+        _, log_text = script_run
+        match = re.search(r"^Extract job id:\s+(\S+)\s*$", log_text, re.MULTILINE)
+        assert match is not None, (
+            f"No 'Extract job id:' line found in {OUTPUT_LOG}; cannot verify job."
+        )
+        job_id = match.group(1)
+    
+        token = os.environ.get("LLAMA_CLOUD_API_KEY")
+        assert token, "LLAMA_CLOUD_API_KEY is not set in the verifier environment."
+    
+        from llama_cloud import LlamaCloud
+    
+>       client = LlamaCloud(token=token)
+E       TypeError: LlamaCloud.__init__() got an unexpected keyword argument 'token'
+
+tests/test_final_state.py:187: TypeError
+_______________ test_external_file_id_registered_on_llama_cloud ________________
+
+script_run = ('{\n  "invoice_number": "INV-2024-7842",\n  "vendor_name": "Pochi Industries Ltd.",\n  "customer_name": "Atlantis Trading Co.",\n  "total_amount": 6480.0,\n  "currency": "USD"\n}', 'Extract job id: ext-cix0u3wtjc33nye7r8wjiz30weg4\n')
+expected_external_file_id = 'harbor-invoice-extract_invoice_data_py__TF3Rn2i.pdf'
+
+    def test_external_file_id_registered_on_llama_cloud(script_run, expected_external_file_id):
+        """The uploaded LlamaCloud file must use the trial-scoped external_file_id."""
+        token = os.environ.get("LLAMA_CLOUD_API_KEY")
+        assert token, "LLAMA_CLOUD_API_KEY is not set in the verifier environment."
+    
+        from llama_cloud import LlamaCloud
+    
+>       client = LlamaCloud(token=token)
+E       TypeError: LlamaCloud.__init__() got an unexpected keyword argument 'token'
+
+tests/test_final_state.py:202: TypeError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_output_json_has_exact_top_level_keys
+PASSED tests/test_final_state.py::test_extracted_invoice_number
+PASSED tests/test_final_state.py::test_extracted_vendor_name
+PASSED tests/test_final_state.py::test_extracted_customer_name
+PASSED tests/test_final_state.py::test_extracted_total_amount
+PASSED tests/test_final_state.py::test_extracted_currency
+PASSED tests/test_final_state.py::test_output_log_contains_extract_job_id_line
+FAILED tests/test_final_state.py::test_extract_job_completed_on_llama_cloud
+FAILED tests/test_final_state.py::test_external_file_id_registered_on_llama_cloud
+========================= 2 failed, 7 passed in 6.60s ==========================

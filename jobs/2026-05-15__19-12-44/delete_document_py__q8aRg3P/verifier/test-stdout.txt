@@ -1,0 +1,353 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 6 items
+
+tests/test_final_state.py EEEEEE                                         [100%]
+
+==================================== ERRORS ====================================
+_____________ ERROR at setup of test_log_contains_index_name_line ______________
+
+expected_index_name = 'harbor-delete-index-delete_document_py__q8aRg3P'
+
+    @pytest.fixture(scope="module")
+    def script_output(expected_index_name: str):
+        """Run manage_index.py once and yield the produced log text."""
+        assert os.path.isfile(MANAGE_SCRIPT), (
+            f"Expected the executor-created script at {MANAGE_SCRIPT}, but it is missing."
+        )
+    
+        if os.path.exists(OUTPUT_LOG):
+            os.remove(OUTPUT_LOG)
+    
+        env = os.environ.copy()
+        result = subprocess.run(
+            ["python3", "manage_index.py"],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            env=env,
+            timeout=1200,
+        )
+>       assert result.returncode == 0, (
+            "manage_index.py did not exit with status 0.\n"
+            f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
+E       AssertionError: manage_index.py did not exit with status 0.
+E         stdout:
+E         Creating managed index: harbor-delete-index-delete_document_py__q8aRg3P
+E         Created pipeline 840b5210-7426-42ec-9a3c-74bfd8cdc721 with name harbor-delete-index-delete_document_py__q8aRg3P
+E         
+E         stderr:
+E         Traceback (most recent call last):
+E           File "/home/user/delete_task/manage_index.py", line 71, in <module>
+E             main()
+E           File "/home/user/delete_task/manage_index.py", line 30, in main
+E             index = LlamaCloudIndex.from_documents(
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/base.py", line 617, in from_documents
+E             upserted_documents_response = client.pipelines.documents.create(
+E                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/resources/pipelines/documents.py", line 79, in create
+E             return self._post(
+E                    ^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/_base_client.py", line 1280, in post
+E             return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+E                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/_base_client.py", line 1067, in request
+E             raise self._make_status_error_from_response(err.response) from None
+E         llama_cloud.ConflictError: Error code: 409 - {'detail': 'Document atlantis-history already exists'}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', 'manage_index.py'], returncode=1, stdout='Creating managed index: harbor-delete-inde... from None\nllama_cloud.ConflictError: Error code: 409 - {\'detail\': \'Document atlantis-history already exists\'}\n').returncode
+
+tests/test_final_state.py:51: AssertionError
+_________ ERROR at setup of test_log_contains_deleted_document_id_line _________
+
+expected_index_name = 'harbor-delete-index-delete_document_py__q8aRg3P'
+
+    @pytest.fixture(scope="module")
+    def script_output(expected_index_name: str):
+        """Run manage_index.py once and yield the produced log text."""
+        assert os.path.isfile(MANAGE_SCRIPT), (
+            f"Expected the executor-created script at {MANAGE_SCRIPT}, but it is missing."
+        )
+    
+        if os.path.exists(OUTPUT_LOG):
+            os.remove(OUTPUT_LOG)
+    
+        env = os.environ.copy()
+        result = subprocess.run(
+            ["python3", "manage_index.py"],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            env=env,
+            timeout=1200,
+        )
+>       assert result.returncode == 0, (
+            "manage_index.py did not exit with status 0.\n"
+            f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
+E       AssertionError: manage_index.py did not exit with status 0.
+E         stdout:
+E         Creating managed index: harbor-delete-index-delete_document_py__q8aRg3P
+E         Created pipeline 840b5210-7426-42ec-9a3c-74bfd8cdc721 with name harbor-delete-index-delete_document_py__q8aRg3P
+E         
+E         stderr:
+E         Traceback (most recent call last):
+E           File "/home/user/delete_task/manage_index.py", line 71, in <module>
+E             main()
+E           File "/home/user/delete_task/manage_index.py", line 30, in main
+E             index = LlamaCloudIndex.from_documents(
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/base.py", line 617, in from_documents
+E             upserted_documents_response = client.pipelines.documents.create(
+E                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/resources/pipelines/documents.py", line 79, in create
+E             return self._post(
+E                    ^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/_base_client.py", line 1280, in post
+E             return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+E                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/_base_client.py", line 1067, in request
+E             raise self._make_status_error_from_response(err.response) from None
+E         llama_cloud.ConflictError: Error code: 409 - {'detail': 'Document atlantis-history already exists'}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', 'manage_index.py'], returncode=1, stdout='Creating managed index: harbor-delete-inde... from None\nllama_cloud.ConflictError: Error code: 409 - {\'detail\': \'Document atlantis-history already exists\'}\n').returncode
+
+tests/test_final_state.py:51: AssertionError
+_ ERROR at setup of test_log_retrieval_for_cuisine_still_contains_grilled_seaweed _
+
+expected_index_name = 'harbor-delete-index-delete_document_py__q8aRg3P'
+
+    @pytest.fixture(scope="module")
+    def script_output(expected_index_name: str):
+        """Run manage_index.py once and yield the produced log text."""
+        assert os.path.isfile(MANAGE_SCRIPT), (
+            f"Expected the executor-created script at {MANAGE_SCRIPT}, but it is missing."
+        )
+    
+        if os.path.exists(OUTPUT_LOG):
+            os.remove(OUTPUT_LOG)
+    
+        env = os.environ.copy()
+        result = subprocess.run(
+            ["python3", "manage_index.py"],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            env=env,
+            timeout=1200,
+        )
+>       assert result.returncode == 0, (
+            "manage_index.py did not exit with status 0.\n"
+            f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
+E       AssertionError: manage_index.py did not exit with status 0.
+E         stdout:
+E         Creating managed index: harbor-delete-index-delete_document_py__q8aRg3P
+E         Created pipeline 840b5210-7426-42ec-9a3c-74bfd8cdc721 with name harbor-delete-index-delete_document_py__q8aRg3P
+E         
+E         stderr:
+E         Traceback (most recent call last):
+E           File "/home/user/delete_task/manage_index.py", line 71, in <module>
+E             main()
+E           File "/home/user/delete_task/manage_index.py", line 30, in main
+E             index = LlamaCloudIndex.from_documents(
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/base.py", line 617, in from_documents
+E             upserted_documents_response = client.pipelines.documents.create(
+E                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/resources/pipelines/documents.py", line 79, in create
+E             return self._post(
+E                    ^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/_base_client.py", line 1280, in post
+E             return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+E                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/_base_client.py", line 1067, in request
+E             raise self._make_status_error_from_response(err.response) from None
+E         llama_cloud.ConflictError: Error code: 409 - {'detail': 'Document atlantis-history already exists'}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', 'manage_index.py'], returncode=1, stdout='Creating managed index: harbor-delete-inde... from None\nllama_cloud.ConflictError: Error code: 409 - {\'detail\': \'Document atlantis-history already exists\'}\n').returncode
+
+tests/test_final_state.py:51: AssertionError
+_______ ERROR at setup of test_log_retrieval_for_lumina_sphere_is_absent _______
+
+expected_index_name = 'harbor-delete-index-delete_document_py__q8aRg3P'
+
+    @pytest.fixture(scope="module")
+    def script_output(expected_index_name: str):
+        """Run manage_index.py once and yield the produced log text."""
+        assert os.path.isfile(MANAGE_SCRIPT), (
+            f"Expected the executor-created script at {MANAGE_SCRIPT}, but it is missing."
+        )
+    
+        if os.path.exists(OUTPUT_LOG):
+            os.remove(OUTPUT_LOG)
+    
+        env = os.environ.copy()
+        result = subprocess.run(
+            ["python3", "manage_index.py"],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            env=env,
+            timeout=1200,
+        )
+>       assert result.returncode == 0, (
+            "manage_index.py did not exit with status 0.\n"
+            f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
+E       AssertionError: manage_index.py did not exit with status 0.
+E         stdout:
+E         Creating managed index: harbor-delete-index-delete_document_py__q8aRg3P
+E         Created pipeline 840b5210-7426-42ec-9a3c-74bfd8cdc721 with name harbor-delete-index-delete_document_py__q8aRg3P
+E         
+E         stderr:
+E         Traceback (most recent call last):
+E           File "/home/user/delete_task/manage_index.py", line 71, in <module>
+E             main()
+E           File "/home/user/delete_task/manage_index.py", line 30, in main
+E             index = LlamaCloudIndex.from_documents(
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/base.py", line 617, in from_documents
+E             upserted_documents_response = client.pipelines.documents.create(
+E                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/resources/pipelines/documents.py", line 79, in create
+E             return self._post(
+E                    ^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/_base_client.py", line 1280, in post
+E             return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+E                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/_base_client.py", line 1067, in request
+E             raise self._make_status_error_from_response(err.response) from None
+E         llama_cloud.ConflictError: Error code: 409 - {'detail': 'Document atlantis-history already exists'}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', 'manage_index.py'], returncode=1, stdout='Creating managed index: harbor-delete-inde... from None\nllama_cloud.ConflictError: Error code: 409 - {\'detail\': \'Document atlantis-history already exists\'}\n').returncode
+
+tests/test_final_state.py:51: AssertionError
+______________ ERROR at setup of test_llama_cloud_pipeline_exists ______________
+
+expected_index_name = 'harbor-delete-index-delete_document_py__q8aRg3P'
+
+    @pytest.fixture(scope="module")
+    def script_output(expected_index_name: str):
+        """Run manage_index.py once and yield the produced log text."""
+        assert os.path.isfile(MANAGE_SCRIPT), (
+            f"Expected the executor-created script at {MANAGE_SCRIPT}, but it is missing."
+        )
+    
+        if os.path.exists(OUTPUT_LOG):
+            os.remove(OUTPUT_LOG)
+    
+        env = os.environ.copy()
+        result = subprocess.run(
+            ["python3", "manage_index.py"],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            env=env,
+            timeout=1200,
+        )
+>       assert result.returncode == 0, (
+            "manage_index.py did not exit with status 0.\n"
+            f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
+E       AssertionError: manage_index.py did not exit with status 0.
+E         stdout:
+E         Creating managed index: harbor-delete-index-delete_document_py__q8aRg3P
+E         Created pipeline 840b5210-7426-42ec-9a3c-74bfd8cdc721 with name harbor-delete-index-delete_document_py__q8aRg3P
+E         
+E         stderr:
+E         Traceback (most recent call last):
+E           File "/home/user/delete_task/manage_index.py", line 71, in <module>
+E             main()
+E           File "/home/user/delete_task/manage_index.py", line 30, in main
+E             index = LlamaCloudIndex.from_documents(
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/base.py", line 617, in from_documents
+E             upserted_documents_response = client.pipelines.documents.create(
+E                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/resources/pipelines/documents.py", line 79, in create
+E             return self._post(
+E                    ^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/_base_client.py", line 1280, in post
+E             return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+E                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/_base_client.py", line 1067, in request
+E             raise self._make_status_error_from_response(err.response) from None
+E         llama_cloud.ConflictError: Error code: 409 - {'detail': 'Document atlantis-history already exists'}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', 'manage_index.py'], returncode=1, stdout='Creating managed index: harbor-delete-inde... from None\nllama_cloud.ConflictError: Error code: 409 - {\'detail\': \'Document atlantis-history already exists\'}\n').returncode
+
+tests/test_final_state.py:51: AssertionError
+____ ERROR at setup of test_llama_cloud_pipeline_documents_reflect_deletion ____
+
+expected_index_name = 'harbor-delete-index-delete_document_py__q8aRg3P'
+
+    @pytest.fixture(scope="module")
+    def script_output(expected_index_name: str):
+        """Run manage_index.py once and yield the produced log text."""
+        assert os.path.isfile(MANAGE_SCRIPT), (
+            f"Expected the executor-created script at {MANAGE_SCRIPT}, but it is missing."
+        )
+    
+        if os.path.exists(OUTPUT_LOG):
+            os.remove(OUTPUT_LOG)
+    
+        env = os.environ.copy()
+        result = subprocess.run(
+            ["python3", "manage_index.py"],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            env=env,
+            timeout=1200,
+        )
+>       assert result.returncode == 0, (
+            "manage_index.py did not exit with status 0.\n"
+            f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+        )
+E       AssertionError: manage_index.py did not exit with status 0.
+E         stdout:
+E         Creating managed index: harbor-delete-index-delete_document_py__q8aRg3P
+E         Created pipeline 840b5210-7426-42ec-9a3c-74bfd8cdc721 with name harbor-delete-index-delete_document_py__q8aRg3P
+E         
+E         stderr:
+E         Traceback (most recent call last):
+E           File "/home/user/delete_task/manage_index.py", line 71, in <module>
+E             main()
+E           File "/home/user/delete_task/manage_index.py", line 30, in main
+E             index = LlamaCloudIndex.from_documents(
+E                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/base.py", line 617, in from_documents
+E             upserted_documents_response = client.pipelines.documents.create(
+E                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/resources/pipelines/documents.py", line 79, in create
+E             return self._post(
+E                    ^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/_base_client.py", line 1280, in post
+E             return cast(ResponseT, self.request(cast_to, opts, stream=stream, stream_cls=stream_cls))
+E                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/_base_client.py", line 1067, in request
+E             raise self._make_status_error_from_response(err.response) from None
+E         llama_cloud.ConflictError: Error code: 409 - {'detail': 'Document atlantis-history already exists'}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', 'manage_index.py'], returncode=1, stdout='Creating managed index: harbor-delete-inde... from None\nllama_cloud.ConflictError: Error code: 409 - {\'detail\': \'Document atlantis-history already exists\'}\n').returncode
+
+tests/test_final_state.py:51: AssertionError
+=========================== short test summary info ============================
+ERROR tests/test_final_state.py::test_log_contains_index_name_line - Assertio...
+ERROR tests/test_final_state.py::test_log_contains_deleted_document_id_line
+ERROR tests/test_final_state.py::test_log_retrieval_for_cuisine_still_contains_grilled_seaweed
+ERROR tests/test_final_state.py::test_log_retrieval_for_lumina_sphere_is_absent
+ERROR tests/test_final_state.py::test_llama_cloud_pipeline_exists - Assertion...
+ERROR tests/test_final_state.py::test_llama_cloud_pipeline_documents_reflect_deletion
+============================== 6 errors in 6.88s ===============================
