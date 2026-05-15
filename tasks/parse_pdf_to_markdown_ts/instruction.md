@@ -1,0 +1,37 @@
+# Parse a PDF to Markdown with LlamaParse (TypeScript)
+
+## Background
+You are tasked with using **LlamaParse** (LlamaCloud's managed document parsing service) from a **TypeScript / Node.js** script to convert a PDF into clean Markdown that downstream RAG pipelines can index. LlamaParse is exposed via the official `@llamaindex/llama-cloud` Node SDK and produces page-by-page Markdown that preserves headings and tables much better than naive PDF text extraction.
+
+The Node.js v24 runtime and the `@llamaindex/llama-cloud` SDK are already installed globally in the environment. The LlamaCloud account has already been provisioned and the API key is available in the environment variable `LLAMA_CLOUD_API_KEY`. A sample PDF named `sample.pdf` is pre-staged at `/home/user/myproject/sample.pdf`. It is a short business-style report whose first heading reads `Quarterly Sales Report` and which contains a small table of products and revenues.
+
+This task is the **TypeScript counterpart** to the Python LlamaParse workflow: same input PDF, same SDK behavior, same expected output files — but written and executed as a TypeScript program.
+
+## Requirements
+- Write a TypeScript program at `/home/user/myproject/parse_doc.ts` that:
+  - Reads the `trial_id` value from the file `/logs/artifacts/trial_id`.
+  - Uses the `LlamaCloud` client from `@llamaindex/llama-cloud` to upload `/home/user/myproject/sample.pdf` as a `parse` file, then runs a parse job (e.g. `client.parsing.parse({ ... })`) that returns Markdown output (request `expand: ['markdown']`).
+  - Concatenates the Markdown of every parsed page into one single string and writes it to `/home/user/myproject/output.md`.
+  - Writes a plain-text log to `/home/user/myproject/output.log` containing at minimum these two lines:
+    - `trial_id: <trial_id>` — the value read from `/logs/artifacts/trial_id`.
+    - `pages_parsed: <N>` — the number of pages returned by LlamaParse (a positive integer).
+- The script must be runnable end to end with `npx tsx parse_doc.ts` from `/home/user/myproject`.
+
+## Implementation Hints
+- Import the SDK with `import LlamaCloud from '@llamaindex/llama-cloud'` and create a client with `new LlamaCloud()` — it reads `LLAMA_CLOUD_API_KEY` from the environment automatically.
+- Upload the PDF using `client.files.create({ file: fs.createReadStream('./sample.pdf'), purpose: 'parse' })` to obtain a file id, then call `client.parsing.parse({ file_id, tier: 'agentic', version: 'latest', expand: ['markdown'] })`. The SDK blocks until the job completes.
+- The Markdown output is structured as `result.markdown.pages`, an array of `{ page_number, markdown }` objects. Join the per-page `markdown` strings (with blank lines or `---` separators) to produce the full document.
+- Use `fs.writeFileSync` (or `fs.promises.writeFile`) to write `output.md` and `output.log`.
+- Top-level `await` works under `tsx` (no need to wrap in an `async main()` function), but wrapping in `main()` is also acceptable.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/parse_doc.ts`
+- Command: `npx tsx parse_doc.ts` (run from `/home/user/myproject`)
+- The script must run to completion and exit with status code `0`.
+- Output files created by the script:
+  - `/home/user/myproject/output.md` — non-empty Markdown text that contains the phrase `Quarterly Sales Report` (case-insensitive substring match is acceptable).
+  - `/home/user/myproject/output.log` — must contain:
+    - A line in the format `trial_id: <trial_id>` where `<trial_id>` is the exact value read from `/logs/artifacts/trial_id`.
+    - A line in the format `pages_parsed: <N>` where `<N>` is a positive integer (>= 1).
+

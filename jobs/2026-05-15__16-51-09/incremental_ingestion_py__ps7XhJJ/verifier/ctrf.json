@@ -1,0 +1,151 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 14,
+            "passed": 14,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778835893192,
+            "stop": 1778835912398
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_exit_code_is_zero",
+                "status": "passed",
+                "duration": 13226,
+                "start": 1778835893216,
+                "stop": 1778835906442,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_markdown_file_exists",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778835906443,
+                "stop": 1778835906443,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_markdown_contains_required_headings_in_order",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835906443,
+                "stop": 1778835906444,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_markdown_aurora_section_contains_expected_phrases",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835906444,
+                "stop": 1778835906445,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_markdown_borealis_section_contains_expected_phrases",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778835906445,
+                "stop": 1778835906445,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_file_exists",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778835906446,
+                "stop": 1778835906446,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_trial_id_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835906446,
+                "stop": 1778835906447,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_index_name_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835906447,
+                "stop": 1778835906448,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_num_initial_files_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835906448,
+                "stop": 1778835906449,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_num_new_files_uploaded_line",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778835906449,
+                "stop": 1778835906449,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_aurora_num_retrieved_line",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778835906450,
+                "stop": 1778835906450,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_borealis_num_retrieved_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835906450,
+                "stop": 1778835906451,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_managed_index_exists_on_llamacloud",
+                "status": "passed",
+                "duration": 2385,
+                "start": 1778835906451,
+                "stop": 1778835908836,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_borealis_content_retrievable_from_managed_index",
+                "status": "passed",
+                "duration": 3562,
+                "start": 1778835908836,
+                "stop": 1778835912398,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

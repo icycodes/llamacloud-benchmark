@@ -1,0 +1,66 @@
+# Incremental File Ingestion into an Existing LlamaCloud Managed Index
+
+## Background
+You are extending a small Retrieval-Augmented Generation (RAG) prototype on **LlamaCloud**, the managed RAG-as-a-Service platform from LlamaIndex. The prototype already has a baseline managed `LlamaCloudIndex` built from a small "initial" corpus. New documents arrive over time and the team does NOT want to rebuild the whole index each time — they want to *incrementally* add the new files to the same managed index and continue retrieving against it.
+
+The Python SDK `llama-index-indices-managed-llama-cloud` (which exposes `LlamaCloudIndex`) is already installed. The LlamaCloud account is already provisioned, and the API key is available in the environment variable `LLAMA_CLOUD_API_KEY`. The default project name to use is `Default`.
+
+Two pre-staged plain-text corpora exist on disk:
+
+- `/home/user/myproject/docs_initial/` — contains exactly **one** file (`project_aurora.txt`) describing a fictional internal initiative named **Project Aurora**, whose stated mission is to *catalog every star in the Milky Way*.
+- `/home/user/myproject/docs_new/` — contains exactly **one** file (`project_borealis.txt`) describing a different fictional initiative named **Project Borealis**, whose stated mission is to *map every ocean current on Earth*.
+
+Because this task may run multiple times concurrently against the same LlamaCloud project, your managed index name **MUST be unique per trial run**: read the `trial_id` from `/logs/artifacts/trial_id` and append it as a suffix to the base name `harbor-inc-idx`.
+
+## Requirements
+Write a Python script at `/home/user/myproject/incremental_ingest.py` that:
+- Reads the `trial_id` value from `/logs/artifacts/trial_id`.
+- Phase 1 — **Initial build**: Loads every file in `/home/user/myproject/docs_initial/` as a list of LlamaIndex `Document` objects (e.g. via `SimpleDirectoryReader`) and creates a **new** managed `LlamaCloudIndex` from those documents using:
+  - `name = "harbor-inc-idx-<trial_id>"` (substituting the actual `trial_id`)
+  - `project_name = "Default"`
+  - Authentication via the `LLAMA_CLOUD_API_KEY` environment variable
+  Wait for ingestion to finish (`LlamaCloudIndex.from_documents(...)` does this synchronously by default).
+- Phase 2 — **Incremental ingestion**: For every file path under `/home/user/myproject/docs_new/`, upload that file into the **already created** managed index using the SDK method `index.upload_file(file_path=..., wait_for_ingestion=True)`. Do **NOT** rebuild the index. Do **NOT** call `from_documents` again with the combined corpora.
+- Phase 3 — **Retrieval**: Use the index's retriever (`index.as_retriever(...)`) to run two retrievals against the *same* index, in this order:
+  1. `aurora_query`: `What is the mission of Project Aurora?`
+  2. `borealis_query`: `What is the mission of Project Borealis?`
+  For each query, identify the top-1 retrieved node (the `NodeWithScore` with the highest `.score`).
+- Writes a Markdown summary to `/home/user/myproject/output.md` containing, **in this order**, the following Markdown sections:
+  - A top heading `# LlamaCloud Incremental Ingestion Result`.
+  - A sub-heading `## Aurora Query Top Node` followed by the full text of the top-1 retrieved node for the Aurora query.
+  - A sub-heading `## Borealis Query Top Node` followed by the full text of the top-1 retrieved node for the Borealis query.
+- Writes a plain-text log to `/home/user/myproject/output.log` containing at minimum the following lines (one fact per line):
+  - `trial_id: <trial_id>` — the value read from `/logs/artifacts/trial_id`.
+  - `index_name: harbor-inc-idx-<trial_id>` — the exact managed-index name created on LlamaCloud.
+  - `num_initial_files: <Ni>` — the number of files loaded from `/home/user/myproject/docs_initial/` and used to build the index (must be `>= 1`).
+  - `num_new_files_uploaded: <Nu>` — the number of files uploaded from `/home/user/myproject/docs_new/` into the existing index via `upload_file` (must be `>= 1`).
+  - `aurora_num_retrieved: <Na>` — the number of nodes returned by the Aurora retrieval (a positive integer).
+  - `borealis_num_retrieved: <Nb>` — the number of nodes returned by the Borealis retrieval (a positive integer).
+
+## Implementation Hints
+- Import `LlamaCloudIndex` from `llama_index.indices.managed.llama_cloud` and `SimpleDirectoryReader` from `llama_index.core`.
+- The SDK reads `LLAMA_CLOUD_API_KEY` automatically from the environment; you can also pass `api_key=...` explicitly if you prefer.
+- The base name for the index is fixed (`harbor-inc-idx`); only the trial-id suffix changes per run. The full name **must** equal `harbor-inc-idx-<trial_id>`.
+- To incrementally add a file to an already-created `LlamaCloudIndex`, call `index.upload_file(file_path="/abs/path/to/file.txt", wait_for_ingestion=True)`. This uploads the file and waits until the managed pipeline finishes ingesting it. Do this once per file in `docs_new/`.
+- `index.as_retriever()` returns a retriever whose `.retrieve(query)` method yields a list of `NodeWithScore` objects; each has `.node.get_content()` (or `.node.text`) and `.score` attributes.
+- The script must run end to end with `python3 incremental_ingest.py` from `/home/user/myproject` and exit with status code `0`.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/incremental_ingest.py`
+- Command: `python3 incremental_ingest.py` (run from `/home/user/myproject`)
+- The script must exit with return code `0`.
+- A managed LlamaCloud index named exactly `harbor-inc-idx-<trial_id>` must exist in project `Default` after the script runs, where `<trial_id>` is the value of `/logs/artifacts/trial_id`.
+- Output files created by the script:
+  - `/home/user/myproject/output.md` — non-empty Markdown that contains, in order:
+    - The heading `# LlamaCloud Incremental Ingestion Result`.
+    - The sub-heading `## Aurora Query Top Node` followed by text that mentions both `Project Aurora` and the phrase `catalog every star in the Milky Way` (case-insensitive substring matches are acceptable).
+    - The sub-heading `## Borealis Query Top Node` followed by text that mentions both `Project Borealis` and the phrase `map every ocean current on Earth` (case-insensitive substring matches are acceptable).
+  - `/home/user/myproject/output.log` — must contain:
+    - A line matching `trial_id: <trial_id>` where `<trial_id>` equals the value in `/logs/artifacts/trial_id`.
+    - A line matching `index_name: harbor-inc-idx-<trial_id>`.
+    - A line matching `num_initial_files: <Ni>` where `<Ni>` is a positive integer (>= 1).
+    - A line matching `num_new_files_uploaded: <Nu>` where `<Nu>` is a positive integer (>= 1).
+    - A line matching `aurora_num_retrieved: <Na>` where `<Na>` is a positive integer (>= 1).
+    - A line matching `borealis_num_retrieved: <Nb>` where `<Nb>` is a positive integer (>= 1).
+

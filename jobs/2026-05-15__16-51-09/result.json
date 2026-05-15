@@ -1,0 +1,50 @@
+{
+    "id": "11d51d8c-02b8-45ab-ba0c-fe6e011528c2",
+    "started_at": "2026-05-15T16:51:09.736943",
+    "updated_at": "2026-05-15T17:06:04.708080",
+    "finished_at": "2026-05-15T17:06:04.708080",
+    "n_total_trials": 10,
+    "stats": {
+        "n_completed_trials": 10,
+        "n_errored_trials": 0,
+        "n_running_trials": 0,
+        "n_pending_trials": 0,
+        "n_cancelled_trials": 0,
+        "n_retries": 0,
+        "evals": {
+            "pochi__gemini-3-flash__tasks": {
+                "n_trials": 10,
+                "n_errors": 0,
+                "metrics": [
+                    {
+                        "mean": 0.9
+                    }
+                ],
+                "pass_at_k": {},
+                "reward_stats": {
+                    "reward": {
+                        "1.0": [
+                            "extract_invoice_schema_py__9M2ZjFT",
+                            "classify_documents_py__fS3zHSH",
+                            "parse_pdf_to_markdown_ts__BWDhSVv",
+                            "parse_to_json_layout_py__2VoLnH7",
+                            "managed_index_retrieve_py__CmyaZKV",
+                            "extract_pdf_tables_py__miMyrML",
+                            "parse_pdf_to_markdown__rLkFSxe",
+                            "incremental_ingestion_py__ps7XhJJ",
+                            "query_engine_synthesize_py__mxmNrpB"
+                        ],
+                        "0.0": [
+                            "composite_retriever_py__rDzocSG"
+                        ]
+                    }
+                },
+                "exception_stats": {}
+            }
+        },
+        "n_input_tokens": 0,
+        "n_cache_tokens": 0,
+        "n_output_tokens": 177290,
+        "cost_usd": null
+    }
+}

@@ -1,0 +1,157 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 14,
+            "passed": 12,
+            "failed": 2,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778835927987,
+            "stop": 1778835949108
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_exit_code_is_zero",
+                "status": "passed",
+                "duration": 20683,
+                "start": 1778835928009,
+                "stop": 1778835948692,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_markdown_file_exists",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778835948693,
+                "stop": 1778835948693,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_markdown_headings_present_and_ordered",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835948693,
+                "stop": 1778835948694,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_astronomy_top_node_section_contains_expected_phrases",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835948694,
+                "stop": 1778835948695,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_cooking_top_node_section_contains_expected_phrases",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778835948695,
+                "stop": 1778835948695,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_file_exists",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778835948696,
+                "stop": 1778835948696,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_trial_id_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835948696,
+                "stop": 1778835948697,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_astro_index_name_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835948697,
+                "stop": 1778835948698,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_cook_index_name_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835948698,
+                "stop": 1778835948699,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_composite_retriever_name_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835948699,
+                "stop": 1778835948700,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_astro_num_retrieved_line",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778835948700,
+                "stop": 1778835948700,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_cook_num_retrieved_line",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778835948701,
+                "stop": 1778835948701,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_astro_managed_index_exists_on_llamacloud",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 375,
+                "start": 1778835948701,
+                "stop": 1778835949076,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_astro_managed_index_exists_on_llamacloud():\n        \"\"\"The astronomy managed index must actually exist on the LlamaCloud service.\"\"\"\n        api_key = os.environ.get(\"LLAMA_CLOUD_API_KEY\")\n        assert api_key, (\n            \"Verifier environment must have LLAMA_CLOUD_API_KEY set to confirm the \"\n            \"managed index exists on LlamaCloud.\"\n        )\n        try:\n>           from llama_index.indices.managed.llama_cloud import LlamaCloudIndex\n\ntests/test_final_state.py:296: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nusr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/__init__.py:1: in <module>\n    from llama_index.indices.managed.llama_cloud.base import LlamaCloudIndex\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\n    \"\"\"Managed index.\n    \n    A managed Index - where the index is accessible via some API that\n    interfaces a managed service.\n    \n    \"\"\"\n    \n    import httpx\n    import os\n    import time\n    from typing import Any, List, Optional, Sequence, Type\n    from urllib.parse import quote_plus\n    \n>   from llama_cloud import (\n        ManagedIngestionStatusResponse,\n        PipelineCreate,\n        PipelineCreateEmbeddingConfig,\n        PipelineCreateTransformConfig,\n        PipelineType,\n        ProjectCreate,\n        ManagedIngestionStatus,\n        CloudDocumentCreate,\n        CloudDocument,\n        PipelineFileCreate,\n    )\nE   ImportError: cannot import name 'ProjectCreate' from 'llama_cloud' (/usr/local/lib/python3.12/dist-packages/llama_cloud/__init__.py)\n\nusr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py:14: ImportError\n\nDuring handling of the above exception, another exception occurred:\n\n    def test_astro_managed_index_exists_on_llamacloud():\n        \"\"\"The astronomy managed index must actually exist on the LlamaCloud service.\"\"\"\n        api_key = os.environ.get(\"LLAMA_CLOUD_API_KEY\")\n        assert api_key, (\n            \"Verifier environment must have LLAMA_CLOUD_API_KEY set to confirm the \"\n            \"managed index exists on LlamaCloud.\"\n        )\n        try:\n            from llama_index.indices.managed.llama_cloud import LlamaCloudIndex\n        except ImportError as exc:\n>           pytest.fail(\n                \"Verifier could not import \"\n                \"`llama_index.indices.managed.llama_cloud.LlamaCloudIndex`: \"\n                f\"{exc}\"\n            )\nE           Failed: Verifier could not import `llama_index.indices.managed.llama_cloud.LlamaCloudIndex`: cannot import name 'ProjectCreate' from 'llama_cloud' (/usr/local/lib/python3.12/dist-packages/llama_cloud/__init__.py)\n\ntests/test_final_state.py:298: Failed",
+                "message": "The test failed in the call phase"
+            },
+            {
+                "name": "test_final_state.py::test_cook_managed_index_exists_on_llamacloud",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 32,
+                "start": 1778835949076,
+                "stop": 1778835949108,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_cook_managed_index_exists_on_llamacloud():\n        \"\"\"The cooking managed index must actually exist on the LlamaCloud service.\"\"\"\n        api_key = os.environ.get(\"LLAMA_CLOUD_API_KEY\")\n        assert api_key, (\n            \"Verifier environment must have LLAMA_CLOUD_API_KEY set to confirm the \"\n            \"managed index exists on LlamaCloud.\"\n        )\n        try:\n>           from llama_index.indices.managed.llama_cloud import LlamaCloudIndex\n\ntests/test_final_state.py:330: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nusr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/__init__.py:1: in <module>\n    from llama_index.indices.managed.llama_cloud.base import LlamaCloudIndex\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\n    \"\"\"Managed index.\n    \n    A managed Index - where the index is accessible via some API that\n    interfaces a managed service.\n    \n    \"\"\"\n    \n    import httpx\n    import os\n    import time\n    from typing import Any, List, Optional, Sequence, Type\n    from urllib.parse import quote_plus\n    \n>   from llama_cloud import (\n        ManagedIngestionStatusResponse,\n        PipelineCreate,\n        PipelineCreateEmbeddingConfig,\n        PipelineCreateTransformConfig,\n        PipelineType,\n        ProjectCreate,\n        ManagedIngestionStatus,\n        CloudDocumentCreate,\n        CloudDocument,\n        PipelineFileCreate,\n    )\nE   ImportError: cannot import name 'ProjectCreate' from 'llama_cloud' (/usr/local/lib/python3.12/dist-packages/llama_cloud/__init__.py)\n\nusr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py:14: ImportError\n\nDuring handling of the above exception, another exception occurred:\n\n    def test_cook_managed_index_exists_on_llamacloud():\n        \"\"\"The cooking managed index must actually exist on the LlamaCloud service.\"\"\"\n        api_key = os.environ.get(\"LLAMA_CLOUD_API_KEY\")\n        assert api_key, (\n            \"Verifier environment must have LLAMA_CLOUD_API_KEY set to confirm the \"\n            \"managed index exists on LlamaCloud.\"\n        )\n        try:\n            from llama_index.indices.managed.llama_cloud import LlamaCloudIndex\n        except ImportError as exc:\n>           pytest.fail(\n                \"Verifier could not import \"\n                \"`llama_index.indices.managed.llama_cloud.LlamaCloudIndex`: \"\n                f\"{exc}\"\n            )\nE           Failed: Verifier could not import `llama_index.indices.managed.llama_cloud.LlamaCloudIndex`: cannot import name 'ProjectCreate' from 'llama_cloud' (/usr/local/lib/python3.12/dist-packages/llama_cloud/__init__.py)\n\ntests/test_final_state.py:332: Failed",
+                "message": "The test failed in the call phase"
+            }
+        ]
+    }
+}
