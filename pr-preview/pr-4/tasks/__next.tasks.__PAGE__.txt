@@ -1,0 +1,665 @@
+1:"$Sreact.fragment"
+2:I[42654,["/llamacloud-benchmark/pr-preview/pr-4/_next/static/chunks/babff0e7418ab052.js","/llamacloud-benchmark/pr-preview/pr-4/_next/static/chunks/3ecbb78a8ff87549.js","/llamacloud-benchmark/pr-preview/pr-4/_next/static/chunks/28c0ea01e9ff9346.js","/llamacloud-benchmark/pr-preview/pr-4/_next/static/chunks/be08138953094657.js"],"TasksPageClient"]
+11:I[75049,["/llamacloud-benchmark/pr-preview/pr-4/_next/static/chunks/d2c13bb33c4fcd54.js","/llamacloud-benchmark/pr-preview/pr-4/_next/static/chunks/c21188132e0e0d48.js"],"OutletBoundary"]
+12:"$Sreact.suspense"
+3:T147c,# Parse a PDF Asynchronously with LlamaParse (Python `AsyncLlamaCloud`)
+
+## Background
+You are working at `/home/user/myproject`, which already contains a sample PDF named `sample.pdf` (it embeds the literal text `Hello LlamaParse - Harbor Test Document` on a single page). Your job is to build a small command-line utility that uses the **asynchronous** [LlamaCloud Python SDK](https://developers.llamaindex.ai/llamaparse/parse/getting_started/) (the `llama-cloud` package, version 2.1 or newer) to parse a PDF document via the managed LlamaParse service and persist the parsed markdown content to disk.
+
+Unlike the synchronous `LlamaCloud` client, this task **MUST** be implemented with the asynchronous client `AsyncLlamaCloud`. The script must define an async coroutine that performs the upload and parse using `await`, and the program entry-point must drive that coroutine with `asyncio.run(...)`.
+
+The SDK is already installed in the environment and the `LLAMA_CLOUD_API_KEY` environment variable is configured. You do NOT need to handle authentication explicitly — the SDK reads the API key from the environment automatically.
+
+## Requirements
+- Implement a Python CLI named `async_parse.py` at `/home/user/myproject/async_parse.py`.
+- The script must accept exactly two command-line arguments:
+  - `--input <path>`: the path to the local PDF file to parse.
+  - `--output <path>`: the path where the parsed markdown should be written.
+- The script MUST use the **asynchronous** LlamaCloud Python SDK client: `from llama_cloud import AsyncLlamaCloud`.
+- The script MUST define an `async def` coroutine (e.g., `async def main():`) that contains all `await`-ed SDK calls, and the program entry-point MUST drive it with `asyncio.run(main())`.
+- Validate that the `--input` file exists before uploading. If it does not, print an error message to stderr and exit with a **non-zero** status code (do NOT silently succeed when the input file is missing).
+- Inside the coroutine:
+  - Upload the input file with `purpose="parse"` using `await client.files.create(file=<input_path>, purpose="parse")`.
+  - Trigger a parsing job using `await client.parsing.parse(file_id=..., tier="agentic", version="latest", expand=["markdown"])`. The SDK awaits until the job finishes and returns the full result.
+- After the job completes, write the **per-page markdown joined into a single document** to the `--output` file. Pages must be joined with two consecutive newline characters (`\n\n`) between adjacent pages, in their original page order. Use UTF-8 encoding for the output file.
+- Print a single line to stdout in the exact format: `Parsed <N> pages asynchronously` where `<N>` is the number of pages returned by the parse job (i.e., `len(result.markdown.pages)`).
+- The script must exit with status code `0` on success.
+
+## Implementation Guide
+1. Create `/home/user/myproject/async_parse.py`.
+2. Use `argparse` (standard library) to parse `--input` and `--output`.
+3. Check existence of `--input` with `os.path.isfile(...)`. If missing, write an error message to `sys.stderr` and `sys.exit(1)`.
+4. Import the async client: `from llama_cloud import AsyncLlamaCloud`.
+5. Define `async def main(input_path: str, output_path: str) -> int:` that:
+   - Instantiates the client: `client = AsyncLlamaCloud()` (it reads `LLAMA_CLOUD_API_KEY` from the environment).
+   - Uploads the file: `file = await client.files.create(file=input_path, purpose="parse")`.
+   - Submits the parse job: `result = await client.parsing.parse(file_id=file.id, tier="agentic", version="latest", expand=["markdown"])`.
+   - Joins per-page markdown: `"\n\n".join(p.markdown for p in result.markdown.pages)`.
+   - Writes the joined string to `output_path` (UTF-8).
+   - Prints `Parsed <N> pages asynchronously` where `<N>` is `len(result.markdown.pages)`.
+   - Returns `0` on success.
+6. Drive the coroutine: `sys.exit(asyncio.run(main(args.input, args.output)))`.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Script path: /home/user/myproject/async_parse.py
+- Command: `python3 async_parse.py --input <pdf_path> --output <output_md_path>`
+- Input argument format: `--input <path_to_pdf>` and `--output <path_to_output_markdown_file>`
+- Expected command stdout: includes exactly one line `Parsed <N> pages asynchronously` where `<N>` is the page count returned by LlamaParse (the provided `sample.pdf` has exactly 1 page, so the line must be exactly `Parsed 1 pages asynchronously`).
+- The output markdown file must be created at the path specified by `--output` and must contain the per-page markdown joined with `\n\n` between pages.
+- The script must import the **asynchronous** client class `AsyncLlamaCloud` from `llama_cloud` (a line matching `from llama_cloud import AsyncLlamaCloud`).
+- The script must define at least one `async def` function and drive it with `asyncio.run(...)`. The string `asyncio.run` must appear in the source.
+- The script must pass `tier="agentic"`, `version="latest"`, and `expand` including `"markdown"` to `client.parsing.parse`.
+- The script must succeed (exit code 0) when given a valid PDF and a valid `LLAMA_CLOUD_API_KEY`.
+- The script must exit with a non-zero status code when `--input` refers to a non-existent file.
+
+4:T1a22,# Chat With a LlamaCloud Managed Index (Python)
+
+## Background
+You are working in `/home/user/myproject`, which already contains a small `docs/` folder with a single text file describing the fictional company **Acme Widgets Corporation**. Your job is to build a Python command-line utility that uses the [LlamaIndex managed index integration](https://docs.llamaindex.ai/en/stable/api_reference/indices/llama_cloud/) (the `llama-index-indices-managed-llama-cloud` package) to:
+
+1. Create a new managed index on **LlamaCloud** from the local documents.
+2. Open a **multi-turn chat session** against that index using `index.as_chat_engine(chat_mode="context")`.
+3. Send two consecutive messages on the **same** chat engine instance, where the second message relies on conversation memory from the first turn (e.g., uses an anaphoric reference like "that company").
+
+The SDK is already installed in the environment and the `LLAMA_CLOUD_API_KEY` environment variable is configured. You do NOT need to handle authentication explicitly — the SDK reads the API key from the environment automatically.
+
+Unlike a query engine (one-off question/answer), a chat engine is **stateful**: it keeps track of prior turns so it can resolve follow-up questions that depend on earlier context. You MUST reuse the same `chat_engine` object for both turns (do NOT create a new chat engine between turns and do NOT call `chat_engine.reset()` between turns).
+
+## Parallel-Run Safety
+Many trials may run concurrently and share the same LlamaCloud account, so every external resource you create on LlamaCloud **MUST** be uniquely named. The harness writes the current `trial_id` to the file `/logs/artifacts/trial_id` before the task starts. Read that file and use the value to disambiguate your index name (see Requirements).
+
+## Requirements
+- Implement a Python CLI named `chat.py` at `/home/user/myproject/chat.py`.
+- The script must accept exactly four command-line arguments:
+  - `--data-dir <path>`: path to a local directory whose files should be loaded into the index.
+  - `--message1 <text>`: the first user message for the chat session.
+  - `--message2 <text>`: the second user message for the chat session (must be sent on the same chat engine instance, after the first turn).
+  - `--output <path>`: the path where the JSON transcript of the chat session should be written.
+- Read `trial_id` from `/logs/artifacts/trial_id` (the file is a single line). Strip any trailing whitespace/newline.
+- Build the **index name** as `harbor-chat-${trial_id}` (literal prefix `harbor-chat-` followed by the trimmed `trial_id`).
+- Use `SimpleDirectoryReader` from `llama_index.core` to load documents from `--data-dir`.
+- Use `LlamaCloudIndex.from_documents(...)` from `llama_index.indices.managed.llama_cloud` to create a new managed index with:
+  - `name="harbor-chat-${trial_id}"`
+  - `project_name="Default"`
+  - `verbose=True`
+- Build a single chat engine via `chat_engine = index.as_chat_engine(chat_mode="context")`.
+- Send the first message: `response1 = chat_engine.chat(<message1>)`.
+- Then, on the **same** chat engine instance and **without** calling `chat_engine.reset()`, send the second message: `response2 = chat_engine.chat(<message2>)`.
+- Write a JSON object to `--output` (UTF-8, with `indent=2`) containing exactly these fields, in this order:
+  - `index_name`: the full index name (string, `"harbor-chat-<trial_id>"`).
+  - `message1`: the first user message (string, exactly as provided via `--message1`).
+  - `response1`: `str(response1)` — the textual response returned by the first `chat_engine.chat(...)` call.
+  - `message2`: the second user message (string, exactly as provided via `--message2`).
+  - `response2`: `str(response2)` — the textual response returned by the second `chat_engine.chat(...)` call.
+- Print exactly one line to stdout: `Chat session: harbor-chat-${trial_id}` where `${trial_id}` is replaced by the trimmed value from `/logs/artifacts/trial_id`.
+- The script must exit with status code `0` on success and a non-zero status code when `--data-dir` does not exist or is not a directory.
+
+## Implementation Guide
+1. Parse `--data-dir`, `--message1`, `--message2`, and `--output` using `argparse` (standard library).
+2. Open `/logs/artifacts/trial_id`, read its content, and strip whitespace to obtain `trial_id`.
+3. Validate that `--data-dir` exists and is a directory; if not, exit with a non-zero status code.
+4. Load documents from `--data-dir` with `SimpleDirectoryReader(<data-dir>).load_data()`.
+5. Create the managed index with `LlamaCloudIndex.from_documents(...)` using `name=f"harbor-chat-{trial_id}"`, `project_name="Default"`, and `verbose=True`.
+6. Build the chat engine: `chat_engine = index.as_chat_engine(chat_mode="context")`.
+7. Call `response1 = chat_engine.chat(<message1>)`.
+8. Without resetting, call `response2 = chat_engine.chat(<message2>)`.
+9. Build a Python dict with the five fields above (in the listed order) and write it to `--output` via `json.dump(..., indent=2)` in UTF-8.
+10. Print the `Chat session: harbor-chat-<trial_id>` line.
+11. Return exit code `0`.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Script path: /home/user/myproject/chat.py
+- Command: `python3 chat.py --data-dir <data_dir> --message1 <message1> --message2 <message2> --output <output_json_path>`
+- Input argument format: `--data-dir <path_to_directory>`, `--message1 <user_message_1>`, `--message2 <user_message_2>`, `--output <path_to_output_json_file>`.
+- Expected command stdout: includes exactly one line `Chat session: harbor-chat-<trial_id>` where `<trial_id>` is read (and stripped) from `/logs/artifacts/trial_id`.
+- A new LlamaCloud index/pipeline named `harbor-chat-<trial_id>` must exist in the `Default` project after the script runs.
+- The `--output` file must be created and must be valid JSON containing the fields `index_name`, `message1`, `response1`, `message2`, and `response2`.
+  - `index_name` must equal `harbor-chat-<trial_id>`.
+  - `message1` and `message2` must equal the exact strings passed via `--message1` and `--message2`.
+  - `response1` and `response2` must be non-empty strings.
+- The script must call `LlamaCloudIndex.from_documents` from `llama_index.indices.managed.llama_cloud` with `project_name="Default"`.
+- The script must call `index.as_chat_engine(chat_mode="context")` exactly once and reuse the returned chat engine for both `chat(...)` calls (i.e., the source must contain at least two calls to `chat_engine.chat(` against the same chat engine variable, and must NOT call `chat_engine.reset(` between turns).
+- The script must exit with a non-zero status code when `--data-dir` does not exist.
+
+5:T1108,# Classify a Document with LlamaClassify (Python)
+
+## Background
+You are working in `/home/user/myproject`, which already contains a small text file named `document.txt` describing a business document. Your job is to build a Python command-line utility that uses the [LlamaCloud Python SDK](https://developers.llamaindex.ai/llamaparse/classify/sdk/) (the `llama-cloud` package, version 1.6 or newer) and the managed **LlamaClassify** service to classify the document into one of two pre-defined categories: `invoice` or `receipt`.
+
+The SDK is already installed in the environment and the `LLAMA_CLOUD_API_KEY` environment variable is configured. You do NOT need to handle authentication explicitly — the SDK reads the API key from the environment automatically.
+
+The convenience method `client.classifier.classify(...)` uploads, classifies, and waits for completion in a single call. Results are returned as a list of items; each item exposes a `result` attribute with `type`, `confidence`, and `reasoning` fields.
+
+## Requirements
+- Implement a Python CLI named `classify.py` at `/home/user/myproject/classify.py`.
+- The script must accept exactly two command-line arguments:
+  - `--input <path>`: the path to the local input file (typically `document.txt`).
+  - `--output <path>`: the path where the classification result should be written as JSON.
+- The script must use the **`llama-cloud`** Python SDK (`from llama_cloud import LlamaCloud`).
+- Upload the input file with `purpose="classify"`.
+- Submit a classification job using `client.classifier.classify(...)` with the following two rules (in this exact order):
+  1. `type="invoice"`, `description="Documents that contain an invoice number, invoice date, bill-to section, and line items with totals."`
+  2. `type="receipt"`, `description="Short purchase receipts, typically from POS systems, with merchant, items and total, often a single page."`
+- Pass `mode="FAST"` to the classify call.
+- After the call returns, take the first item from `result.items`. If `item.result` is `None`, exit with a non-zero status code.
+- Otherwise, write a JSON object to the `--output` path (UTF-8, with `indent=2`) containing exactly these fields:
+  - `type`: the classified type (string).
+  - `confidence`: the confidence value as returned by the SDK.
+  - `reasoning`: the reasoning string returned by the SDK.
+- After a successful run, print a single line to stdout in the exact format: `Classified as: <type>` where `<type>` is the classified type from the result item.
+- The script must exit with status code `0` on success and a non-zero status code if classification failed (no result available) or if the input file does not exist.
+
+## Implementation Guide
+1. Initialize the project at `/home/user/myproject`.
+2. Parse `--input` and `--output` using `argparse` (standard library).
+3. Instantiate `LlamaCloud()` — it reads `LLAMA_CLOUD_API_KEY` from the environment.
+4. Upload the input file using `client.files.create(file=<input_path>, purpose="classify")` and capture the returned file id.
+5. Call `client.classifier.classify(file_ids=[<file_id>], rules=[...], mode="FAST")` with the two rules described above.
+6. Inspect `result.items[0]`. If `item.result` is `None`, exit non-zero.
+7. Otherwise, build a dict with `type`, `confidence`, and `reasoning` and write it as pretty-printed JSON to `--output`.
+8. Print `Classified as: <type>`.
+9. Return exit code 0.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Script path: /home/user/myproject/classify.py
+- Command: `python3 classify.py --input <input_path> --output <output_json_path>`
+- Input argument format: `--input <path_to_input_file>` and `--output <path_to_output_json_file>`
+- Expected stdout: includes exactly one line `Classified as: invoice` when the provided `document.txt` describes an invoice.
+- The output JSON file must be created at the path specified by `--output` and must contain the fields `type`, `confidence`, and `reasoning`.
+- The script must use the `llama-cloud` Python SDK with `mode="FAST"`.
+- The classify call must include both rules (`type="invoice"` and `type="receipt"`) with the descriptions specified above.
+- The script must succeed (exit code 0) when given a valid input file and a valid `LLAMA_CLOUD_API_KEY`.
+- The script must exit with a non-zero status code when the input file does not exist.
+
+6:T1c06,# Build a LlamaCloud Composite Retriever Across Two Managed Indexes (Python)
+
+## Background
+You are working in `/home/user/myproject`, which contains two pre-populated document folders:
+
+- `/home/user/myproject/products/` — product specification documents for the fictional Acme Widgets Corporation.
+- `/home/user/myproject/support/` — customer support FAQ documents for the same company.
+
+Your job is to build a Python command-line utility that uses the [LlamaIndex managed index integration](https://docs.llamaindex.ai/en/stable/api_reference/indices/llama_cloud/) (the `llama-index-indices-managed-llama-cloud` package) to:
+
+1. Create **two separate** managed indexes on LlamaCloud — one per folder.
+2. Combine both indexes into a single `LlamaCloudCompositeRetriever` running in `CompositeRetrievalMode.FULL` mode.
+3. Run a natural-language query against the composite retriever and persist the retrieved chunks.
+
+The SDK is already installed in the environment and the `LLAMA_CLOUD_API_KEY` environment variable is configured. You do NOT need to handle authentication explicitly — the SDK reads the API key from the environment automatically.
+
+## Parallel-Run Safety
+Many trials may run concurrently and share the same LlamaCloud account, so every external resource you create on LlamaCloud **MUST** be uniquely named. The harness writes the current `trial_id` to the file `/logs/artifacts/trial_id` before the task starts. Read that file and use the value to disambiguate every index and retriever name (see Requirements).
+
+## Requirements
+- Implement a Python CLI named `composite.py` at `/home/user/myproject/composite.py`.
+- The script must accept exactly four command-line arguments:
+  - `--products-dir <path>`: path to the products documents directory.
+  - `--support-dir <path>`: path to the support documents directory.
+  - `--query <text>`: a natural-language query string.
+  - `--output <path>`: the path where the retrieved chunks should be written (UTF-8 text file).
+- Read `trial_id` from `/logs/artifacts/trial_id` (the file is a single line). Strip any trailing whitespace/newline.
+- Build the resource names using the trimmed `trial_id`:
+  - Products index name: `harbor-products-${trial_id}`
+  - Support index name: `harbor-support-${trial_id}`
+  - Composite retriever name: `harbor-composite-${trial_id}`
+- Use `SimpleDirectoryReader` from `llama_index.core` to load documents from each directory.
+- Use `LlamaCloudIndex.from_documents(...)` from `llama_index.indices.managed.llama_cloud` to create each managed index with `project_name="Default"`.
+- Build a `LlamaCloudCompositeRetriever` from `llama_index.indices.managed.llama_cloud` with:
+  - `name="harbor-composite-${trial_id}"`
+  - `project_name="Default"`
+  - `create_if_not_exists=True`
+  - `mode=CompositeRetrievalMode.FULL` (import `CompositeRetrievalMode` from `llama_cloud`)
+  - `rerank_top_n=5`
+- Attach **both** managed indexes to the composite retriever via `composite_retriever.add_index(<index>, description=<description>)`. Use these descriptions verbatim:
+  - Products index description: `Product specifications and technical details for Acme Widgets Corporation products.`
+  - Support index description: `Customer support FAQ and troubleshooting guides for Acme Widgets Corporation.`
+- Run the user-supplied query against the composite retriever via `composite_retriever.retrieve(<query>)`.
+- Write the retrieved nodes to the `--output` file (UTF-8). Each retrieved node must be written as a single line in the format `score=<score>: <text>` followed by a newline, in the order returned by `.retrieve(...)`. `<score>` should be `node.score` formatted via `repr(...)` (so `None` scores render as `None`); `<text>` should be `node.get_content()` with all newline characters replaced by a single space.
+- Print exactly one line to stdout: `Retriever name: harbor-composite-${trial_id}` where `${trial_id}` is replaced by the trimmed value from `/logs/artifacts/trial_id`.
+- The script must exit with status code `0` on success and a non-zero status code when either `--products-dir` or `--support-dir` does not exist (or is not a directory).
+
+## Implementation Guide
+1. Parse `--products-dir`, `--support-dir`, `--query`, and `--output` using `argparse` (standard library).
+2. Open `/logs/artifacts/trial_id`, read its content, and strip whitespace to obtain `trial_id`.
+3. Validate that both `--products-dir` and `--support-dir` exist and are directories; if not, exit with a non-zero status code.
+4. Load documents for each folder via `SimpleDirectoryReader(<dir>).load_data()`.
+5. Create each managed index, e.g.:
+   ```python
+   from llama_index.indices.managed.llama_cloud import LlamaCloudIndex
+   products_index = LlamaCloudIndex.from_documents(
+       products_documents,
+       name=f"harbor-products-{trial_id}",
+       project_name="Default",
+   )
+   ```
+6. Build the composite retriever and attach both indexes:
+   ```python
+   from llama_cloud import CompositeRetrievalMode
+   from llama_index.indices.managed.llama_cloud import LlamaCloudCompositeRetriever
+   composite_retriever = LlamaCloudCompositeRetriever(
+       name=f"harbor-composite-{trial_id}",
+       project_name="Default",
+       create_if_not_exists=True,
+       mode=CompositeRetrievalMode.FULL,
+       rerank_top_n=5,
+   )
+   composite_retriever.add_index(products_index, description="...")
+   composite_retriever.add_index(support_index, description="...")
+   ```
+7. Call `nodes = composite_retriever.retrieve(<query>)` and write `score=<repr(node.score)>: <flattened-text>` lines (one node per line) to `--output`.
+8. Print the `Retriever name: harbor-composite-<trial_id>` line.
+9. Return exit code 0.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Script path: /home/user/myproject/composite.py
+- Command: `python3 composite.py --products-dir <products_dir> --support-dir <support_dir> --query <query> --output <output_path>`
+- Input argument format: `--products-dir <path>`, `--support-dir <path>`, `--query <query_string>`, `--output <path_to_text_file>`.
+- Expected command stdout: includes exactly one line `Retriever name: harbor-composite-<trial_id>` where `<trial_id>` is read (and stripped) from `/logs/artifacts/trial_id`.
+- Two new LlamaCloud pipelines named `harbor-products-<trial_id>` and `harbor-support-<trial_id>` must exist in the `Default` project after the script runs.
+- A new LlamaCloud retriever named `harbor-composite-<trial_id>` must exist (queryable via the `GET /api/v1/retrievers` REST endpoint). The retriever must have **exactly two** attached pipelines, whose IDs match the two indexes above.
+- The `--output` file must be created, must be non-empty, and each line must start with `score=` (one line per retrieved node).
+- The script must call `LlamaCloudIndex.from_documents` from `llama_index.indices.managed.llama_cloud` for each managed index with `project_name="Default"`.
+- The script must use `LlamaCloudCompositeRetriever` with `mode=CompositeRetrievalMode.FULL` and `rerank_top_n=5`, and must call `add_index` twice.
+- The script must exit with a non-zero status code when either `--products-dir` or `--support-dir` does not exist.
+
+7:T16b6,# Configure a Region-Aware LlamaCloud Client (Python)
+
+## Background
+LlamaCloud offers two managed deployments: a default **North America (NA)** region and a separate **Europe (EU)** region. Each region has its own base URL, and a client created against the wrong base URL silently produces authentication errors instead of working requests. Your job is to build a small Python command-line utility that uses the [LlamaCloud Python SDK](https://developers.llamaindex.ai/reference/python/) (the `llama-cloud` package) to construct a region-aware `LlamaCloud` client and persist its resolved configuration to disk.
+
+The SDK is already installed in the environment and the `LLAMA_CLOUD_API_KEY` environment variable is configured for the **NA** region (the default region). You do NOT need to handle authentication explicitly — the SDK reads the API key from the environment automatically.
+
+The two valid regional base URLs are:
+- **NA (`us`)**: `https://api.cloud.llamaindex.ai`
+- **EU (`eu`)**: `https://api.cloud.eu.llamaindex.ai`
+
+## Requirements
+- Implement a Python CLI named `region_client.py` at `/home/user/myproject/region_client.py`.
+- The script must accept exactly these command-line arguments:
+  - `--region <us|eu>` (**required**): the LlamaCloud region. Comparison must be case-insensitive (i.e. `US`, `Us`, `eu`, `EU` are all valid). Any other value (for example `apac` or an empty string) MUST cause the script to exit with a non-zero status code.
+  - `--output <path>` (**required**): the path where the resolved client configuration must be written as JSON.
+  - `--check` (**optional flag**): when present, the script must perform a real connectivity check against the configured base URL by calling the SDK to list projects (see Implementation Guide).
+- The script must use the **`llama-cloud`** Python SDK (`from llama_cloud import LlamaCloud`).
+- Map the (case-insensitive) region argument to a base URL using exactly these two literals:
+  - `us` → `https://api.cloud.llamaindex.ai`
+  - `eu` → `https://api.cloud.eu.llamaindex.ai`
+- Instantiate the client using the keyword argument `base_url=<resolved_url>` (i.e. the resolved URL must be passed to the `LlamaCloud(...)` constructor via the `base_url` keyword).
+- After constructing the client, write a single JSON object to the `--output` path (UTF-8, with `indent=2`) containing **exactly** these fields, with **exactly** these names:
+  - `region`: the lowercased region string (`"us"` or `"eu"`).
+  - `base_url`: the resolved base URL string for the region (one of the two literals above).
+  - `connection_verified`: a JSON boolean. Must be `true` only when `--check` was supplied AND the project-listing call returned successfully without raising an exception. Must be `false` in every other case.
+  - `project_count`: a JSON integer. Must be the number of projects returned by the project-listing call when `--check` succeeded. Must be `0` when `--check` was not supplied or when the project-listing call failed.
+- After a successful run, print exactly one line to stdout in the **exact** format: `Region: <region> | Base URL: <base_url>` (single space around the pipe), where `<region>` is the lowercased region string and `<base_url>` is the resolved URL.
+- The script must exit with status code `0` on success (including when `--check` is omitted) and with a non-zero status code on argument-validation errors (such as an unknown region).
+
+## Implementation Guide
+1. Parse `--region`, `--output`, and the flag `--check` using `argparse` (standard library).
+2. Normalize `--region` to lowercase, then look it up in a dict that maps `"us"` and `"eu"` to their respective base URLs. If the value is unknown, exit with a non-zero status code (you may print an error to stderr).
+3. Construct the client:
+   ```python
+   from llama_cloud import LlamaCloud
+   client = LlamaCloud(base_url=resolved_url)
+   ```
+4. If `--check` is supplied, list the projects via the SDK using `client.projects.list()`. Convert the iterable to a `list(...)` so you can take its length. Wrap the call in a `try/except` so any SDK exception (network error, auth failure, etc.) results in `connection_verified=false` and `project_count=0` rather than a crash.
+5. Build the summary dictionary with the four required fields and write it to `--output` using `json.dump(summary, fp, indent=2)`.
+6. Print the line `Region: <region> | Base URL: <base_url>` to stdout.
+7. Return exit code 0.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Script path: /home/user/myproject/region_client.py
+- Command: `python3 region_client.py --region <us|eu> --output <path_to_json> [--check]`
+- Input argument format: `--region <us|eu>` (case-insensitive), `--output <path_to_json_file>`, optional `--check` flag.
+- Expected stdout: includes exactly one line `Region: <region> | Base URL: <base_url>` where `<region>` is the lowercased input region (`us` or `eu`) and `<base_url>` is the matching literal URL.
+- The `--output` JSON file must be created at the path specified by `--output` and must contain exactly the four fields `region`, `base_url`, `connection_verified`, and `project_count` with the semantics described in Requirements.
+- When `--region us --check` is supplied, the JSON file must contain `connection_verified: true` and `project_count` must be an integer `>= 1` (the configured account has at least one project).
+- When `--region eu` is supplied without `--check`, the JSON file must contain `base_url: "https://api.cloud.eu.llamaindex.ai"`, `connection_verified: false`, and `project_count: 0` (no API call is made).
+- The script must use `LlamaCloud(base_url=...)` from the `llama_cloud` package to construct the client.
+- The script must exit with a non-zero status code when given an unknown region value (for example `--region apac`).
+
+8:T11f9,# Create and Query a LlamaCloud Managed Index (Python)
+
+## Background
+You are working in `/home/user/myproject`, which already contains a small `docs/` folder with a single text file describing the fictional company **Acme Widgets Corporation**. Your job is to build a Python command-line utility that uses the [LlamaIndex managed index integration](https://docs.llamaindex.ai/en/stable/api_reference/indices/llama_cloud/) (the `llama-index-indices-managed-llama-cloud` package) to create a new managed index on **LlamaCloud**, ingest the documents, and run a natural-language query against the index.
+
+The SDK is already installed in the environment and the `LLAMA_CLOUD_API_KEY` environment variable is configured. You do NOT need to handle authentication explicitly — the SDK reads the API key from the environment automatically.
+
+## Parallel-Run Safety
+Many trials may run concurrently and share the same LlamaCloud account, so every external resource you create on LlamaCloud **MUST** be uniquely named. The harness writes the current `trial_id` to the file `/logs/artifacts/trial_id` before the task starts. Read that file and use the value to disambiguate your index name (see Requirements).
+
+## Requirements
+- Implement a Python CLI named `build_index.py` at `/home/user/myproject/build_index.py`.
+- The script must accept exactly three command-line arguments:
+  - `--data-dir <path>`: path to a local directory whose files should be loaded into the index.
+  - `--query <text>`: a natural-language query string.
+  - `--output <path>`: the path where the query response text should be written (UTF-8 text file).
+- Read `trial_id` from `/logs/artifacts/trial_id` (the file is a single line). Strip any trailing whitespace/newline.
+- Build the **index name** as `harbor-rag-${trial_id}` (literal prefix `harbor-rag-` followed by the trimmed `trial_id`).
+- Use `SimpleDirectoryReader` from `llama_index.core` to load documents from `--data-dir`.
+- Use `LlamaCloudIndex.from_documents(...)` from `llama_index.indices.managed.llama_cloud` to create a new managed index with:
+  - `name="harbor-rag-${trial_id}"`
+  - `project_name="Default"`
+  - `verbose=True`
+- After the index is created, build a query engine via `index.as_query_engine()` and run the user-supplied query against it.
+- Write the textual response (the `response` object converted to `str(...)`) to the `--output` file (UTF-8).
+- Print exactly one line to stdout: `Index name: harbor-rag-${trial_id}` where `${trial_id}` is replaced by the trimmed value from `/logs/artifacts/trial_id`.
+- The script must exit with status code `0` on success and a non-zero status code when `--data-dir` does not exist or contains no files.
+
+## Implementation Guide
+1. Parse `--data-dir`, `--query`, and `--output` using `argparse` (standard library).
+2. Open `/logs/artifacts/trial_id`, read its content, and strip whitespace to obtain `trial_id`.
+3. Validate that `--data-dir` exists and is a directory; if not, exit with a non-zero status code.
+4. Load documents:
+   ```python
+   from llama_index.core import SimpleDirectoryReader
+   documents = SimpleDirectoryReader(<data-dir>).load_data()
+   ```
+5. Create the managed index:
+   ```python
+   from llama_index.indices.managed.llama_cloud import LlamaCloudIndex
+   index = LlamaCloudIndex.from_documents(
+       documents,
+       name=f"harbor-rag-{trial_id}",
+       project_name="Default",
+       verbose=True,
+   )
+   ```
+6. Run the query:
+   ```python
+   query_engine = index.as_query_engine()
+   response = query_engine.query(<query>)
+   ```
+7. Write `str(response)` to `--output`.
+8. Print the line `Index name: harbor-rag-<trial_id>`.
+9. Return exit code 0.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Script path: /home/user/myproject/build_index.py
+- Command: `python3 build_index.py --data-dir <data_dir> --query <query> --output <output_path>`
+- Input argument format: `--data-dir <path_to_directory>`, `--query <query_string>`, `--output <path_to_text_file>`.
+- Expected command stdout: includes exactly one line `Index name: harbor-rag-<trial_id>` where `<trial_id>` is read (and stripped) from `/logs/artifacts/trial_id`.
+- A new LlamaCloud index/pipeline named `harbor-rag-<trial_id>` must exist in the `Default` project after the script runs.
+- The `--output` file must be created and must contain a non-empty answer to the query.
+- The script must use `LlamaCloudIndex.from_documents` from the `llama_index.indices.managed.llama_cloud` module with `project_name="Default"`.
+- The script must exit with a non-zero status code when `--data-dir` does not exist.
+
+9:T1172,# Extract Structured Data from a Document with LlamaExtract (Python)
+
+## Background
+You are working in `/home/user/myproject`, which already contains a small text file named `candidate.txt` describing a job candidate. Your job is to build a Python command-line utility that uses the [LlamaCloud Python SDK](https://developers.llamaindex.ai/llamaparse/extract/sdk/) (the `llama-cloud` package, version 2.1 or newer) and the managed **LlamaExtract** service to extract structured fields from `candidate.txt` into a JSON file.
+
+The SDK is already installed in the environment and the `LLAMA_CLOUD_API_KEY` environment variable is configured. You do NOT need to handle authentication explicitly — the SDK reads the API key from the environment automatically.
+
+LlamaExtract is asynchronous: you submit a job and must poll for completion. The completed job exposes the extracted data under `job.extract_result`.
+
+## Requirements
+- Implement a Python CLI named `extract.py` at `/home/user/myproject/extract.py`.
+- The script must accept exactly two command-line arguments:
+  - `--input <path>`: the path to the local input file (typically `candidate.txt`).
+  - `--output <path>`: the path where the extracted result should be written as JSON.
+- The script must use the **`llama-cloud`** Python SDK (`from llama_cloud import LlamaCloud`).
+- Define the extraction schema with **Pydantic** as a model named `Candidate` containing exactly these fields, in this order:
+  - `name: str` — Full name of the candidate.
+  - `email: str` — Email address of the candidate.
+  - `skills: list[str]` — Technical skills listed for the candidate.
+- Upload the input file with `purpose="extract"`, then create an extraction job using:
+  - `data_schema=Candidate.model_json_schema()`
+  - `extraction_target="per_doc"`
+  - `tier="agentic"`
+- Poll the job until its `status` is one of `COMPLETED`, `FAILED`, or `CANCELLED`. Use `client.extract.get(job.id)` to refresh.
+- If the job finished with `status == "COMPLETED"`, write `job.extract_result` to the `--output` path as a JSON file (UTF-8, with `indent=2`).
+- After a successful run, print a single line to stdout in the exact format: `Extracted candidate: <name>` where `<name>` is taken from the extracted result.
+- The script must exit with status code `0` on success and a non-zero status code if the extraction job did not complete successfully (e.g., `FAILED` or `CANCELLED`).
+
+## Implementation Guide
+1. Initialize the project at `/home/user/myproject`.
+2. Parse `--input` and `--output` using `argparse` (standard library).
+3. Define the `Candidate` Pydantic model with the three required fields.
+4. Instantiate `LlamaCloud()` — it reads `LLAMA_CLOUD_API_KEY` from the environment.
+5. Upload the input file using `client.files.create(file=<input_path>, purpose="extract")` and capture the returned file object.
+6. Submit the extraction job with `client.extract.create(file_input=<file_id>, configuration={...})` using the configuration dict described above.
+7. Poll the job with a short delay (e.g., `time.sleep(2)`) until `job.status` is terminal. Refresh with `client.extract.get(job.id)`.
+8. On `COMPLETED`, serialize `job.extract_result` to JSON and write it to `--output`.
+9. Print `Extracted candidate: <name>` where `<name>` is the `name` field from `job.extract_result`.
+10. Return exit code 0. On any non-`COMPLETED` terminal status, exit with a non-zero code.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Script path: /home/user/myproject/extract.py
+- Command: `python3 extract.py --input <input_path> --output <output_json_path>`
+- Input argument format: `--input <path_to_text_or_pdf>` and `--output <path_to_output_json_file>`
+- Expected stdout: includes exactly one line `Extracted candidate: <name>` where `<name>` is the candidate's full name from the extracted result.
+- The output JSON file must be created at the path specified by `--output` and must contain the extracted fields `name`, `email`, and `skills`.
+- The script must use the `llama-cloud` Python SDK with `extraction_target="per_doc"` and `tier="agentic"`.
+- The Pydantic schema must be passed to the SDK via `model_json_schema()` and submitted as `data_schema` inside the `configuration` parameter.
+- The script must succeed (exit code 0) when given a valid input file and a valid `LLAMA_CLOUD_API_KEY`.
+- The script must exit with a non-zero status code when the extraction job ends in a non-`COMPLETED` terminal state.
+
+a:T19d8,# Incremental Ingestion into a LlamaCloud Managed Index (Python)
+
+## Background
+You are working in `/home/user/myproject`, which already contains two folders of documents:
+
+- `/home/user/myproject/initial_docs/` — the **first batch** of documents that should be used to bootstrap the managed index.
+- `/home/user/myproject/new_docs/` — the **second batch** of documents that should be added to the **same** index incrementally (without recreating it).
+
+Your job is to build a Python command-line utility that uses the [LlamaIndex managed index integration](https://docs.llamaindex.ai/en/stable/api_reference/indices/llama_cloud/) (the `llama-index-indices-managed-llama-cloud` package) to:
+
+1. Create a brand-new managed index on LlamaCloud from the initial batch.
+2. Incrementally upload the second batch of files into the **same** index, using the SDK's `upload_file` method (NOT by recreating the index and NOT by passing `documents=...` again).
+3. Wait for ingestion of the newly uploaded files to complete.
+
+The SDK is already installed in the environment and the `LLAMA_CLOUD_API_KEY` environment variable is configured. You do NOT need to handle authentication explicitly — the SDK reads the API key from the environment automatically.
+
+## Parallel-Run Safety
+Many trials may run concurrently and share the same LlamaCloud account, so every external resource you create on LlamaCloud **MUST** be uniquely named. The harness writes the current `trial_id` to the file `/logs/artifacts/trial_id` before the task starts. Read that file and use the value to disambiguate your index name (see Requirements).
+
+## Requirements
+- Implement a Python CLI named `ingest.py` at `/home/user/myproject/ingest.py`.
+- The script must accept exactly three command-line arguments:
+  - `--initial-dir <path>`: path to the directory containing the initial batch of documents (must be loaded as LlamaIndex `Document` objects via `SimpleDirectoryReader`).
+  - `--new-dir <path>`: path to the directory containing the additional batch of files that must be uploaded one-by-one via `upload_file`.
+  - `--output <path>`: path where the final JSON summary should be written.
+- Read `trial_id` from `/logs/artifacts/trial_id` (the file is a single line). Strip any trailing whitespace/newline.
+- Build the **index name** as `harbor-inc-${trial_id}` (literal prefix `harbor-inc-` followed by the trimmed `trial_id`).
+- Use `SimpleDirectoryReader` from `llama_index.core` to load the **initial** documents from `--initial-dir`.
+- Create a new managed index using `LlamaCloudIndex.from_documents(...)` from `llama_index.indices.managed.llama_cloud` with:
+  - `name="harbor-inc-${trial_id}"`
+  - `project_name="Default"`
+  - `verbose=True`
+- After the index is created, iterate over the files in `--new-dir` (top-level only, in `sorted()` order) and add each file to the index using `index.upload_file(<file_path>, wait_for_ingestion=False)`.
+- After all files have been uploaded, call `index.wait_for_completion()` to block until ingestion of the newly uploaded files is finished.
+- Write a JSON object to `--output` (UTF-8, with `indent=2`) containing exactly these fields:
+  - `index_name`: the full index name (string, `"harbor-inc-<trial_id>"`).
+  - `initial_documents`: the number of `Document` objects loaded from `--initial-dir` (integer).
+  - `uploaded_files`: an ordered list of the **base file names** (NOT full paths) of every file uploaded from `--new-dir`, in the same `sorted()` order in which they were uploaded.
+- Print exactly one line to stdout in the format: `Ingested N file(s) into harbor-inc-${trial_id}` where `N` is the integer length of `uploaded_files` (e.g., `Ingested 2 file(s) into harbor-inc-abc123`).
+- The script must exit with status code `0` on success and a non-zero status code when `--initial-dir` or `--new-dir` does not exist (or is not a directory).
+
+## Implementation Guide
+1. Parse `--initial-dir`, `--new-dir`, and `--output` using `argparse` (standard library).
+2. Open `/logs/artifacts/trial_id`, read its content, and strip whitespace to obtain `trial_id`.
+3. Validate that both `--initial-dir` and `--new-dir` exist and are directories; if not, exit with a non-zero status code.
+4. Load the initial documents:
+   ```python
+   from llama_index.core import SimpleDirectoryReader
+   initial_documents = SimpleDirectoryReader(<initial-dir>).load_data()
+   ```
+5. Create the managed index from the initial documents:
+   ```python
+   from llama_index.indices.managed.llama_cloud import LlamaCloudIndex
+   index = LlamaCloudIndex.from_documents(
+       initial_documents,
+       name=f"harbor-inc-{trial_id}",
+       project_name="Default",
+       verbose=True,
+   )
+   ```
+6. List the top-level files inside `--new-dir` (`os.listdir(...)`, sorted), keeping only entries that are files (not subdirectories). For each file, call `index.upload_file(<full_path>, wait_for_ingestion=False)`.
+7. Call `index.wait_for_completion()` to block until ingestion is done.
+8. Write the JSON summary to `--output` with the three fields above.
+9. Print the `Ingested N file(s) into harbor-inc-<trial_id>` line to stdout.
+10. Return exit code 0.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Script path: /home/user/myproject/ingest.py
+- Command: `python3 ingest.py --initial-dir <initial_dir> --new-dir <new_dir> --output <output_json_path>`
+- Input argument format: `--initial-dir <path_to_initial_directory>`, `--new-dir <path_to_new_directory>`, `--output <path_to_output_json_file>`.
+- Expected stdout: includes exactly one line `Ingested <N> file(s) into harbor-inc-<trial_id>` where `<N>` matches the number of files uploaded from `--new-dir` and `<trial_id>` is read (and stripped) from `/logs/artifacts/trial_id`.
+- A new LlamaCloud index/pipeline named `harbor-inc-<trial_id>` must exist in the `Default` project after the script runs.
+- The number of files attached to that pipeline on LlamaCloud must be at least `initial_documents_count + N` (i.e., the new files must actually have been uploaded to the same index, not to a fresh one).
+- The output JSON file must be created at the path specified by `--output` and must contain the fields `index_name`, `initial_documents`, and `uploaded_files`. `uploaded_files` must be a list of base file names (no directory components) in `sorted()` order.
+- The script must use `index.upload_file(...)` to add each new file (not `from_documents` a second time).
+- The script must call `index.wait_for_completion()` before exiting.
+- The script must exit with a non-zero status code when either `--initial-dir` or `--new-dir` does not exist.
+
+b:T19f1,# Parse a PDF Using the LlamaCloud REST API Directly (Bash)
+
+## Background
+You are working in `/home/user/myproject`, which already contains:
+
+- A sample one-page PDF at `/home/user/myproject/sample.pdf` (it embeds the literal text `Hello LlamaParse - Harbor Test Document`).
+- `curl` and `jq` are already installed in the environment.
+
+Unlike the official Python and TypeScript SDKs, the **LlamaCloud REST API is asynchronous**: you upload a file, kick off a parse job, then poll for the result. Your job is to write a small **Bash** command-line utility (no SDK) that drives the LlamaCloud REST API directly with `curl` to parse the PDF and persist the parsed markdown content to disk.
+
+The `LLAMA_CLOUD_API_KEY` environment variable is configured. All authenticated REST calls must use it as a bearer token: `Authorization: Bearer $LLAMA_CLOUD_API_KEY`.
+
+The relevant REST endpoints (US region) are:
+- `POST https://api.cloud.llamaindex.ai/api/v1/files/` — upload a file with `Content-Type: multipart/form-data` and a `file=@<path>;type=application/pdf` form field; returns a JSON body with the new file's `id`.
+- `POST https://api.cloud.llamaindex.ai/api/v2/parse` — start a parse job. JSON body must include `file_id`, `tier`, and `version`. Returns a JSON body with the new job's `id` and an initial `status`.
+- `GET https://api.cloud.llamaindex.ai/api/v2/parse/<job_id>?expand=markdown_full` — poll the parse job. The response includes `job.status` (one of `PENDING`, `RUNNING`, `COMPLETED`, `FAILED`, `CANCELLED`). When `status == "COMPLETED"`, the response also includes `markdown_full` (a single string containing the full markdown).
+
+## Requirements
+- Implement a Bash CLI named `parse.sh` at `/home/user/myproject/parse.sh`.
+- The script must accept exactly two command-line arguments, in any order:
+  - `--input <path>`: the path to the local PDF file to parse.
+  - `--output <path>`: the path where the parsed markdown should be written.
+- The script must be self-contained: it must NOT use the Python (`llama-cloud`), TypeScript (`@llamaindex/llama-cloud`), or any other LlamaCloud SDK. It must invoke the REST API directly with `curl` and parse JSON with `jq`.
+- Validate that the `--input` file exists before uploading. If it does not, print an error message to stderr and exit with a non-zero status code.
+- Step 1 — **Upload the file**: `POST` to `https://api.cloud.llamaindex.ai/api/v1/files/` with `Authorization: Bearer $LLAMA_CLOUD_API_KEY`, `Content-Type: multipart/form-data`, and the form field `file=@<input_path>;type=application/pdf`. Extract the `id` from the JSON response with `jq` and use it as the `file_id` going forward.
+- Step 2 — **Start a parse job**: `POST` to `https://api.cloud.llamaindex.ai/api/v2/parse` with `Authorization: Bearer $LLAMA_CLOUD_API_KEY`, `Content-Type: application/json`, and a JSON body containing exactly `{"file_id": <file_id>, "tier": "cost_effective", "version": "latest"}`. Extract the `id` from the response as the `job_id`.
+- Step 3 — **Poll until completion**: repeatedly `GET https://api.cloud.llamaindex.ai/api/v2/parse/<job_id>?expand=markdown_full` (with the same `Authorization` header) until `job.status` is one of `COMPLETED`, `FAILED`, or `CANCELLED`. Between polls, sleep for at least 2 seconds. Stop polling after at most 60 attempts; if the job has not reached a terminal status by then, exit with a non-zero status code.
+- Step 4 — **Persist the result**: if the terminal status is `COMPLETED`, write the value of `markdown_full` (a single string) to the `--output` path as a UTF-8 file. Otherwise, exit with a non-zero status code.
+- Print exactly one line to stdout after a successful run, in this exact format: `Parsed job: <job_id>` where `<job_id>` is the `id` returned in Step 2.
+- The script must exit with status code `0` on success and a non-zero status code on any failure (missing input file, HTTP error, terminal status `FAILED`/`CANCELLED`, polling timeout, etc.).
+
+## Implementation Guide
+1. Use `#!/usr/bin/env bash` and parse `--input` and `--output` from `$@` (a simple `while`/`case` loop is sufficient).
+2. Confirm `$LLAMA_CLOUD_API_KEY` is non-empty; if not, exit with a non-zero status code.
+3. Confirm the input file exists with `[ -f "$INPUT" ]`; if not, exit with a non-zero status code.
+4. Use `curl -sS -f -X POST` with `-H "Authorization: Bearer $LLAMA_CLOUD_API_KEY"` and `-F "file=@$INPUT;type=application/pdf"` against `https://api.cloud.llamaindex.ai/api/v1/files/`. Pipe the response to `jq -r '.id'` to capture `FILE_ID`.
+5. Use `curl -sS -f -X POST` with `-H "Authorization: Bearer $LLAMA_CLOUD_API_KEY"`, `-H "Content-Type: application/json"`, and a JSON body `{"file_id": "<FILE_ID>", "tier": "cost_effective", "version": "latest"}` against `https://api.cloud.llamaindex.ai/api/v2/parse`. Capture `JOB_ID` with `jq -r '.id'`.
+6. Poll up to 60 times: `curl -sS -f -H "Authorization: Bearer $LLAMA_CLOUD_API_KEY" "https://api.cloud.llamaindex.ai/api/v2/parse/$JOB_ID?expand=markdown_full"`. Read `STATUS` with `jq -r '.job.status'`. Break out of the loop when `STATUS` is `COMPLETED`, `FAILED`, or `CANCELLED`. Otherwise sleep 2 seconds.
+7. If `STATUS == "COMPLETED"`, extract `.markdown_full` with `jq -r` and write the raw string to `--output` (you can redirect the `jq` output with `>`).
+8. Print `Parsed job: <JOB_ID>` to stdout.
+9. Exit with `0`. Any earlier failure must propagate a non-zero exit code.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/parse.sh`
+- Command: `bash parse.sh --input <pdf_path> --output <output_md_path>` (run from `/home/user/myproject`)
+- Input argument format: `--input <path_to_pdf>` and `--output <path_to_output_markdown_file>`
+- Expected command output: stdout must include exactly one line `Parsed job: <job_id>` where `<job_id>` is the parse job id returned by the LlamaCloud REST API.
+- The output markdown file must be created at the path specified by `--output` and must contain the value of `markdown_full` returned by the LlamaCloud REST API (a single markdown string).
+- The script must invoke the LlamaCloud REST API directly using `curl` (not via the Python or TypeScript SDKs) and must use `tier="cost_effective"` and `version="latest"` when starting the parse job.
+- The script must succeed (exit code 0) when given a valid PDF and a valid `LLAMA_CLOUD_API_KEY`.
+- The script must exit with a non-zero status code when `--input` refers to a non-existent file.
+- The script must NOT import any LlamaCloud Python or TypeScript SDK (the script `parse.sh` must contain only Bash and `curl`/`jq` invocations).
+
+c:Tce4,# Parse a PDF Document to Markdown with LlamaParse (Python)
+
+## Background
+You are working at `/home/user/myproject`, which already contains a sample PDF named `sample.pdf`. Your job is to build a small command-line utility that uses the [LlamaCloud Python SDK](https://developers.llamaindex.ai/llamaparse/parse/getting_started/) (the `llama-cloud` package, version 2.1 or newer) to parse a PDF document via the managed LlamaParse service and persist the parsed markdown content to disk.
+
+The SDK is already installed in the environment and the `LLAMA_CLOUD_API_KEY` environment variable is configured. You do NOT need to handle authentication explicitly — the SDK reads the API key from the environment automatically.
+
+## Requirements
+- Implement a Python CLI named `parse.py` at `/home/user/myproject/parse.py`.
+- The script must accept exactly two command-line arguments:
+  - `--input <path>`: the path to the local PDF file to parse.
+  - `--output <path>`: the path where the parsed markdown should be written.
+- The script must use the **`llama-cloud`** Python SDK (`from llama_cloud import LlamaCloud`).
+- Upload the input file with `purpose="parse"` and then run a parsing job using **tier `cost_effective`** and **version `latest`**. Request markdown output via the `expand` parameter.
+- After the job completes, write the **per-page markdown joined into a single document** to the `--output` file. Pages must be joined with two consecutive newline characters (`\n\n`) between adjacent pages, in their original page-order.
+- Print a single line to stdout in the exact format: `Parsed <N> pages` where `<N>` is the number of pages returned by the parse job.
+- The script must exit with status code `0` on success.
+
+## Implementation Guide
+1. Initialize the project at `/home/user/myproject`.
+2. Use `argparse` (standard library) to parse `--input` and `--output` arguments.
+3. Import `LlamaCloud` from `llama_cloud` and instantiate a client (no arguments — it reads `LLAMA_CLOUD_API_KEY` from the environment).
+4. Upload the file via `client.files.create(file=<input_path>, purpose="parse")`.
+5. Trigger a parse job via `client.parsing.parse(file_id=..., tier="cost_effective", version="latest", expand=["markdown"])`. The SDK blocks until the job completes.
+6. Iterate over `result.markdown.pages` (each page exposes a `markdown` attribute), join the per-page markdown strings with `\n\n`, and write the joined string to `--output`.
+7. Print `Parsed <N> pages` to stdout where `<N>` equals `len(result.markdown.pages)`.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Script path: /home/user/myproject/parse.py
+- Command: `python3 parse.py --input <pdf_path> --output <output_md_path>`
+- Input argument format: `--input <path_to_pdf>` and `--output <path_to_output_markdown_file>`
+- Expected command output: stdout must include exactly one line `Parsed <N> pages` where `<N>` is the page count returned by LlamaParse.
+- The output markdown file must be created at the path specified by `--output` and must contain the per-page markdown joined with `\n\n` between pages.
+- The script must use the `llama-cloud` Python SDK with `tier="cost_effective"` and `version="latest"`.
+- The script must succeed (exit code 0) when given a valid PDF and a valid `LLAMA_CLOUD_API_KEY`.
+
+d:T12aa,# Parse a PDF Document to Markdown with LlamaParse (TypeScript)
+
+## Background
+You are working in `/home/user/myproject`, which is a pre-initialized Node.js project. It already contains:
+
+- A sample one-page PDF at `/home/user/myproject/sample.pdf` (it embeds the literal text `Hello LlamaParse - Harbor Test Document`).
+- A `package.json` with `"type": "module"`.
+- Pre-installed npm dependencies in `node_modules/`: the [`@llamaindex/llama-cloud`](https://www.npmjs.com/package/@llamaindex/llama-cloud) TypeScript SDK and [`tsx`](https://www.npmjs.com/package/tsx) (for running TypeScript files directly).
+
+Your job is to build a small TypeScript command-line utility that uses the LlamaCloud TypeScript SDK to parse a PDF document via the managed LlamaParse service and persist the parsed markdown content to disk.
+
+The SDK is already installed in the environment and the `LLAMA_CLOUD_API_KEY` environment variable is configured. You do NOT need to handle authentication explicitly — the SDK reads the API key from the environment automatically when you call `new LlamaCloud()`.
+
+## Requirements
+- Implement a TypeScript CLI named `parse.ts` at `/home/user/myproject/parse.ts`.
+- The script must accept exactly two command-line arguments:
+  - `--input <path>`: the path to the local PDF file to parse.
+  - `--output <path>`: the path where the parsed markdown should be written.
+- The script must use the **`@llamaindex/llama-cloud`** TypeScript SDK (`import LlamaCloud from "@llamaindex/llama-cloud"`).
+- Upload the input file with `purpose: "parse"` and then run a parsing job using **tier `cost_effective`** and **version `latest`**. Request markdown output via the `expand` parameter (i.e., `expand: ["markdown"]`).
+- After the job completes, write the **per-page markdown joined into a single document** to the `--output` file. Pages must be joined with two consecutive newline characters (`\n\n`) between adjacent pages, in their original page order.
+- Print a single line to stdout in the exact format: `Parsed <N> pages` where `<N>` is the number of pages returned by the parse job (i.e., `result.markdown.pages.length`).
+- The script must exit with status code `0` on success and a **non-zero** status code if the `--input` path does not exist (i.e., it MUST fail fast instead of silently uploading nothing).
+
+## Implementation Guide
+1. The project is already initialized at `/home/user/myproject` with `"type": "module"` in `package.json` and the `@llamaindex/llama-cloud` and `tsx` packages in `node_modules/`. Do NOT run `npm install` — work directly with the existing dependencies.
+2. Create `/home/user/myproject/parse.ts`.
+3. Parse `--input` and `--output` from `process.argv` (you can use Node's built-in `node:util` `parseArgs`, or any other approach — no extra npm packages are required).
+4. Validate that the `--input` file exists before uploading (e.g., with `fs.existsSync`). If it does not, print an error message and exit with a non-zero status code.
+5. Import `LlamaCloud` from `@llamaindex/llama-cloud` and instantiate a client (no arguments — it reads `LLAMA_CLOUD_API_KEY` from the environment).
+6. Upload the file via `client.files.create({ file: fs.createReadStream(inputPath), purpose: "parse" })`.
+7. Trigger a parse job via `client.parsing.parse({ file_id: ..., tier: "cost_effective", version: "latest", expand: ["markdown"] })`. The SDK blocks until the job completes.
+8. Iterate over `result.markdown.pages` (each page exposes a `markdown` field), join the per-page markdown strings with `\n\n`, and write the joined string to `--output` (e.g., with `fs.writeFileSync`).
+9. Print `Parsed <N> pages` to stdout where `<N>` equals `result.markdown.pages.length`.
+10. Run the script with `npx tsx parse.ts --input <pdf_path> --output <output_md_path>` from `/home/user/myproject`.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/parse.ts`
+- Command: `npx tsx parse.ts --input <pdf_path> --output <output_md_path>` (run from `/home/user/myproject`)
+- Input argument format: `--input <path_to_pdf>` and `--output <path_to_output_markdown_file>`
+- Expected command output: stdout must include exactly one line `Parsed <N> pages` where `<N>` is the page count returned by LlamaParse.
+- The output markdown file must be created at the path specified by `--output` and must contain the per-page markdown joined with `\n\n` between pages.
+- The script must use the `@llamaindex/llama-cloud` TypeScript SDK with `tier: "cost_effective"`, `version: "latest"`, and `expand` including `"markdown"`.
+- The script must succeed (exit code 0) when given a valid PDF and a valid `LLAMA_CLOUD_API_KEY`.
+- The script must exit with a non-zero status code when `--input` refers to a non-existent file.
+
+0:{"buildId":"KTIBgU5zcHkhxp0aRXC-9","rsc":["$","$1","c",{"children":[["$","div",null,{"className":"min-h-screen bg-background text-foreground font-sans selection:bg-primary/20","children":[["$","div",null,{"className":"fixed inset-0 -z-10 h-full w-full bg-background bg-[radial-gradient(#2a2a2a_1px,transparent_1px)] [background-size:16px_16px] [mask-image:radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-20 dark:opacity-40"}],["$","$L2",null,{"tasksData":[{"taskName":"async_parse_pdf_py","instruction":"$3","trials":[{"job_name":"2026-05-14__23-46-01","trial_name":"async_parse_pdf_py__LNaCqUV","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":188.576,"latency_breakdown":{"env_setup":68.25,"agent_setup":19.899,"agent_exec":68.383,"verifier":5.168},"taskName":"async_parse_pdf_py","jobId":"LNaCqUV","exec_duration":68.383}]},{"taskName":"chat_with_managed_index_py","instruction":"$4","trials":[{"job_name":"2026-05-14__23-46-01","trial_name":"chat_with_managed_index_py__jrtzj4v","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":341.203,"latency_breakdown":{"env_setup":146.352,"agent_setup":21.197,"agent_exec":141.303,"verifier":13.48},"taskName":"chat_with_managed_index_py","jobId":"jrtzj4v","exec_duration":141.303}]},{"taskName":"classify_document_py","instruction":"$5","trials":[{"job_name":"2026-05-14__23-46-01","trial_name":"classify_document_py__MpvvhsZ","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":386.714,"latency_breakdown":{"env_setup":177.692,"agent_setup":23.16,"agent_exec":151.963,"verifier":10.794},"taskName":"classify_document_py","jobId":"MpvvhsZ","exec_duration":151.963}]},{"taskName":"composite_retriever_py","instruction":"$6","trials":[{"job_name":"2026-05-14__23-46-01","trial_name":"composite_retriever_py__EzehBSD","model":"gemini-3-flash","agent":"Pochi","passed":false,"reward":0,"error":false,"latency_sec":388.296,"latency_breakdown":{"env_setup":82.664,"agent_setup":20.284,"agent_exec":242.024,"verifier":19.778},"taskName":"composite_retriever_py","jobId":"EzehBSD","exec_duration":242.024}]},{"taskName":"configure_regional_client_py","instruction":"$7","trials":[{"job_name":"2026-05-14__23-46-01","trial_name":"configure_regional_client_py__bq4pWUw","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":277.086,"latency_breakdown":{"env_setup":178.084,"agent_setup":22.153,"agent_exec":60.23,"verifier":3.441},"taskName":"configure_regional_client_py","jobId":"bq4pWUw","exec_duration":60.23}]},{"taskName":"create_managed_index_py","instruction":"$8","trials":[{"job_name":"2026-05-14__23-46-01","trial_name":"create_managed_index_py__LZBcCgs","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":514.786,"latency_breakdown":{"env_setup":178.377,"agent_setup":21.208,"agent_exec":283.123,"verifier":13.452},"taskName":"create_managed_index_py","jobId":"LZBcCgs","exec_duration":283.123}]},{"taskName":"extract_structured_data_py","instruction":"$9","trials":[{"job_name":"2026-05-14__23-46-01","trial_name":"extract_structured_data_py__ugXCjTs","model":"gemini-3-flash","agent":"Pochi","passed":false,"reward":0,"error":false,"latency_sec":197.426,"latency_breakdown":{"env_setup":78.972,"agent_setup":20.936,"agent_exec":55.466,"verifier":23.276},"taskName":"extract_structured_data_py","jobId":"ugXCjTs","exec_duration":55.466}]},{"taskName":"incremental_ingestion_py","instruction":"$a","trials":[{"job_name":"2026-05-14__23-46-01","trial_name":"incremental_ingestion_py__d8rKd8j","model":"gemini-3-flash","agent":"Pochi","passed":false,"reward":0,"error":false,"latency_sec":201.177,"latency_breakdown":{"env_setup":105.695,"agent_setup":20.421,"agent_exec":36.155,"verifier":16.134},"taskName":"incremental_ingestion_py","jobId":"d8rKd8j","exec_duration":36.155}]},{"taskName":"parse_pdf_rest_api_bash","instruction":"$b","trials":[{"job_name":"2026-05-14__23-46-01","trial_name":"parse_pdf_rest_api_bash__Xa5ZHEy","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":370.445,"latency_breakdown":{"env_setup":76.721,"agent_setup":74.954,"agent_exec":201.151,"verifier":4.956},"taskName":"parse_pdf_rest_api_bash","jobId":"Xa5ZHEy","exec_duration":201.151}]},{"taskName":"parse_pdf_to_markdown_py","instruction":"$c","trials":[{"job_name":"2026-05-14__23-46-01","trial_name":"parse_pdf_to_markdown_py__FcPXoWb","model":"gemini-3-flash","agent":"Pochi","passed":true,"reward":1,"error":false,"latency_sec":310.13,"latency_breakdown":{"env_setup":49.771,"agent_setup":19.74,"agent_exec":205.342,"verifier":15.205},"taskName":"parse_pdf_to_markdown_py","jobId":"FcPXoWb","exec_duration":205.342}]},{"taskName":"parse_pdf_to_markdown_ts","instruction":"$d","trials":[{"job_name":"2026-05-14__23-46-01","trial_name":"parse_pdf_to_markdown_ts__jKYBWXi","model":"gemini-3-flash","agent":"Pochi","passed":false,"reward":null,"error":true,"latency_sec":32.048,"latency_breakdown":{"env_setup":31.053,"agent_setup":null,"agent_exec":null,"verifier":null},"taskName":"parse_pdf_to_markdown_ts","jobId":"jKYBWXi","exec_duration":32.048}]}]}]]}],["$Le","$Lf"],"$L10"]}],"loading":null,"isPartial":false}
+e:["$","script","script-0",{"src":"/llamacloud-benchmark/pr-preview/pr-4/_next/static/chunks/28c0ea01e9ff9346.js","async":true}]
+f:["$","script","script-1",{"src":"/llamacloud-benchmark/pr-preview/pr-4/_next/static/chunks/be08138953094657.js","async":true}]
+10:["$","$L11",null,{"children":["$","$12",null,{"name":"Next.MetadataOutlet","children":"$@13"}]}]
+13:null
