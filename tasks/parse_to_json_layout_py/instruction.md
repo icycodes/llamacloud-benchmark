@@ -1,0 +1,74 @@
+# Parse a Multi-Page PDF to Structured JSON with LlamaParse (Python)
+
+## Background
+You are extending a RAG ingestion pipeline that needs **page-aware, layout-rich** parsing output from **LlamaParse** (LlamaCloud's managed document parsing service, exposed by the `llama-cloud-services` Python SDK). Unlike a plain-Markdown export, LlamaParse's **JSON result mode** returns one structured record per page (with the per-page text, per-page Markdown, layout items, image references, etc.). This per-page JSON is what downstream code uses to build page-scoped nodes, image documents, and bounding-box-aware citations.
+
+The `llama-cloud-services` Python SDK (which provides `LlamaParse`) is already installed in the environment. The LlamaCloud account is already provisioned and the API key is available in the environment variable `LLAMA_CLOUD_API_KEY`. A multi-page sample PDF named `manual.pdf` is pre-staged at `/home/user/myproject/manual.pdf`. It is a small three-page **Operations Manual** test fixture whose pages have the following distinct top-level headings (in order):
+
+1. Page 1 — `Operations Manual` (with an introductory paragraph)
+2. Page 2 — `Equipment List` (with a short bulleted list of items)
+3. Page 3 — `Maintenance Schedule` (with a small table of intervals)
+
+Because this task may run multiple times concurrently against the shared LlamaCloud account, you must read the `trial_id` from `/logs/artifacts/trial_id` and tag the output artifacts with it. LlamaParse itself is stateless per request (no global resource needs to carry the trial id), so only your output files have to include it.
+
+## Requirements
+Write a Python script at `/home/user/myproject/parse_to_json.py` that:
+- Reads the `trial_id` value from `/logs/artifacts/trial_id`.
+- Uses `LlamaParse` from `llama_cloud_services` to parse `/home/user/myproject/manual.pdf` in **JSON result mode** (i.e., call the parser's JSON-result entry point so you get per-page structured records, not a single concatenated Markdown string).
+- Builds a JSON document and writes it to `/home/user/myproject/parsed.json` with the **exact** top-level shape:
+  ```json
+  {
+    "trial_id": "<trial_id>",
+    "source_file": "manual.pdf",
+    "num_pages": <N>,
+    "pages": [
+      {
+        "page_number": 1,
+        "text": "<page-1 plain text>",
+        "md": "<page-1 markdown>"
+      },
+      {
+        "page_number": 2,
+        "text": "...",
+        "md": "..."
+      },
+      ...
+    ]
+  }
+  ```
+  where:
+  - `trial_id` is the value read from `/logs/artifacts/trial_id`.
+  - `source_file` is the basename of the parsed file (`manual.pdf`).
+  - `num_pages` is an integer >= 3 (the fixture has three pages).
+  - `pages` is a list with at least three entries, in page order. Each entry must contain at minimum the keys `page_number` (1-based integer), `text` (a non-empty string of the page's plain text), and `md` (a non-empty string of the page's Markdown).
+- Writes a plain-text log to `/home/user/myproject/output.log` containing at minimum these three lines (one fact per line):
+  - `trial_id: <trial_id>` — the value read from `/logs/artifacts/trial_id`.
+  - `source_file: manual.pdf`
+  - `num_pages: <N>` — same integer as `num_pages` in `parsed.json`.
+
+## Implementation Hints
+- Import the parser with `from llama_cloud_services import LlamaParse` (alternatively `from llama_parse import LlamaParse` if you prefer the standalone package — both expose the same class). The SDK automatically picks up `LLAMA_CLOUD_API_KEY` from the environment.
+- Two equivalent ways to get per-page JSON output:
+  - Call the JSON-result helper: `parser.get_json_result("/home/user/myproject/manual.pdf")`. This returns a list (one entry per parsed file); each entry has a `pages` field — a list of per-page dicts whose keys typically include `page`, `text`, `md`, `items`, `images`, `width`, `height`.
+  - Or call `result = parser.parse("/home/user/myproject/manual.pdf")` and read its `.pages` attribute; each page object exposes `.text` and `.md`.
+- Use `json.dump(obj, f, indent=2, ensure_ascii=False)` to write the structured output; use `\n`-separated lines for the log file.
+- The script must run end to end with `python3 parse_to_json.py` from `/home/user/myproject` and exit with status code `0`.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Script path: `/home/user/myproject/parse_to_json.py`
+- Command: `python3 parse_to_json.py` (run from `/home/user/myproject`)
+- The script must exit with return code `0`.
+- Output files created by the script:
+  - `/home/user/myproject/parsed.json` — must be valid JSON with the top-level shape described above:
+    - `trial_id` (string) equal to the value at `/logs/artifacts/trial_id`.
+    - `source_file` (string) equal to `manual.pdf` (case-insensitive match acceptable).
+    - `num_pages` (integer) equal to the length of the `pages` list and >= 3.
+    - `pages` (list) with at least three entries. Each entry is a dict with the keys `page_number` (1-based integer), `text` (non-empty string), and `md` (non-empty string). The first three entries must have `page_number` values of `1`, `2`, `3` (in that order).
+    - The concatenation of every page's `text` field (case-insensitive) must contain all three of: `Operations Manual`, `Equipment List`, and `Maintenance Schedule`.
+    - The concatenation of every page's `md` field (case-insensitive) must also contain all three of: `Operations Manual`, `Equipment List`, and `Maintenance Schedule`.
+  - `/home/user/myproject/output.log` — must contain:
+    - A line in the format `trial_id: <trial_id>` where `<trial_id>` is the exact value at `/logs/artifacts/trial_id`.
+    - A line in the format `source_file: manual.pdf` (case-insensitive match on the value).
+    - A line in the format `num_pages: <N>` where `<N>` is an integer >= 3 and equals the `num_pages` value in `parsed.json`.
+

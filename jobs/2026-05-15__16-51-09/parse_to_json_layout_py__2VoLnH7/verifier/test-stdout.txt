@@ -1,0 +1,23 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 12 items
+
+tests/test_final_state.py ............                                   [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_exit_code_is_zero
+PASSED tests/test_final_state.py::test_parsed_json_is_dict_with_required_top_level_keys
+PASSED tests/test_final_state.py::test_parsed_json_trial_id_matches
+PASSED tests/test_final_state.py::test_parsed_json_source_file_is_manual_pdf
+PASSED tests/test_final_state.py::test_parsed_json_num_pages_is_consistent
+PASSED tests/test_final_state.py::test_pages_entries_have_required_fields
+PASSED tests/test_final_state.py::test_first_three_pages_are_numbered_in_order
+PASSED tests/test_final_state.py::test_aggregate_text_contains_expected_headings
+PASSED tests/test_final_state.py::test_aggregate_md_contains_expected_headings
+PASSED tests/test_final_state.py::test_output_log_trial_id_line
+PASSED tests/test_final_state.py::test_output_log_source_file_line
+PASSED tests/test_final_state.py::test_output_log_num_pages_line_matches_parsed_json
+============================== 12 passed in 4.10s ==============================

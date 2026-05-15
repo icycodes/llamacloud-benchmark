@@ -1,0 +1,178 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 15,
+            "passed": 15,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778835374170,
+            "stop": 1778835388384
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_exit_code_is_zero",
+                "status": "passed",
+                "duration": 14164,
+                "start": 1778835374196,
+                "stop": 1778835388360,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_file_exists",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835388361,
+                "stop": 1778835388362,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_top_level_shape",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835388362,
+                "stop": 1778835388364,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_trial_id_matches",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835388364,
+                "stop": 1778835388366,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_total_files_is_valid_integer",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835388366,
+                "stop": 1778835388368,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_results_structure",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835388368,
+                "stop": 1778835388370,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_per_file_classification",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835388370,
+                "stop": 1778835388372,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::file_name,expected_type::[('contract.pdf', 'contract'), ('invoice.pdf', 'invoice'), ('receipt.pdf', 'receipt')]"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_output_json_per_file_classification",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835388373,
+                "stop": 1778835388374,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::file_name,expected_type::[('contract.pdf', 'contract'), ('invoice.pdf', 'invoice'), ('receipt.pdf', 'receipt')]"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_output_json_per_file_classification",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835388374,
+                "stop": 1778835388375,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::file_name,expected_type::[('contract.pdf', 'contract'), ('invoice.pdf', 'invoice'), ('receipt.pdf', 'receipt')]"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_output_log_file_exists",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778835388376,
+                "stop": 1778835388376,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_trial_id_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835388377,
+                "stop": 1778835388378,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_total_files_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835388378,
+                "stop": 1778835388379,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_per_file_classification",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835388380,
+                "stop": 1778835388381,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::file_name,expected_type::[('contract.pdf', 'contract'), ('invoice.pdf', 'invoice'), ('receipt.pdf', 'receipt')]"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_per_file_classification",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835388381,
+                "stop": 1778835388382,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::file_name,expected_type::[('contract.pdf', 'contract'), ('invoice.pdf', 'invoice'), ('receipt.pdf', 'receipt')]"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_per_file_classification",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835388383,
+                "stop": 1778835388384,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::file_name,expected_type::[('contract.pdf', 'contract'), ('invoice.pdf', 'invoice'), ('receipt.pdf', 'receipt')]"
+                ]
+            }
+        ]
+    }
+}

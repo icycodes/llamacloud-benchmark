@@ -1,0 +1,45 @@
+- Initializing MCP connections...
+You
+# Extract Structured Invoice Data with LlamaExtract (Python) ## Background You are building a small invoice-ingestion prototype for an accounts-payable workflow on **LlamaCloud**. Instead of using LlamaParse to get Markdown and then parsing fields yourself, you will use **LlamaExtract** — the schema-driven structured-extraction service exposed by the official `llama-cloud` Python SDK — to extract a typed JSON object directly from an invoice PDF using a **Pydantic schema** that you define. LlamaExtract is invoked via `client.extract.create(...)` on a `llama_cloud.LlamaCloud` client. You pass a JSON schema (derived from a Pydantic model via `Model.model_json_schema()`) under `configuration.data_schema` and the service returns one structured object per document under `job.extract_result`. The `llama-cloud` Python SDK and `pydantic` are already installed in the environment, the `LLAMA_CLOUD_API_KEY` environment variable is set, and a sample invoice PDF is pre-staged at `/home/user/myproject/invoice.pdf`. The invoice is a one-page document with the following content (you may rely on these specific values when designing your schema and verification): - Header: `INVOICE` - `Invoice Number: INV-2024-0042` - `Invoice Date: 2024-03-15` - `Vendor: Acme Corporation` (with address) - `Bill To: Globex Industries` - A three-row line-item table with columns `Description`, `Quantity`, `Unit Price (USD)`, `Amount (USD)`: - `Widget Type A`, `10`, `25.00`, `250.00` - `Service Hours - Onsite Support`, `8`, `120.00`, `960.00` - `Annual Maintenance Plan`, `1`, `500.00`, `500.00` - `Subtotal: 1710.00` - `Tax (8%): 136.80` - `Total: 1846.80` Because this task may run multiple times concurrently, you must read the `trial_id` from `/logs/artifacts/trial_id` and tag the output artifacts with it. LlamaExtract itself is stateless per request (no global resource needs to carry the trial id), so only your output files have to include it. ## Requirements Write a Python script at `/home/user/myproject/extract_invoice.py` that: - Reads the `trial_id` value from `/logs/artifacts/trial_id`. - Defines a **Pydantic** schema for the invoice. The model **MUST** include at least the following fields with reasonable types and field descriptions: - `invoice_number` (string) - `invoice_date` (string in `YYYY-MM-DD` form is acceptable) - `vendor_name` (string) - `customer_name` (string) - `subtotal` (number) - `tax` (number) - `total` (number) - `line_items` — a list of nested objects, each with at least `description` (string), `quantity` (number), `unit_price` (number), and `amount` (number). - Uploads `/home/user/myproject/invoice.pdf` to LlamaCloud with `client.files.create(file=..., purpose="extract")`. - Submits an extraction job with `client.extract.create(file_input=<file_id>, configuration={"data_schema": Invoice.model_json_schema(), "extraction_target": "per_doc", "tier": "agentic"})`. - Polls the job (e.g. with `client.extract.get(job.id)`) until the status reaches a terminal state. The job must end in status `COMPLETED`; if it ends in `FAILED` or `CANCELLED`, the script must raise an error and exit non-zero. - Writes the structured extraction result as a single JSON document to `/home/user/myproject/invoice.json` with the exact top-level shape: ```json { "trial_id": "<trial_id>", "job_id": "<the LlamaExtract job id>", "status": "COMPLETED", "data": { /* the extracted invoice object (the single per-doc result) */ } } ``` where `data` is the single per-document extraction result returned by the service (it must be a JSON object, **not** wrapped in a list, even though `job.extract_result` may itself be a list of per-document results). - Writes a plain-text log to `/home/user/myproject/output.log` containing at minimum these four lines (one fact per line): - `trial_id: <trial_id>` - `job_status: COMPLETED` - `invoice_number: <the extracted invoice number>` - `total: <the extracted total as a decimal number>` ## Implementation Hints - Import the synchronous client with `from llama_cloud import LlamaCloud` and the schema base with `from pydantic import BaseModel, Field`. The client picks up `LLAMA_CLOUD_API_KEY` from the environment automatically. - `client.extract.create(...)` returns a job object that exposes `.id`, `.status`, and (once finished) `.extract_result`. Status moves through `PENDING` -> `RUNNING` -> `COMPLETED`. Poll with `client.extract.get(job.id)` until `status` is in `{"COMPLETED", "FAILED", "CANCELLED"}`; sleep ~2 seconds between polls. - `job.extract_result` is typically a list of per-document objects (because the API supports per-page / per-doc extraction); pick the **first** per-doc result for this single-document task and store **that object** under the `data` key (do not store the whole list). - Convert the Pydantic model to a JSON schema using `Invoice.model_json_schema()`. - The script must run end to end with `python3 extract_invoice.py` from `/home/user/myproject` and exit with status code `0`. ## Acceptance Criteria - Project path: `/home/user/myproject` - Script path: `/home/user/myproject/extract_invoice.py` - Command: `python3 extract_invoice.py` (run from `/home/user/myproject`) - The script must exit with return code `0`. - Output files created by the script: - `/home/user/myproject/invoice.json` — must be valid JSON with the top-level shape described above: - `trial_id` (string) equal to the value at `/logs/artifacts/trial_id`. - `job_id` (non-empty string). - `status` (string) equal to `COMPLETED`. - `data` (object, not a list) — the single per-doc extraction result. It must: - Have an `invoice_number` field that equals (case-insensitive) `INV-2024-0042`. - Have a `vendor_name` field whose value contains the substring `Acme` (case-insensitive). - Have a `customer_name` field whose value contains the substring `Globex` (case-insensitive). - Have a `total` field whose numeric value is within `0.05` of `1846.80`. - Have a `line_items` field that is a list with **at least 3** entries; the concatenation of all `description` fields (case-insensitive) must contain each of `Widget Type A`, `Onsite Support`, and `Annual Maintenance`. - `/home/user/myproject/output.log` — must contain: - A line in the format `trial_id: <trial_id>` where `<trial_id>` is the exact value at `/logs/artifacts/trial_id`. - A line in the format `job_status: COMPLETED`. - A line in the format `invoice_number: INV-2024-0042` (case-insensitive match on the value). - A line in the format `total: <amount>` where `<amount>` parses as a decimal number within `0.05` of `1846.80`.   
+
+Pochi
+📋 Updating todo list (4 items) ✔ 
+📂 Listing files in /home/user/myproject ✔ 
+📖 Reading /logs/artifacts/trial_id ✔ 
+📋 Updating todo list (4 items) ✔ 
+✏️  Writing /home/user/myproject/extract_invoice.py ✔ 
+📋 Updating todo list (4 items) ✔ 
+💫 Executing python3 /home/user/myproject/extract_invoice.py ✖ "Command exited with code 1"
+✏️  Writing /home/user/myproject/extract_invoice.py ✔ 
+💫 Executing python3 /home/user/myproject/extract_invoice.py ✔ 
+📖 Reading /home/user/myproject/invoice.json ✔ 
+📖 Reading /home/user/myproject/output.log ✔ 
+📋 Updating todo list (4 items) ✔ 
+🎉 Task Completed
+I have successfully implemented the invoice extraction prototype using LlamaExtract and the `llama-cloud` Python SDK.
+
+### Accomplishments:
+1.  **Script Creation**: Developed `/home/user/myproject/extract_invoice.py` which:
+    *   Reads the `trial_id` from `/logs/artifacts/trial_id`.
+    *   Defines a robust **Pydantic** schema (`Invoice` and `LineItem`) for structured data extraction.
+    *   Uploads the invoice PDF to LlamaCloud.
+    *   Submits an extraction job using the `agentic` tier and the defined schema.
+    *   Polls the job status until completion (`COMPLETED`).
+2.  **Structured Output**: Generated `/home/user/myproject/invoice.json` containing:
+    *   `trial_id`, `job_id`, and `status`.
+    *   The extracted `data` object with fields like `invoice_number`, `vendor_name`, `customer_name`, `total`, and a list of `line_items`.
+3.  **Logging**: Generated `/home/user/myproject/output.log` with key extraction facts:
+    *   `trial_id`
+    *   `job_status`
+    *   `invoice_number`
+    *   `total`
+
+### Verification:
+*   The script runs end-to-end and exits with status code 0.
+*   Extracted `invoice_number` matches `INV-2024-0042`.
+*   Extracted `total` is `1846.8`, matching the expected value.
+*   Line items include "Widget Type A", "Service Hours - Onsite Support", and "Annual Maintenance Plan".
+*   All output files are correctly tagged with the `trial_id`.
+
+The prototype is now ready for use in the accounts-payable workflow.   
+  

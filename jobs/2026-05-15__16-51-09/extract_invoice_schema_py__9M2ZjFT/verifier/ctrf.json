@@ -1,0 +1,178 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 17,
+            "passed": 17,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778835384225,
+            "stop": 1778835390619
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_exit_code_is_zero",
+                "status": "passed",
+                "duration": 6336,
+                "start": 1778835384251,
+                "stop": 1778835390587,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_file_exists",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835390588,
+                "stop": 1778835390589,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_top_level_shape",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835390590,
+                "stop": 1778835390592,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_trial_id_matches",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835390592,
+                "stop": 1778835390594,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_job_id_is_non_empty_string",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835390594,
+                "stop": 1778835390596,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_status_is_completed",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835390597,
+                "stop": 1778835390599,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_data_is_object",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835390599,
+                "stop": 1778835390600,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_extracted_invoice_number_matches",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835390601,
+                "stop": 1778835390602,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_extracted_vendor_name_contains_acme",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835390603,
+                "stop": 1778835390604,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_extracted_customer_name_contains_globex",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835390605,
+                "stop": 1778835390606,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_extracted_total_within_tolerance",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835390607,
+                "stop": 1778835390609,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_extracted_line_items_cover_expected_descriptions",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835390609,
+                "stop": 1778835390611,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_file_exists",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835390611,
+                "stop": 1778835390613,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_trial_id_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835390613,
+                "stop": 1778835390614,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_job_status_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835390615,
+                "stop": 1778835390616,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_invoice_number_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835390616,
+                "stop": 1778835390617,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_total_line_within_tolerance",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835390618,
+                "stop": 1778835390619,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

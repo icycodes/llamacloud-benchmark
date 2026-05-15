@@ -1,0 +1,160 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 14 items
+
+tests/test_final_state.py ............FF                                 [100%]
+
+=================================== FAILURES ===================================
+________________ test_astro_managed_index_exists_on_llamacloud _________________
+
+    def test_astro_managed_index_exists_on_llamacloud():
+        """The astronomy managed index must actually exist on the LlamaCloud service."""
+        api_key = os.environ.get("LLAMA_CLOUD_API_KEY")
+        assert api_key, (
+            "Verifier environment must have LLAMA_CLOUD_API_KEY set to confirm the "
+            "managed index exists on LlamaCloud."
+        )
+        try:
+>           from llama_index.indices.managed.llama_cloud import LlamaCloudIndex
+
+tests/test_final_state.py:296: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/__init__.py:1: in <module>
+    from llama_index.indices.managed.llama_cloud.base import LlamaCloudIndex
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Managed index.
+    
+    A managed Index - where the index is accessible via some API that
+    interfaces a managed service.
+    
+    """
+    
+    import httpx
+    import os
+    import time
+    from typing import Any, List, Optional, Sequence, Type
+    from urllib.parse import quote_plus
+    
+>   from llama_cloud import (
+        ManagedIngestionStatusResponse,
+        PipelineCreate,
+        PipelineCreateEmbeddingConfig,
+        PipelineCreateTransformConfig,
+        PipelineType,
+        ProjectCreate,
+        ManagedIngestionStatus,
+        CloudDocumentCreate,
+        CloudDocument,
+        PipelineFileCreate,
+    )
+E   ImportError: cannot import name 'ProjectCreate' from 'llama_cloud' (/usr/local/lib/python3.12/dist-packages/llama_cloud/__init__.py)
+
+usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py:14: ImportError
+
+During handling of the above exception, another exception occurred:
+
+    def test_astro_managed_index_exists_on_llamacloud():
+        """The astronomy managed index must actually exist on the LlamaCloud service."""
+        api_key = os.environ.get("LLAMA_CLOUD_API_KEY")
+        assert api_key, (
+            "Verifier environment must have LLAMA_CLOUD_API_KEY set to confirm the "
+            "managed index exists on LlamaCloud."
+        )
+        try:
+            from llama_index.indices.managed.llama_cloud import LlamaCloudIndex
+        except ImportError as exc:
+>           pytest.fail(
+                "Verifier could not import "
+                "`llama_index.indices.managed.llama_cloud.LlamaCloudIndex`: "
+                f"{exc}"
+            )
+E           Failed: Verifier could not import `llama_index.indices.managed.llama_cloud.LlamaCloudIndex`: cannot import name 'ProjectCreate' from 'llama_cloud' (/usr/local/lib/python3.12/dist-packages/llama_cloud/__init__.py)
+
+tests/test_final_state.py:298: Failed
+_________________ test_cook_managed_index_exists_on_llamacloud _________________
+
+    def test_cook_managed_index_exists_on_llamacloud():
+        """The cooking managed index must actually exist on the LlamaCloud service."""
+        api_key = os.environ.get("LLAMA_CLOUD_API_KEY")
+        assert api_key, (
+            "Verifier environment must have LLAMA_CLOUD_API_KEY set to confirm the "
+            "managed index exists on LlamaCloud."
+        )
+        try:
+>           from llama_index.indices.managed.llama_cloud import LlamaCloudIndex
+
+tests/test_final_state.py:330: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/__init__.py:1: in <module>
+    from llama_index.indices.managed.llama_cloud.base import LlamaCloudIndex
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Managed index.
+    
+    A managed Index - where the index is accessible via some API that
+    interfaces a managed service.
+    
+    """
+    
+    import httpx
+    import os
+    import time
+    from typing import Any, List, Optional, Sequence, Type
+    from urllib.parse import quote_plus
+    
+>   from llama_cloud import (
+        ManagedIngestionStatusResponse,
+        PipelineCreate,
+        PipelineCreateEmbeddingConfig,
+        PipelineCreateTransformConfig,
+        PipelineType,
+        ProjectCreate,
+        ManagedIngestionStatus,
+        CloudDocumentCreate,
+        CloudDocument,
+        PipelineFileCreate,
+    )
+E   ImportError: cannot import name 'ProjectCreate' from 'llama_cloud' (/usr/local/lib/python3.12/dist-packages/llama_cloud/__init__.py)
+
+usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py:14: ImportError
+
+During handling of the above exception, another exception occurred:
+
+    def test_cook_managed_index_exists_on_llamacloud():
+        """The cooking managed index must actually exist on the LlamaCloud service."""
+        api_key = os.environ.get("LLAMA_CLOUD_API_KEY")
+        assert api_key, (
+            "Verifier environment must have LLAMA_CLOUD_API_KEY set to confirm the "
+            "managed index exists on LlamaCloud."
+        )
+        try:
+            from llama_index.indices.managed.llama_cloud import LlamaCloudIndex
+        except ImportError as exc:
+>           pytest.fail(
+                "Verifier could not import "
+                "`llama_index.indices.managed.llama_cloud.LlamaCloudIndex`: "
+                f"{exc}"
+            )
+E           Failed: Verifier could not import `llama_index.indices.managed.llama_cloud.LlamaCloudIndex`: cannot import name 'ProjectCreate' from 'llama_cloud' (/usr/local/lib/python3.12/dist-packages/llama_cloud/__init__.py)
+
+tests/test_final_state.py:332: Failed
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_exit_code_is_zero
+PASSED tests/test_final_state.py::test_output_markdown_file_exists
+PASSED tests/test_final_state.py::test_output_markdown_headings_present_and_ordered
+PASSED tests/test_final_state.py::test_astronomy_top_node_section_contains_expected_phrases
+PASSED tests/test_final_state.py::test_cooking_top_node_section_contains_expected_phrases
+PASSED tests/test_final_state.py::test_output_log_file_exists
+PASSED tests/test_final_state.py::test_output_log_contains_trial_id_line
+PASSED tests/test_final_state.py::test_output_log_contains_astro_index_name_line
+PASSED tests/test_final_state.py::test_output_log_contains_cook_index_name_line
+PASSED tests/test_final_state.py::test_output_log_contains_composite_retriever_name_line
+PASSED tests/test_final_state.py::test_output_log_contains_astro_num_retrieved_line
+PASSED tests/test_final_state.py::test_output_log_contains_cook_num_retrieved_line
+FAILED tests/test_final_state.py::test_astro_managed_index_exists_on_llamacloud
+FAILED tests/test_final_state.py::test_cook_managed_index_exists_on_llamacloud
+======================== 2 failed, 12 passed in 21.12s =========================

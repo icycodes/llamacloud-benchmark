@@ -1,0 +1,28 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 17 items
+
+tests/test_final_state.py .................                              [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_exit_code_is_zero
+PASSED tests/test_final_state.py::test_output_json_file_exists
+PASSED tests/test_final_state.py::test_output_json_top_level_shape
+PASSED tests/test_final_state.py::test_output_json_trial_id_matches
+PASSED tests/test_final_state.py::test_output_json_job_id_is_non_empty_string
+PASSED tests/test_final_state.py::test_output_json_status_is_completed
+PASSED tests/test_final_state.py::test_output_json_data_is_object
+PASSED tests/test_final_state.py::test_extracted_invoice_number_matches
+PASSED tests/test_final_state.py::test_extracted_vendor_name_contains_acme
+PASSED tests/test_final_state.py::test_extracted_customer_name_contains_globex
+PASSED tests/test_final_state.py::test_extracted_total_within_tolerance
+PASSED tests/test_final_state.py::test_extracted_line_items_cover_expected_descriptions
+PASSED tests/test_final_state.py::test_output_log_file_exists
+PASSED tests/test_final_state.py::test_output_log_contains_trial_id_line
+PASSED tests/test_final_state.py::test_output_log_contains_job_status_line
+PASSED tests/test_final_state.py::test_output_log_contains_invoice_number_line
+PASSED tests/test_final_state.py::test_output_log_contains_total_line_within_tolerance
+============================== 17 passed in 6.39s ==============================

@@ -1,0 +1,79 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 6,
+            "passed": 6,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778835364015,
+            "stop": 1778835368204
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_exit_code_is_zero",
+                "status": "passed",
+                "duration": 4165,
+                "start": 1778835364028,
+                "stop": 1778835368193,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_markdown_file_exists",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835368193,
+                "stop": 1778835368195,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_markdown_contains_quarterly_sales_report",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835368195,
+                "stop": 1778835368197,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_file_exists",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835368197,
+                "stop": 1778835368199,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_trial_id_line",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778835368199,
+                "stop": 1778835368201,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_contains_pages_parsed_line",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778835368202,
+                "stop": 1778835368203,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}
