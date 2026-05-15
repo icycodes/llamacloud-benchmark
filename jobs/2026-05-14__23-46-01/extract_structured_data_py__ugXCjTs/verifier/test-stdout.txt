@@ -1,0 +1,39 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 5 items
+
+tests/test_final_state.py ...F.                                          [100%]
+
+=================================== FAILURES ===================================
+____________ test_script_uses_required_sdk_and_pydantic_constructs _____________
+
+    def test_script_uses_required_sdk_and_pydantic_constructs():
+        """Static inspection: the script must use the required SDK calls and Pydantic schema."""
+        assert os.path.isfile(SCRIPT), f"Script not found at {SCRIPT}"
+        with open(SCRIPT, "r", encoding="utf-8") as f:
+            source = f.read()
+    
+        assert "from llama_cloud import LlamaCloud" in source, (
+            "Expected the script to import LlamaCloud via 'from llama_cloud import LlamaCloud'."
+        )
+        assert "class Candidate(BaseModel):" in source, (
+            "Expected the script to define a Pydantic model named 'Candidate' "
+            "(line matching 'class Candidate(BaseModel):')."
+        )
+>       assert 'extraction_target="per_doc"' in source or "extraction_target='per_doc'" in source, (
+            "Expected the script to pass extraction_target=\"per_doc\" to client.extract.create."
+        )
+E       AssertionError: Expected the script to pass extraction_target="per_doc" to client.extract.create.
+E       assert ('extraction_target="per_doc"' in 'import argparse\nimport json\nimport sys\nimport time\nfrom typing import List\nfrom pydantic import BaseModel\nfrom ...finished with status: {job.status}", file=sys.stderr)\n        sys.exit(1)\n\nif __name__ == "__main__":\n    main()\n' or "extraction_target='per_doc'" in 'import argparse\nimport json\nimport sys\nimport time\nfrom typing import List\nfrom pydantic import BaseModel\nfrom ...finished with status: {job.status}", file=sys.stderr)\n        sys.exit(1)\n\nif __name__ == "__main__":\n    main()\n')
+
+tests/test_final_state.py:96: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_runs_successfully_and_prints_candidate_name
+PASSED tests/test_final_state.py::test_output_json_file_exists
+PASSED tests/test_final_state.py::test_output_json_is_valid_and_has_expected_fields
+PASSED tests/test_final_state.py::test_script_fails_with_missing_input
+FAILED tests/test_final_state.py::test_script_uses_required_sdk_and_pydantic_constructs
+========================= 1 failed, 4 passed in 22.34s =========================

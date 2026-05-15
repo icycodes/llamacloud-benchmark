@@ -1,0 +1,73 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 5,
+            "passed": 4,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778774307086,
+            "stop": 1778774329433
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_runs_successfully_and_prints_candidate_name",
+                "status": "passed",
+                "duration": 21877,
+                "start": 1778774307102,
+                "stop": 1778774328979,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_file_exists",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778774328980,
+                "stop": 1778774328981,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_is_valid_and_has_expected_fields",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778774328982,
+                "stop": 1778774328983,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_uses_required_sdk_and_pydantic_constructs",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 26,
+                "start": 1778774328984,
+                "stop": 1778774329010,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_script_uses_required_sdk_and_pydantic_constructs():\n        \"\"\"Static inspection: the script must use the required SDK calls and Pydantic schema.\"\"\"\n        assert os.path.isfile(SCRIPT), f\"Script not found at {SCRIPT}\"\n        with open(SCRIPT, \"r\", encoding=\"utf-8\") as f:\n            source = f.read()\n    \n        assert \"from llama_cloud import LlamaCloud\" in source, (\n            \"Expected the script to import LlamaCloud via 'from llama_cloud import LlamaCloud'.\"\n        )\n        assert \"class Candidate(BaseModel):\" in source, (\n            \"Expected the script to define a Pydantic model named 'Candidate' \"\n            \"(line matching 'class Candidate(BaseModel):').\"\n        )\n>       assert 'extraction_target=\"per_doc\"' in source or \"extraction_target='per_doc'\" in source, (\n            \"Expected the script to pass extraction_target=\\\"per_doc\\\" to client.extract.create.\"\n        )\nE       AssertionError: Expected the script to pass extraction_target=\"per_doc\" to client.extract.create.\nE       assert ('extraction_target=\"per_doc\"' in 'import argparse\\nimport json\\nimport sys\\nimport time\\nfrom typing import List\\nfrom pydantic import BaseModel\\nfrom ...finished with status: {job.status}\", file=sys.stderr)\\n        sys.exit(1)\\n\\nif __name__ == \"__main__\":\\n    main()\\n' or \"extraction_target='per_doc'\" in 'import argparse\\nimport json\\nimport sys\\nimport time\\nfrom typing import List\\nfrom pydantic import BaseModel\\nfrom ...finished with status: {job.status}\", file=sys.stderr)\\n        sys.exit(1)\\n\\nif __name__ == \"__main__\":\\n    main()\\n')\n\ntests/test_final_state.py:96: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_script_fails_with_missing_input",
+                "status": "passed",
+                "duration": 423,
+                "start": 1778774329010,
+                "stop": 1778774329433,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

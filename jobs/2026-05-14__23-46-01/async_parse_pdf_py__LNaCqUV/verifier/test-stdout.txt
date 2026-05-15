@@ -1,0 +1,24 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 13 items
+
+tests/test_final_state.py .............                                  [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_async_parse_script_uses_async_llama_cloud_import
+PASSED tests/test_final_state.py::test_async_parse_script_defines_async_def
+PASSED tests/test_final_state.py::test_async_parse_script_uses_asyncio_run
+PASSED tests/test_final_state.py::test_async_parse_script_uses_agentic_tier
+PASSED tests/test_final_state.py::test_async_parse_script_uses_latest_version
+PASSED tests/test_final_state.py::test_async_parse_script_requests_markdown_expand
+PASSED tests/test_final_state.py::test_async_parse_script_runs_successfully
+PASSED tests/test_final_state.py::test_stdout_reports_one_page_asynchronously
+PASSED tests/test_final_state.py::test_output_markdown_file_created
+PASSED tests/test_final_state.py::test_output_markdown_file_nonempty
+PASSED tests/test_final_state.py::test_output_markdown_contains_hello_llamaparse
+PASSED tests/test_final_state.py::test_output_markdown_contains_harbor_test_document
+PASSED tests/test_final_state.py::test_script_fails_on_missing_input
+============================== 13 passed in 4.30s ==============================

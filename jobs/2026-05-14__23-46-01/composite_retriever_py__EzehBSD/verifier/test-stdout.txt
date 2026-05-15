@@ -1,0 +1,87 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 11 items
+
+tests/test_final_state.py FF...FFF...                                    [100%]
+
+=================================== FAILURES ===================================
+____________________________ test_script_exits_zero ____________________________
+
+run_script = CompletedProcess(args=['python3', 'composite.py', '--products-dir', '/home/user/myproject/products', '--support-dir', ...                                        ^^^^^^^^^^^^^^^^^\nAttributeError: \'Omit\' object has no attribute \'get\'\n')
+
+    def test_script_exits_zero(run_script):
+>       assert run_script.returncode == 0, (
+            "Expected composite.py to exit with code 0, "
+            f"got {run_script.returncode}. stdout={run_script.stdout!r} "
+            f"stderr={run_script.stderr!r}"
+        )
+E       AssertionError: Expected composite.py to exit with code 0, got 1. stdout='Find your index at https://cloud.llamaindex.ai/project/b420cea9-2ed0-451d-8ebc-617151ec45f6/deploy/f25b876e-dcdf-4789-a47b-cd4f237ca5b4\nFind your index at https://cloud.llamaindex.ai/project/b420cea9-2ed0-451d-8ebc-617151ec45f6/deploy/61b0ac39-9cd4-467b-909b-73b49c350109\n' stderr='Traceback (most recent call last):\n  File "/home/user/myproject/composite.py", line 95, in <module>\n    main()\n  File "/home/user/myproject/composite.py", line 82, in main\n    nodes = composite_retriever.retrieve(args.query)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/dist-packages/llama_index_instrumentation/dispatcher.py", line 413, in wrapper\n    result = func(*args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/dist-packages/llama_index/core/base/base_retriever.py", line 216, in retrieve\n    nodes = self._retrieve(query_bundle)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/dist-packages/llama_index_instrumentation/dispatcher.py", line 413, in wrapper\n    result = func(*args, **kwargs)\n             ^^^^^^^^^^^^^^^^^^^^^\n  File "/usr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/composite_retriever.py", line 207, in _retrieve\n    rerank_config = ReRankConfigParam(top_n=rerank_top_n, type=rerank_config.get("type", "system_default"))\n                                                               ^^^^^^^^^^^^^^^^^\nAttributeError: \'Omit\' object has no attribute \'get\'\n'
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', 'composite.py', '--products-dir', '/home/user/myproject/products', '--support-dir', ...                                        ^^^^^^^^^^^^^^^^^\nAttributeError: \'Omit\' object has no attribute \'get\'\n').returncode
+
+tests/test_final_state.py:72: AssertionError
+_____________________ test_stdout_contains_retriever_name ______________________
+
+run_script = CompletedProcess(args=['python3', 'composite.py', '--products-dir', '/home/user/myproject/products', '--support-dir', ...                                        ^^^^^^^^^^^^^^^^^\nAttributeError: \'Omit\' object has no attribute \'get\'\n')
+
+    def test_stdout_contains_retriever_name(run_script):
+        expected_line = f"Retriever name: {_composite_retriever_name()}"
+        stdout_lines = [line.strip() for line in run_script.stdout.splitlines()]
+>       assert expected_line in stdout_lines, (
+            f"Expected stdout to contain the line {expected_line!r}, "
+            f"got stdout lines: {stdout_lines!r}"
+        )
+E       AssertionError: Expected stdout to contain the line 'Retriever name: harbor-composite-composite_retriever_py__EzehBSD', got stdout lines: ['Find your index at https://cloud.llamaindex.ai/project/b420cea9-2ed0-451d-8ebc-617151ec45f6/deploy/f25b876e-dcdf-4789-a47b-cd4f237ca5b4', 'Find your index at https://cloud.llamaindex.ai/project/b420cea9-2ed0-451d-8ebc-617151ec45f6/deploy/61b0ac39-9cd4-467b-909b-73b49c350109']
+E       assert 'Retriever name: harbor-composite-composite_retriever_py__EzehBSD' in ['Find your index at https://cloud.llamaindex.ai/project/b420cea9-2ed0-451d-8ebc-617151ec45f6/deploy/f25b876e-dcdf-478... https://cloud.llamaindex.ai/project/b420cea9-2ed0-451d-8ebc-617151ec45f6/deploy/61b0ac39-9cd4-467b-909b-73b49c350109']
+
+tests/test_final_state.py:82: AssertionError
+____________________ test_output_file_exists_and_non_empty _____________________
+
+run_script = CompletedProcess(args=['python3', 'composite.py', '--products-dir', '/home/user/myproject/products', '--support-dir', ...                                        ^^^^^^^^^^^^^^^^^\nAttributeError: \'Omit\' object has no attribute \'get\'\n')
+
+    def test_output_file_exists_and_non_empty(run_script):
+>       assert os.path.isfile(OUTPUT_FILE), (
+            f"Expected output file {OUTPUT_FILE} to be created by composite.py."
+        )
+E       AssertionError: Expected output file /home/user/myproject/nodes.txt to be created by composite.py.
+E       assert False
+E        +  where False = <function isfile at 0x7ed8c1c7c220>('/home/user/myproject/nodes.txt')
+E        +    where <function isfile at 0x7ed8c1c7c220> = <module 'posixpath' (frozen)>.isfile
+E        +      where <module 'posixpath' (frozen)> = os.path
+
+tests/test_final_state.py:174: AssertionError
+___________________ test_output_file_lines_start_with_score ____________________
+
+run_script = CompletedProcess(args=['python3', 'composite.py', '--products-dir', '/home/user/myproject/products', '--support-dir', ...                                        ^^^^^^^^^^^^^^^^^\nAttributeError: \'Omit\' object has no attribute \'get\'\n')
+
+    def test_output_file_lines_start_with_score(run_script):
+>       with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/user/myproject/nodes.txt'
+
+tests/test_final_state.py:185: FileNotFoundError
+_________________ test_output_file_contains_temperature_answer _________________
+
+run_script = CompletedProcess(args=['python3', 'composite.py', '--products-dir', '/home/user/myproject/products', '--support-dir', ...                                        ^^^^^^^^^^^^^^^^^\nAttributeError: \'Omit\' object has no attribute \'get\'\n')
+
+    def test_output_file_contains_temperature_answer(run_script):
+        """The Model X100 specs (175 degrees) should appear in the retrieved chunks."""
+>       with open(OUTPUT_FILE, "r", encoding="utf-8") as f:
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/user/myproject/nodes.txt'
+
+tests/test_final_state.py:199: FileNotFoundError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_products_index_exists_on_llamacloud
+PASSED tests/test_final_state.py::test_support_index_exists_on_llamacloud
+PASSED tests/test_final_state.py::test_composite_retriever_exists_with_two_pipelines
+PASSED tests/test_final_state.py::test_script_imports_and_calls
+PASSED tests/test_final_state.py::test_script_fails_on_missing_products_dir
+PASSED tests/test_final_state.py::test_script_fails_on_missing_support_dir
+FAILED tests/test_final_state.py::test_script_exits_zero - AssertionError: Ex...
+FAILED tests/test_final_state.py::test_stdout_contains_retriever_name - Asser...
+FAILED tests/test_final_state.py::test_output_file_exists_and_non_empty - Ass...
+FAILED tests/test_final_state.py::test_output_file_lines_start_with_score - F...
+FAILED tests/test_final_state.py::test_output_file_contains_temperature_answer
+========================= 5 failed, 6 passed in 18.88s =========================

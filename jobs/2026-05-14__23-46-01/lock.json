@@ -1,0 +1,355 @@
+{
+    "schema_version": 1,
+    "created_at": "2026-05-14T15:46:01.614639Z",
+    "harbor": {
+        "version": "0.6.6",
+        "is_editable": false
+    },
+    "invocation": [
+        "/home/icy/github/llamacloud-benchmark/.venv/bin/harbor",
+        "run",
+        "--model",
+        "google/gemini-3-flash",
+        "--agent-import-path",
+        "agents.pochi:Pochi",
+        "--env",
+        "docker",
+        "--path",
+        "/home/icy/github/llamacloud-benchmark/local-scripts/../tasks",
+        "--jobs-dir",
+        "/home/icy/github/llamacloud-benchmark/local-scripts/../jobs",
+        "--n-attempts",
+        "1",
+        "--max-retries",
+        "0",
+        "--n-concurrent",
+        "4",
+        "--artifact",
+        "/home/user",
+        "--yes"
+    ],
+    "n_concurrent_trials": 4,
+    "retry": {
+        "max_retries": 0,
+        "exclude_exceptions": [
+            "VerifierOutputParseError",
+            "RewardFileNotFoundError",
+            "RewardFileEmptyError",
+            "VerifierTimeoutError",
+            "AgentTimeoutError"
+        ],
+        "wait_multiplier": 1.0,
+        "min_wait_sec": 1.0,
+        "max_wait_sec": 60.0
+    },
+    "trials": [
+        {
+            "task": {
+                "name": "classify_document_py",
+                "type": "local",
+                "digest": "sha256:67f11c3b4b4f760fc8ef59477a4deab9b60b6d6ea7bc0e3faafaeaa4b112c82f",
+                "source": "tasks",
+                "path": "/home/icy/github/llamacloud-benchmark/local-scripts/../tasks/classify_document_py"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "import_path": "agents.pochi:Pochi",
+                "model_name": "google/gemini-3-flash",
+                "kwargs": {},
+                "env": {}
+            },
+            "environment": {
+                "type": "docker",
+                "force_build": false,
+                "delete": true,
+                "suppress_override_warnings": false,
+                "env": {},
+                "kwargs": {}
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        },
+        {
+            "task": {
+                "name": "create_managed_index_py",
+                "type": "local",
+                "digest": "sha256:15ecd63eb8ef686c658bbeaa8f641e5f106342865fe9ab27da3e56eaec178a69",
+                "source": "tasks",
+                "path": "/home/icy/github/llamacloud-benchmark/local-scripts/../tasks/create_managed_index_py"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "import_path": "agents.pochi:Pochi",
+                "model_name": "google/gemini-3-flash",
+                "kwargs": {},
+                "env": {}
+            },
+            "environment": {
+                "type": "docker",
+                "force_build": false,
+                "delete": true,
+                "suppress_override_warnings": false,
+                "env": {},
+                "kwargs": {}
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        },
+        {
+            "task": {
+                "name": "configure_regional_client_py",
+                "type": "local",
+                "digest": "sha256:78a4d128c9dbfbe2c0df1f6c7b74a0ca798effe03e7beb2f462bd6212ebe72b8",
+                "source": "tasks",
+                "path": "/home/icy/github/llamacloud-benchmark/local-scripts/../tasks/configure_regional_client_py"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "import_path": "agents.pochi:Pochi",
+                "model_name": "google/gemini-3-flash",
+                "kwargs": {},
+                "env": {}
+            },
+            "environment": {
+                "type": "docker",
+                "force_build": false,
+                "delete": true,
+                "suppress_override_warnings": false,
+                "env": {},
+                "kwargs": {}
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        },
+        {
+            "task": {
+                "name": "parse_pdf_to_markdown_ts",
+                "type": "local",
+                "digest": "sha256:eca8427a95ea1d2500361d1d18ff76ba5c259efe35c1137393d205701b9fe861",
+                "source": "tasks",
+                "path": "/home/icy/github/llamacloud-benchmark/local-scripts/../tasks/parse_pdf_to_markdown_ts"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "import_path": "agents.pochi:Pochi",
+                "model_name": "google/gemini-3-flash",
+                "kwargs": {},
+                "env": {}
+            },
+            "environment": {
+                "type": "docker",
+                "force_build": false,
+                "delete": true,
+                "suppress_override_warnings": false,
+                "env": {},
+                "kwargs": {}
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        },
+        {
+            "task": {
+                "name": "chat_with_managed_index_py",
+                "type": "local",
+                "digest": "sha256:0a2c51ae3732e9198cde20a9ab0e8dd27ff0c5a912b7b186da3834b9fca4bee9",
+                "source": "tasks",
+                "path": "/home/icy/github/llamacloud-benchmark/local-scripts/../tasks/chat_with_managed_index_py"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "import_path": "agents.pochi:Pochi",
+                "model_name": "google/gemini-3-flash",
+                "kwargs": {},
+                "env": {}
+            },
+            "environment": {
+                "type": "docker",
+                "force_build": false,
+                "delete": true,
+                "suppress_override_warnings": false,
+                "env": {},
+                "kwargs": {}
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        },
+        {
+            "task": {
+                "name": "parse_pdf_to_markdown_py",
+                "type": "local",
+                "digest": "sha256:a2291cf18380dda3c7046301a7bec8e151941552a0bd3bc903050bb0d26b6c37",
+                "source": "tasks",
+                "path": "/home/icy/github/llamacloud-benchmark/local-scripts/../tasks/parse_pdf_to_markdown_py"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "import_path": "agents.pochi:Pochi",
+                "model_name": "google/gemini-3-flash",
+                "kwargs": {},
+                "env": {}
+            },
+            "environment": {
+                "type": "docker",
+                "force_build": false,
+                "delete": true,
+                "suppress_override_warnings": false,
+                "env": {},
+                "kwargs": {}
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        },
+        {
+            "task": {
+                "name": "async_parse_pdf_py",
+                "type": "local",
+                "digest": "sha256:4b573da696420637b201f4d52238a9741307507f191bb7668f48ef133f7ad962",
+                "source": "tasks",
+                "path": "/home/icy/github/llamacloud-benchmark/local-scripts/../tasks/async_parse_pdf_py"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "import_path": "agents.pochi:Pochi",
+                "model_name": "google/gemini-3-flash",
+                "kwargs": {},
+                "env": {}
+            },
+            "environment": {
+                "type": "docker",
+                "force_build": false,
+                "delete": true,
+                "suppress_override_warnings": false,
+                "env": {},
+                "kwargs": {}
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        },
+        {
+            "task": {
+                "name": "composite_retriever_py",
+                "type": "local",
+                "digest": "sha256:696e2d9c7cfb756d16bc46bdac2a477e1b6db2e7f090e3a60ef8ca2a313742d5",
+                "source": "tasks",
+                "path": "/home/icy/github/llamacloud-benchmark/local-scripts/../tasks/composite_retriever_py"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "import_path": "agents.pochi:Pochi",
+                "model_name": "google/gemini-3-flash",
+                "kwargs": {},
+                "env": {}
+            },
+            "environment": {
+                "type": "docker",
+                "force_build": false,
+                "delete": true,
+                "suppress_override_warnings": false,
+                "env": {},
+                "kwargs": {}
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        },
+        {
+            "task": {
+                "name": "parse_pdf_rest_api_bash",
+                "type": "local",
+                "digest": "sha256:77d4462899642361bc7f3138999bba22232c55de1d3bed142d64842ccc65a00c",
+                "source": "tasks",
+                "path": "/home/icy/github/llamacloud-benchmark/local-scripts/../tasks/parse_pdf_rest_api_bash"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "import_path": "agents.pochi:Pochi",
+                "model_name": "google/gemini-3-flash",
+                "kwargs": {},
+                "env": {}
+            },
+            "environment": {
+                "type": "docker",
+                "force_build": false,
+                "delete": true,
+                "suppress_override_warnings": false,
+                "env": {},
+                "kwargs": {}
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        },
+        {
+            "task": {
+                "name": "incremental_ingestion_py",
+                "type": "local",
+                "digest": "sha256:bb5b62caaee490c030cd3f8a5e38a0571b4ee7f1872f56ef6b0d73387ccc4f6a",
+                "source": "tasks",
+                "path": "/home/icy/github/llamacloud-benchmark/local-scripts/../tasks/incremental_ingestion_py"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "import_path": "agents.pochi:Pochi",
+                "model_name": "google/gemini-3-flash",
+                "kwargs": {},
+                "env": {}
+            },
+            "environment": {
+                "type": "docker",
+                "force_build": false,
+                "delete": true,
+                "suppress_override_warnings": false,
+                "env": {},
+                "kwargs": {}
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        },
+        {
+            "task": {
+                "name": "extract_structured_data_py",
+                "type": "local",
+                "digest": "sha256:6f78b51d1520b56ae2020736653113fe4db87a2dd1738ea8654aac5a182c593b",
+                "source": "tasks",
+                "path": "/home/icy/github/llamacloud-benchmark/local-scripts/../tasks/extract_structured_data_py"
+            },
+            "timeout_multiplier": 1.0,
+            "agent": {
+                "import_path": "agents.pochi:Pochi",
+                "model_name": "google/gemini-3-flash",
+                "kwargs": {},
+                "env": {}
+            },
+            "environment": {
+                "type": "docker",
+                "force_build": false,
+                "delete": true,
+                "suppress_override_warnings": false,
+                "env": {},
+                "kwargs": {}
+            },
+            "verifier": {
+                "env": {},
+                "disable": false
+            }
+        }
+    ]
+}
