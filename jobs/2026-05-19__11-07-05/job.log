@@ -1,0 +1,963 @@
+Skipping image OS validation for hb__parse_pdf_to_markdown_ts: docker inspect returned 1
+Skipping image OS validation for hb__composite_retriever_ts: docker inspect returned 1
+Skipping image OS validation for hb__create_managed_index_py: docker inspect returned 1
+Skipping image OS validation for hb__async_parse_folder_py: docker inspect returned 1
+Running command: apt-get update && apt-get install -y curl ripgrep
+Running command: apt-get update && apt-get install -y curl ripgrep
+Running command: apt-get update && apt-get install -y curl ripgrep
+Running command: apt-get update && apt-get install -y curl ripgrep
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Command outputs captured
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Running command: echo async_parse_folder_py__Jn6sRNz > /logs/artifacts/trial_id
+Running command: echo parse_pdf_to_markdown_ts__NwdGPj6 > /logs/artifacts/trial_id
+Command outputs captured
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# Parse a PDF to Markdown with LlamaCloud (TypeScript)
+
+## Background
+LlamaCloud provides a managed Parse service that turns complex PDFs into clean, layout-aware markdown via the agentic LlamaParse pipeline. Your job is to build a small CLI utility in TypeScript that uses the official `@llamaindex/llama-cloud` SDK to upload a PDF, run a parse job, and write the resulting markdown to disk.
+
+## Requirements
+- Build a Node.js/TypeScript project located at `/home/user/myproject`.
+- The project must expose an executable `parse.ts` script that can be invoked with `npx tsx parse.ts --input <pdf_path> --output <md_path>`.
+- The script must:
+  - Read the LlamaCloud API key from the `LLAMA_CLOUD_API_KEY` environment variable (do not hard-code it).
+  - Upload the PDF referenced by `--input` to LlamaCloud, then run the Parse job and collect the markdown output for every page.
+  - Concatenate the per-page markdown into a single markdown document and write it to the path supplied via `--output`, creating any intermediate directories if they do not yet exist.
+  - Print the line `Parsed <N> pages to <output_path>` to stdout on success, where `<N>` is the number of parsed pages.
+- Exit with a non-zero status if the API key is missing or the input file does not exist.
+
+## Implementation Hints
+- Install the official SDK with `npm install @llamaindex/llama-cloud` and a runtime such as `tsx` for executing TypeScript directly.
+- The SDK's `client.parsing.parse({...})` call blocks until the job is finished and returns a result object that exposes the per-page markdown when you pass `expand: ["markdown"]`.
+- The `agentic` tier with `version: "latest"` is a sensible default for general-purpose PDFs.
+- A minimal arg parser is enough; you do not need a heavy CLI framework.
+- Be careful with module resolution: top-level `await` requires an ESM project (`"type": "module"` in `package.json`) or you can wrap the body inside an async `main` function.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Command: `npx tsx parse.ts --input <pdf_path> --output <md_path>`
+- Required CLI flags:
+  - `--input <pdf_path>`: Path to an existing PDF file on disk.
+  - `--output <md_path>`: Path where the resulting markdown should be written.
+- On success, the script must:
+  - Exit with status code 0.
+  - Create a markdown file at `<md_path>` whose content is a non-empty string assembled from the per-page markdown returned by LlamaCloud.
+  - Print a line matching the pattern `Parsed <N> pages to <md_path>` to stdout, where `<N>` is an integer ≥ 1.
+- On failure:
+  - When `LLAMA_CLOUD_API_KEY` is unset, the command must exit with a non-zero status and not create the output file.
+  - When `--input` points to a non-existent file, the command must exit with a non-zero status and not create the output file.
+- The project must declare `@llamaindex/llama-cloud` as a dependency in `package.json` and the implementation must actually call the LlamaCloud Parse API (no local stubs).
+
+
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# Async Batch PDF Parsing with LlamaParse
+
+## Background
+You are building a data ingestion pipeline that needs to parse many PDF documents in parallel. LlamaCloud's LlamaParse service is the managed parser of choice. Your job is to write a Python script that asynchronously parses every PDF in a folder, saves the resulting Markdown for each document, and writes a summary log.
+
+## Requirements
+- Implement a Python script at `/home/user/myproject/parse_folder.py` that:
+  - Reads `LLAMA_CLOUD_API_KEY` from the environment.
+  - Discovers every `*.pdf` file in `/home/user/myproject/input_pdfs/` (non-recursive).
+  - Uses `llama_parse.LlamaParse` (from the `llama-parse` PyPI package) with `result_type="markdown"` and processes the files concurrently via the asynchronous parsing API (e.g. `aload_data`).
+  - For each input file `<name>.pdf`, writes the parsed Markdown to `/home/user/myproject/output_md/<name>.md`.
+  - Writes a summary line per file to `/home/user/myproject/output.log`.
+- The script must complete successfully when executed with `python3 parse_folder.py` from `/home/user/myproject`.
+
+## Implementation Hints
+- LlamaParse exposes async methods such as `aload_data` that fan out parse jobs concurrently and wait for all of them.
+- Read the `trial_id` from `/logs/artifacts/trial_id` and include it in each log line so concurrent trials don't collide.
+- The `documents` object returned by LlamaParse contains a `text` attribute holding the parsed Markdown.
+- Make sure the output directory exists before writing files.
+- Print any helpful debugging info to stdout, but the canonical results must go to the files listed above.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Log file: /home/user/myproject/output.log
+- Command: `python3 parse_folder.py` executed from the project directory.
+- The script reads the active `trial_id` from `/logs/artifacts/trial_id`.
+- For every `<name>.pdf` in `/home/user/myproject/input_pdfs/`, a Markdown file `/home/user/myproject/output_md/<name>.md` must exist and contain non-empty Markdown content produced by LlamaParse.
+- `/home/user/myproject/output.log` must contain, for every parsed file, a line in the exact format:
+  `Parsed: <name>.pdf -> output_md/<name>.md (trial_id=<trial_id>)`
+- The script must exit with status code 0.
+
+
+EOF
+Running command: echo composite_retriever_ts__CvE736o > /logs/artifacts/trial_id
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# Composite Retriever across Multiple LlamaCloud Indices (TypeScript)
+
+## Background
+LlamaCloud is a managed RAG-as-a-Service platform from LlamaIndex. In real applications, different document types (e.g. company policies vs. product FAQs) benefit from being stored in separate managed indices so each can use its own parsing and chunking configuration. The LlamaCloud Client SDK (`@llamaindex/llama-cloud`) exposes a Composite Retriever that fans out a single query across multiple indices and globally re-ranks the results.
+
+Your task is to build a small TypeScript program that programmatically creates two managed indices, ingests local files into each one, wires them together with a Composite Retriever, and runs a query that returns hits drawn from both indices.
+
+## Requirements
+- The program must be implemented in TypeScript and executed with `tsx`.
+- Use the `@llamaindex/llama-cloud` Client SDK to:
+  - Create (upsert) two separate managed pipelines (indices) — one for "policies" content and one for "faq" content.
+  - Upload the local input files into the correct pipeline.
+  - Wait until both pipelines finish ingestion.
+  - Create a Composite Retriever that references both pipelines.
+  - Run a query against the Composite Retriever in `full` mode and capture the returned nodes.
+- All externally visible resource names (pipelines and retriever) must be scoped with the current `trial_id` so concurrent runs do not collide.
+- Write a structured log file that summarizes the created resources and the query result.
+
+## Implementation Hints
+- Read the current `trial_id` from `/logs/artifacts/trial_id` (a single-line file). Trim whitespace before using it.
+- The two pipelines must be named exactly:
+  - `policies-${trial_id}` — ingest the files under `./data/policies`
+  - `faq-${trial_id}` — ingest the files under `./data/faq`
+- Use `client.pipelines.upsert(...)` to create or update each pipeline. For embeddings, configure `OPENAI_EMBEDDING` with `text-embedding-3-small` and the API key from the `OPENAI_API_KEY` environment variable. Use the managed data sink (`data_sink_id: null`).
+- Upload local files with `client.files.create({ file: fs.createReadStream(...), purpose: "user_data" })`, then attach them to a pipeline using `client.pipelines.files.create(pipelineId, { body: [...] })`.
+- Poll `client.pipelines.getStatus(pipelineId)` until ingestion leaves the `NOT_STARTED` / `IN_PROGRESS` states for both pipelines before retrieval.
+- Create the composite retriever via `client.retrievers.create({ name: "composite-retriever-${trial_id}", pipelines: [...] })`. Give each sub-pipeline a meaningful `description` so the routing agent could disambiguate them.
+- Query with `client.retrievers.retriever.search(retrieverId, { query, mode: "full", rerank_top_n: 5 })`.
+- The `LLAMA_CLOUD_API_KEY` and `OPENAI_API_KEY` environment variables are already set in the runtime.
+
+## Acceptance Criteria
+- Project path: /home/user/composite_retriever
+- Log file: /home/user/composite_retriever/output.log
+- The program is run with `npx tsx index.ts` from the project path and must exit with status 0.
+- The `trial_id` is read from `/logs/artifacts/trial_id`.
+- Two LlamaCloud pipelines named `policies-${trial_id}` and `faq-${trial_id}` exist in the configured LlamaCloud project after the run.
+- A LlamaCloud retriever named `composite-retriever-${trial_id}` exists and references both pipelines.
+- The log file must contain the following lines, in any order, with literal prefixes (case-sensitive):
+  - `Trial ID: <trial_id>`
+  - `Policies Pipeline ID: <pipeline_id>`
+  - `FAQ Pipeline ID: <pipeline_id>`
+  - `Composite Retriever ID: <retriever_id>`
+  - `Query: <query string>`
+  - `Result Count: <n>` where `<n>` is the integer number of retrieved nodes (must be >= 1)
+  - At least one line per retrieved node in the format `Node Score: <score> | Text: <first 80 chars of text>`
+
+
+EOF
+Running command: echo create_managed_index_py__aadtNim > /logs/artifacts/trial_id
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# Create a LlamaCloud Managed Index in Python
+
+## Background
+LlamaCloud is LlamaIndex's managed service for production-grade RAG. Instead of running your own vector store, you push your documents to LlamaCloud and let it handle parsing, embedding, indexing, and retrieval. In this task you will write a Python program that ingests a small corpus of local text documents into a new LlamaCloud managed index and then performs a retrieval query against it.
+
+The task environment contains three small plain-text documents under `/home/user/myproject/data/` (one each about cats, dogs, and birds). Your program must build a LlamaCloud managed index from those documents, perform a retrieval, and record the results in a log file.
+
+## Requirements
+- Read the `trial_id` from `/logs/artifacts/trial_id` and use it to derive a unique LlamaCloud index name.
+- Create a brand-new LlamaCloud managed index in the `default` project that contains all three of the provided documents.
+- Wait for ingestion to complete so that retrieval is possible.
+- Use the LlamaCloud index's retriever to retrieve the top-3 most relevant nodes for the query `What do cats like to eat?`.
+- Write the index name, the number of nodes retrieved, and the text content of every retrieved node to a log file.
+- The same script must be runnable as a one-off command and must not depend on any pre-existing index with the same name.
+
+## Implementation Hints
+- Install and use the `llama-index-indices-managed-llama-cloud` Python package (the `LlamaCloudIndex` class) together with `llama-index-core` (for `SimpleDirectoryReader`).
+- The LlamaCloud API key is provided via the `LLAMA_CLOUD_API_KEY` environment variable.
+- `LlamaCloudIndex.from_documents(...)` accepts `name`, `project_name`, `verbose`, and similar arguments and will create the managed index.
+- The retriever returned by `index.as_retriever(...)` exposes a `.retrieve(query_str)` method and returns a list of `NodeWithScore` objects whose text is accessible via `node.get_content()` or `node.text`.
+- You do not need an LLM or an `OPENAI_API_KEY` for retrieval; LlamaCloud handles embeddings server-side with its managed defaults.
+
+## Acceptance Criteria
+- Project path: `/home/user/myproject`
+- Log file: `/home/user/myproject/output.log`
+- The program must create a new LlamaCloud managed index whose name is exactly `harbor-managed-index-${trial_id}`, where `trial_id` is read from `/logs/artifacts/trial_id`. The index must live in the LlamaCloud project named `default`.
+- The newly created managed index must contain ingested content from all three files in `/home/user/myproject/data/` (`cats.txt`, `dogs.txt`, `birds.txt`).
+- The log file must contain:
+  - A line in the form: `Index name: harbor-managed-index-<trial_id>`
+  - A line in the form: `Retrieved nodes: <N>` where `<N>` is an integer greater than or equal to 1.
+  - The full text of every retrieved node, each printed on its own line prefixed with `Node text: `.
+- The retrieval query used must be `What do cats like to eat?` and at least one logged `Node text:` line must contain the substring `cat` (case-insensitive).
+
+
+EOF
+Command outputs captured
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured
+Skipping image OS validation for hb__regional_client_setup_py: docker inspect returned 1
+Command outputs captured
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured
+The verifier.env contains an API key (often the case for LLM-based verifiers). You will incur costs associated with the API calls.
+Running command: apt-get update && apt-get install -y curl ripgrep
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Running command: echo regional_client_setup_py__6QcRFtt > /logs/artifacts/trial_id
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# LlamaCloud Regional Client Setup (Python)
+
+## Background
+LlamaCloud is hosted in multiple regions: North America (the default) and the European Union. API keys are region-specific, so users must point the SDK at the correct regional endpoint or all requests will fail with `401 Unauthorized` errors. Build a small Python CLI that constructs a `LlamaParse` client targeted at the requested region and reports the resolved configuration so it can be wired into a larger pipeline.
+
+## Requirements
+- Implement a Python CLI script that selects the correct LlamaCloud base URL for the requested region and constructs a real `LlamaParse` client from the `llama-cloud-services` package.
+- The CLI must accept a `--region` argument with values `us` or `eu` (case-insensitive).
+- The CLI must read the API key from the `LLAMA_CLOUD_API_KEY` environment variable. Use a placeholder value such as `"llx-dummy"` if the variable is empty so the SDK can still be instantiated.
+- The CLI must print exactly one line of JSON to standard output containing the resolved configuration (see `Acceptance Criteria` for the schema).
+- For unsupported regions, the CLI must exit with a non-zero status code and emit an error message on standard error.
+
+## Implementation Hints
+- Install the official `llama-cloud-services` Python package and import `LlamaParse` and the `EU_BASE_URL` constant from it.
+- The default (NA / US) base URL is `https://api.cloud.llamaindex.ai`; the EU base URL is exported by the SDK as the `EU_BASE_URL` constant (`https://api.cloud.eu.llamaindex.ai`).
+- When building the JSON output, read the `base_url` back from the constructed `LlamaParse` instance to confirm that the SDK accepted the configuration.
+- Use `argparse` (or any equivalent) to parse the CLI argument, and `json.dumps` to emit the result.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Command: `python3 /home/user/myproject/regional_client.py --region <region>`
+- Command input argument format: `--region <us|eu>` (case-insensitive).
+- For a recognized region, the command exits with status code `0` and prints a single JSON object on standard output with this shape:
+
+  ```json
+  {
+    "region": "us" | "eu",
+    "base_url": "https://api.cloud.llamaindex.ai" | "https://api.cloud.eu.llamaindex.ai",
+    "parser_base_url": "https://api.cloud.llamaindex.ai" | "https://api.cloud.eu.llamaindex.ai"
+  }
+  ```
+
+  - `region`: lowercase, matching the requested region.
+  - `base_url`: the canonical regional endpoint chosen by the CLI.
+  - `parser_base_url`: the `base_url` read back from the constructed `LlamaParse` instance.
+- For any other region value (e.g. `apac`, empty string, missing argument), the command exits with a non-zero status code and prints an error message containing the substring `unsupported region` on standard error.
+
+
+EOF
+Skipping image OS validation for hb__parse_pdf_to_markdown_py: docker inspect returned 1
+Running command: apt-get update && apt-get install -y curl ripgrep
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Running command: echo parse_pdf_to_markdown_py__RneTB6B > /logs/artifacts/trial_id
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# Parse a PDF to Markdown with LlamaCloud (Python)
+
+## Background
+LlamaCloud is the managed RAG platform from LlamaIndex. Its Parse service (LlamaParse) turns visually rich documents like PDFs into clean, layout-aware markdown that can be fed into downstream LLM pipelines. In this task you will use the official `llama-cloud` Python SDK to upload a small PDF, run a parse job against LlamaCloud, and persist the resulting markdown to disk so the rest of the pipeline can consume it.
+
+The PDF you need to parse is already on disk at `/home/user/myproject/quarterly_report.pdf`. It is a one-page synthetic report whose body contains the title `ACME CORP QUARTERLY REPORT`, a sentence stating `Total revenue for Q3 was 12345 USD.`, and a short paragraph about the company's outlook.
+
+A LlamaCloud API key is already exported as the `LLAMA_CLOUD_API_KEY` environment variable.
+
+## Requirements
+- Write a Python script at `/home/user/myproject/parse_report.py` that, when executed, performs the following one-off job:
+  - Uploads `/home/user/myproject/quarterly_report.pdf` to LlamaCloud using the official Python SDK.
+  - Runs a parse job against the uploaded file and retrieves the markdown output.
+  - Concatenates the markdown for every page of the document into a single string and writes it to `/home/user/myproject/output.md` (UTF-8 encoded).
+  - Writes a structured log line to `/home/user/myproject/parse.log` indicating success and the LlamaCloud parse job identifier.
+- Run the script once so that `output.md` and `parse.log` are populated before verification begins.
+
+## Implementation Hints
+- The current SDK is the `llama-cloud` Python package; install it with `pip3 install --break-system-packages llama-cloud`.
+- The high-level entry point is `from llama_cloud import LlamaCloud`. The client automatically reads `LLAMA_CLOUD_API_KEY` from the environment.
+- Use `client.files.create(file=..., purpose="parse")` to upload the PDF and grab the returned `id`. Pass that id to `client.parsing.parse(...)` with `expand=["markdown"]` to retrieve the markdown payload synchronously.
+- The markdown payload exposes one entry per page (e.g. `result.markdown.pages[i].markdown`). Join them with blank lines before writing to disk so multi-page documents are not truncated.
+- LlamaParse needs to know the file type. When uploading from disk this is taken from the file extension, so make sure you pass the real PDF path (or, if you use bytes, supply the original file name).
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Script path: /home/user/myproject/parse_report.py
+- Log file: /home/user/myproject/parse.log
+- Markdown output file: /home/user/myproject/output.md
+- The script must be runnable as `python3 /home/user/myproject/parse_report.py` and must exit with status code 0.
+- After running the script:
+  - `/home/user/myproject/output.md` must exist, be non-empty, and contain the parsed markdown for the PDF (every page concatenated).
+  - `/home/user/myproject/parse.log` must contain a line of the form: `Parse job ID: <job_id>` where `<job_id>` is the identifier returned by LlamaCloud for the parse job.
+  - `/home/user/myproject/parse.log` must contain a line of the form: `Parsed file: /home/user/myproject/quarterly_report.pdf`.
+
+
+EOF
+Command outputs captured
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured
+Skipping image OS validation for hb__composite_retriever_py: docker inspect returned 1
+Command outputs captured
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured
+The verifier.env contains an API key (often the case for LLM-based verifiers). You will incur costs associated with the API calls.
+Command outputs captured
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured
+The verifier.env contains an API key (often the case for LLM-based verifiers). You will incur costs associated with the API calls.
+Running command: apt-get update && apt-get install -y curl ripgrep
+Skipping image OS validation for hb__create_managed_index_ts: docker inspect returned 1
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Running command: echo composite_retriever_py__Z5tGTqF > /logs/artifacts/trial_id
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# Build a LlamaCloudCompositeRetriever for Multi-Source RAG
+
+## Background
+Your team maintains two separate knowledge bases on LlamaCloud: one for product documentation and one for customer FAQs. To answer support questions that may pull from either source, you must build a Python application that combines both managed indices into a single `LlamaCloudCompositeRetriever` and exposes it as a query script.
+
+## Requirements
+- Create a Python script `run_retrieval.py` in `/home/user/myproject` that:
+  - Builds two LlamaCloud managed indices from local document folders (one folder per index).
+  - Wires both indices into a `LlamaCloudCompositeRetriever` using the FULL retrieval mode so that every sub-index is queried and results are globally reranked.
+  - Accepts a query string from the command line and prints the retrieval result, including the retrieved chunk text and its source index name, to stdout and to a log file.
+- All LlamaCloud resources created by the script must be uniquely named per trial run.
+- The two source folders (`docs/product/` and `docs/faq/`) and their markdown files are already provided.
+
+## Implementation Hints
+- Read the `trial_id` from `/logs/artifacts/trial_id` and append it to every LlamaCloud resource name you create (the two index names and the composite retriever name).
+- Use the `LlamaCloudIndex.from_documents(...)` constructor (from `llama_index.indices.managed.llama_cloud`) to create each managed index from the local folders. Load files with `SimpleDirectoryReader`.
+- Use `LlamaCloudCompositeRetriever` together with `CompositeRetrievalMode.FULL` from `llama_cloud.types`. Set `create_if_not_exists=True` and `rerank_top_n=3`.
+- When attaching each index via `add_index(...)`, supply a clear `description` so the retriever knows what each sub-index covers.
+- Read the LlamaCloud API key from `LLAMA_CLOUD_API_KEY` and the project name from `LLAMA_CLOUD_PROJECT_NAME` (default to `Default`).
+- Use `argparse` to accept the query string via `--query`.
+- For each retrieved node, print a line of the form `INDEX=<sub_index_name> | SCORE=<score> | TEXT=<retrieved_text>` and also append it to the log file. Print a final line `Retrieved <n> nodes` after iteration.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Command: `python3 run_retrieval.py --query <query_string>`
+- Log file: /home/user/myproject/retrieval.log
+- Reads `trial_id` from `/logs/artifacts/trial_id` and uses it to scope all created LlamaCloud resource names with the pattern:
+  - Product index name: `product-docs-${trial_id}`
+  - FAQ index name: `faq-docs-${trial_id}`
+  - Composite retriever name: `support-composite-${trial_id}`
+- After running the script:
+  - Both managed indices and the composite retriever must exist in the configured LlamaCloud project.
+  - The composite retriever must be configured in `FULL` mode and reference both indices.
+  - Stdout and `retrieval.log` must contain at least one line matching the pattern `INDEX=<name> | SCORE=<float> | TEXT=<text>` and a final line `Retrieved <n> nodes`.
+  - Stdout/log content must demonstrate that retrieved nodes come from the correct sub-index for the queried topic (product vs. FAQ).
+
+
+EOF
+Skipping image OS validation for hb__incremental_ingestion_py: docker inspect returned 1
+Running command: apt-get update && apt-get install -y curl ripgrep
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Running command: echo create_managed_index_ts__trttYah > /logs/artifacts/trial_id
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# Create and Query a LlamaCloud Managed Index (TypeScript)
+
+## Background
+LlamaCloud is a managed RAG-as-a-Service platform from LlamaIndex. In this task you will use the TypeScript SDK (the `llamaindex` package) to spin up a new managed index, ingest a small set of local text documents into it, and execute a natural-language query against the resulting index using its query engine.
+
+The project skeleton has been prepared for you at `/home/user/myproject`:
+- `data/` — contains plain-text source documents that must be ingested into the managed index.
+- `package.json` — already declares the `llamaindex` dependency and a `start` script that runs `index.ts` via `tsx`.
+- `tsconfig.json` — ready-to-use TypeScript config.
+
+Dependencies (including `llamaindex` and `tsx`) are already installed under `node_modules/`.
+
+## Requirements
+- Implement a Node.js/TypeScript program at `/home/user/myproject/index.ts` that:
+  1. Reads the current `trial_id` from `/logs/artifacts/trial_id` and uses it to build a unique index name `harbor-ts-index-${trial_id}` (so concurrent trials never collide on a shared name).
+  2. Loads the documents under `/home/user/myproject/data` (a `SimpleDirectoryReader` works well).
+  3. Creates a new LlamaCloud managed index from those documents using `LlamaCloudIndex.fromDocuments`, in the `Default` project. The `LLAMA_CLOUD_API_KEY` env var is already exported.
+  4. Builds a query engine from the index and asks the question: `What is the capital of France?`.
+  5. Writes the answer and a small JSON summary to `/home/user/myproject/output.log` using the format described below.
+- The program must be runnable from the project directory with `npm start` and must exit with code 0 on success.
+
+## Implementation Hints
+- Import `LlamaCloudIndex` and `SimpleDirectoryReader` from the `llamaindex` package.
+- `LlamaCloudIndex.fromDocuments` is asynchronous and accepts at minimum `{ documents, name, projectName }`. The Default project is named `Default`.
+- The query engine is created with `index.asQueryEngine()` and queried with `await queryEngine.query({ query: '...' })`. The textual response is on the `.message.content` (or `.response`) field — print whatever string representation the SDK returns.
+- Read the trial id with the standard `node:fs` API; do not hard-code a name.
+- Make sure the script writes the log file before exiting so the verifier can read it.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Source file: /home/user/myproject/index.ts
+- Start command: npm start (executed from /home/user/myproject)
+- Log file: /home/user/myproject/output.log
+- The program reads `trial_id` from `/logs/artifacts/trial_id` and creates exactly one new LlamaCloud managed index in the `Default` project named `harbor-ts-index-${trial_id}`.
+- All documents from `/home/user/myproject/data` are ingested into that index.
+- The query engine is invoked at least once on the created index.
+- `output.log` must contain, in this order:
+  - A line starting with `Index name: harbor-ts-index-<trial_id>`.
+  - A line starting with `Query: What is the capital of France?`.
+  - A line starting with `Answer: ` followed by the model's natural-language response (a non-empty string).
+  - A final JSON line starting with `Summary: ` followed by a JSON object containing at least the keys `index_name` (string equal to `harbor-ts-index-<trial_id>`) and `num_documents` (integer equal to the number of files ingested from `data/`).
+
+
+EOF
+Running command: apt-get update && apt-get install -y curl ripgrep
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Running command: echo incremental_ingestion_py__nBKQstZ > /logs/artifacts/trial_id
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# Incremental Ingestion into a LlamaCloud Index (Python)
+
+## Background
+Ingesting documents into a managed LlamaCloud index can be expensive: every file uploaded consumes parsing credits and re-uploading the same files wastes time and money. In production pipelines that watch a folder, you typically only want to upload files that are not already present in the index. In this task you will build a Python CLI that connects to a LlamaCloud index, inspects which files are already ingested, and uploads only the new ones, in a way that is safe to rerun.
+
+## Requirements
+- Build a Python CLI at `/home/user/myproject/sync.py` that:
+  - Accepts a folder of source files via `--folder <path>`.
+  - Accepts the LlamaCloud index name via `--index <name>` and the project name via `--project <name>` (default `Default`).
+  - Reads the `LLAMA_CLOUD_API_KEY` from the environment.
+  - Connects to a LlamaCloud index named `--index` under `--project`, creating it if it does not yet exist.
+  - Determines which files inside `--folder` are already present in the index (by file name) and uploads only the missing ones, waiting for ingestion to finish.
+  - Reports the result on the last line of stdout in the exact format:
+    `Uploaded <N> new file(s): <comma-separated-sorted-filenames-or-none>`
+    where `<N>` is the integer number of files uploaded by this invocation and the file-name list is sorted alphabetically. If `<N>` is `0`, the list portion must be the literal string `none`.
+  - Exits with status `0` on success.
+  - Is idempotent: rerunning the script over the same folder must upload `0` additional files.
+
+## Implementation Hints
+- Use the `llama_cloud_services.LlamaCloudIndex` (from `pip install llama-cloud-services`) to connect to or create the managed index.
+- The underlying `llama_cloud.LlamaCloud` client exposes `client.pipelines.list_pipeline_files(pipeline_id=...)` which returns the files already attached to the pipeline (index). Use the `name` attribute on each returned file to detect previously-uploaded files.
+- `LlamaCloudIndex.upload_file(file_path)` uploads a local file and waits for ingestion by default.
+- To avoid colliding with other concurrent runs, scope the index name with `trial_id` read from `/logs/artifacts/trial_id`. The caller will pass `--index llama-sync-<trial_id>` to your CLI, so your code just needs to honor whatever `--index` value it receives.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Command: `python3 /home/user/myproject/sync.py --folder <folder> --index <name> --project <project>`
+- Input arguments:
+  - `--folder <folder>`: Path to a directory of source files to ingest.
+  - `--index <name>`: Target LlamaCloud index name (will be created if it does not exist).
+  - `--project <project>`: LlamaCloud project name; if omitted defaults to `Default`.
+- The command must exit with status `0`.
+- The last line of stdout must match the exact format `Uploaded <N> new file(s): <list>` where `<list>` is either the literal string `none` (when `<N> == 0`) or a comma-and-space separated list (e.g. `a.txt, b.txt`) of file names sorted alphabetically.
+- Running the same command twice in a row on the same `--folder` must report `0` newly uploaded files on the second invocation.
+- After successful execution, every file in `--folder` must be present in the named LlamaCloud index.
+
+
+EOF
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured
+The verifier.env contains an API key (often the case for LLM-based verifiers). You will incur costs associated with the API calls.
+Exception AgentTimeoutError is in exclude_exceptions, not retrying
+Not retrying trial because the exception is not in include_exceptions or the maximum number of retries has been reached
+Skipping image OS validation for hb__extract_structured_data_py: docker inspect returned 1
+Running command: apt-get update && apt-get install -y curl ripgrep
+Command outputs captured
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured
+The verifier.env contains an API key (often the case for LLM-based verifiers). You will incur costs associated with the API calls.
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Running command: echo extract_structured_data_py__QRG3E9o > /logs/artifacts/trial_id
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# Extract Structured Resume Data with LlamaExtract (Python)
+
+## Background
+LlamaCloud's LlamaExtract service turns unstructured documents (PDFs, text files, etc.) into JSON that conforms to a user-defined schema. In this task you will build a small, rerunnable command-line tool that uses the LlamaExtract Python SDK (`llama-cloud-services`) to extract structured information from a candidate's resume and write the result to a JSON file.
+
+## Requirements
+- Build a Python CLI at `/home/user/myproject/extract.py` that:
+  - Accepts the path to a resume file as `--input` and the path to a JSON output file as `--output`.
+  - Reads the `LLAMA_CLOUD_API_KEY` from the environment (it will already be exported).
+  - Defines a Pydantic schema named `Resume` with the fields `name: str`, `email: str`, and `skills: list[str]`.
+  - Uses `LlamaExtract` (from `llama_cloud_services`) to create or reuse an extraction agent and run extraction on the input file.
+  - Writes the extracted data as a JSON object to the `--output` path with the keys `name`, `email`, and `skills`.
+  - Exits with status code `0` on success and prints `Extraction completed: <output_path>` to stdout when finished.
+
+## Implementation Hints
+- Use the legacy Python SDK package `llama-cloud-services` (`pip install llama-cloud-services`). It exposes `LlamaExtract` and accepts a Pydantic model as `data_schema` when creating an agent.
+- To avoid collisions when this task runs concurrently across trials, name the extraction agent using the `trial_id` read from `/logs/artifacts/trial_id` (for example, `resume-parser-${trial_id}`). If an agent with that name already exists, reuse it instead of failing.
+- The `LlamaExtract` client picks up `LLAMA_CLOUD_API_KEY` from the environment automatically.
+- `agent.extract(<path>)` returns a result whose `.data` attribute is a dict that matches the schema; serialize it with `json.dump`.
+- Make the script idempotent: it should succeed when run multiple times on the same input.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Command: `python3 /home/user/myproject/extract.py --input <input_path> --output <output_path>`
+- Input arguments:
+  - `--input <input_path>`: Path to an existing resume file (plain text or PDF).
+  - `--output <output_path>`: Path where the extracted JSON will be written.
+- The command must exit with status `0` and print a line in the format `Extraction completed: <output_path>` to stdout.
+- The output file must be a valid JSON object containing exactly the keys `name`, `email`, and `skills` with the shape:
+
+  ```json
+  {
+    "name": string,
+    "email": string,
+    "skills": [string, ...]
+  }
+  ```
+
+- The extraction agent created (or reused) on LlamaCloud must be named `resume-parser-${trial_id}` where `trial_id` is read from `/logs/artifacts/trial_id`.
+
+
+EOF
+Command outputs captured
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured
+The verifier.env contains an API key (often the case for LLM-based verifiers). You will incur costs associated with the API calls.
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured
+The verifier.env contains an API key (often the case for LLM-based verifiers). You will incur costs associated with the API calls.
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured
+The verifier.env contains an API key (often the case for LLM-based verifiers). You will incur costs associated with the API calls.
+Exception AgentTimeoutError is in exclude_exceptions, not retrying
+Not retrying trial because the exception is not in include_exceptions or the maximum number of retries has been reached
+Trial create_managed_index_ts__trttYah cancelled

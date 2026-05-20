@@ -1,0 +1,122 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: json-ctrf-0.5.0
+collected 7 items
+
+tests/test_final_state.py .EEEEFF                                        [100%]
+
+==================================== ERRORS ====================================
+_____________ ERROR at setup of test_log_contains_index_name_line ______________
+
+    @pytest.fixture(scope="module")
+    def log_contents():
+>       assert os.path.isfile(LOG_FILE), f"Expected log file at {LOG_FILE}, but it is missing."
+E       AssertionError: Expected log file at /home/user/myproject/output.log, but it is missing.
+E       assert False
+E        +  where False = <function isfile at 0x716d3be5c220>('/home/user/myproject/output.log')
+E        +    where <function isfile at 0x716d3be5c220> = <module 'posixpath' (frozen)>.isfile
+E        +      where <module 'posixpath' (frozen)> = os.path
+
+tests/test_final_state.py:32: AssertionError
+________________ ERROR at setup of test_log_contains_query_line ________________
+
+    @pytest.fixture(scope="module")
+    def log_contents():
+>       assert os.path.isfile(LOG_FILE), f"Expected log file at {LOG_FILE}, but it is missing."
+E       AssertionError: Expected log file at /home/user/myproject/output.log, but it is missing.
+E       assert False
+E        +  where False = <function isfile at 0x716d3be5c220>('/home/user/myproject/output.log')
+E        +    where <function isfile at 0x716d3be5c220> = <module 'posixpath' (frozen)>.isfile
+E        +      where <module 'posixpath' (frozen)> = os.path
+
+tests/test_final_state.py:32: AssertionError
+_________ ERROR at setup of test_log_contains_answer_mentioning_paris __________
+
+    @pytest.fixture(scope="module")
+    def log_contents():
+>       assert os.path.isfile(LOG_FILE), f"Expected log file at {LOG_FILE}, but it is missing."
+E       AssertionError: Expected log file at /home/user/myproject/output.log, but it is missing.
+E       assert False
+E        +  where False = <function isfile at 0x716d3be5c220>('/home/user/myproject/output.log')
+E        +    where <function isfile at 0x716d3be5c220> = <module 'posixpath' (frozen)>.isfile
+E        +      where <module 'posixpath' (frozen)> = os.path
+
+tests/test_final_state.py:32: AssertionError
+_______________ ERROR at setup of test_log_contains_summary_json _______________
+
+    @pytest.fixture(scope="module")
+    def log_contents():
+>       assert os.path.isfile(LOG_FILE), f"Expected log file at {LOG_FILE}, but it is missing."
+E       AssertionError: Expected log file at /home/user/myproject/output.log, but it is missing.
+E       assert False
+E        +  where False = <function isfile at 0x716d3be5c220>('/home/user/myproject/output.log')
+E        +    where <function isfile at 0x716d3be5c220> = <module 'posixpath' (frozen)>.isfile
+E        +      where <module 'posixpath' (frozen)> = os.path
+
+tests/test_final_state.py:32: AssertionError
+=================================== FAILURES ===================================
+_____________________ test_pipeline_exists_in_llama_cloud ______________________
+
+llama_cloud_headers = {'Accept': 'application/json', 'Authorization': 'Bearer (*****SECRET_LEAK_DETECTED*****)'}
+expected_index_name = 'harbor-ts-index-create_managed_index_ts__trttYah'
+
+    def test_pipeline_exists_in_llama_cloud(llama_cloud_headers, expected_index_name):
+        """Verify via the LlamaCloud REST API that a pipeline with the expected name was created."""
+        url = f"{LLAMA_CLOUD_BASE_URL}/api/v1/pipelines"
+        response = requests.get(
+            url,
+            headers=llama_cloud_headers,
+            params={"project_name": "Default"},
+            timeout=60,
+        )
+        assert response.status_code == 200, (
+            f"LlamaCloud pipelines list call failed with status "
+            f"{response.status_code}: {response.text}"
+        )
+        pipelines = response.json()
+        names = [p.get("name") for p in pipelines]
+>       assert expected_index_name in names, (
+            f"Expected to find a LlamaCloud pipeline named {expected_index_name!r} in project 'Default'. "
+            f"Found: {names}"
+        )
+E       AssertionError: Expected to find a LlamaCloud pipeline named 'harbor-ts-index-create_managed_index_ts__trttYah' in project 'Default'. Found: ['product-docs-composite_retriever_py__Z5tGTqF', 'harbor-ts-index-create_managed_index_ts__trttYah-v2']
+E       assert 'harbor-ts-index-create_managed_index_ts__trttYah' in ['product-docs-composite_retriever_py__Z5tGTqF', 'harbor-ts-index-create_managed_index_ts__trttYah-v2']
+
+tests/test_final_state.py:114: AssertionError
+_____________________ test_pipeline_has_ingested_documents _____________________
+
+llama_cloud_headers = {'Accept': 'application/json', 'Authorization': 'Bearer (*****SECRET_LEAK_DETECTED*****)'}
+expected_index_name = 'harbor-ts-index-create_managed_index_ts__trttYah'
+
+    def test_pipeline_has_ingested_documents(llama_cloud_headers, expected_index_name):
+        """Verify that the created pipeline has at least 3 ingested files."""
+        list_url = f"{LLAMA_CLOUD_BASE_URL}/api/v1/pipelines"
+        response = requests.get(
+            list_url,
+            headers=llama_cloud_headers,
+            params={"project_name": "Default"},
+            timeout=60,
+        )
+        assert response.status_code == 200, (
+            f"LlamaCloud pipelines list call failed: {response.status_code} {response.text}"
+        )
+        pipelines = response.json()
+        matching = [p for p in pipelines if p.get("name") == expected_index_name]
+>       assert matching, (
+            f"Pipeline {expected_index_name!r} not found when checking ingested files."
+        )
+E       AssertionError: Pipeline 'harbor-ts-index-create_managed_index_ts__trttYah' not found when checking ingested files.
+E       assert []
+
+tests/test_final_state.py:134: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_index_source_file_exists
+ERROR tests/test_final_state.py::test_log_contains_index_name_line - Assertio...
+ERROR tests/test_final_state.py::test_log_contains_query_line - AssertionErro...
+ERROR tests/test_final_state.py::test_log_contains_answer_mentioning_paris - ...
+ERROR tests/test_final_state.py::test_log_contains_summary_json - AssertionEr...
+FAILED tests/test_final_state.py::test_pipeline_exists_in_llama_cloud - Asser...
+FAILED tests/test_final_state.py::test_pipeline_has_ingested_documents - Asse...
+==================== 2 failed, 1 passed, 4 errors in 1.47s =====================

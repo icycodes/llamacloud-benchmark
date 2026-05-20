@@ -1,0 +1,342 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 8 items
+
+tests/test_final_state.py .EEEEEEE                                       [100%]
+
+==================================== ERRORS ====================================
+_________ ERROR at setup of test_product_pipeline_exists_on_llamacloud _________
+
+cleaned_log = None, trial_id = 'composite_retriever_py__Z5tGTqF'
+
+    @pytest.fixture(scope="session")
+    def faq_run(cleaned_log, trial_id):
+        """Run the FAQ query and capture stdout."""
+        result = subprocess.run(
+            ["python3", SCRIPT_PATH, "--query", FAQ_QUERY],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
+>       assert result.returncode == 0, (
+            f"run_retrieval.py exited with non-zero for FAQ query.\n"
+            f"stdout=\n{result.stdout}\nstderr=\n{result.stderr}"
+        )
+E       AssertionError: run_retrieval.py exited with non-zero for FAQ query.
+E         stdout=
+E         Deleting pipeline: product-docs-composite_retriever_py__Z5tGTqF (35ced14c-99c3-4ee5-9727-9bd21b0aef6f)
+E         Creating/Loading product index: product-docs-composite_retriever_py__Z5tGTqF
+E         
+E         stderr=
+E         /usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py:548: DeprecationWarning: Call to deprecated class LlamaCloudIndex. (llama-index-indices-managed-llama-cloud has been moved to llama-cloud-services (https://github.com/run-llama/llama_cloud_services) as of llama-cloud-services v0.6.55, thus llama-index-indices-managed-llama-cloud package will be deprecated and no longer maintained. Check out the LlamaCloud documentation for more information: https://docs.cloud.llamaindex.ai) -- Deprecated since version 0.9.1.
+E           return cls(
+E         Traceback (most recent call last):
+E           File "/home/user/myproject/run_retrieval.py", line 124, in <module>
+E             if __name__ == "__main__":
+E                 ^^^^^^^^^^^^^^^
+E           File "/home/user/myproject/run_retrieval.py", line 62, in run_retrieval
+E             print(f"Creating/Loading product index: {product_index_name}")
+E                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py", line 670, in from_documents
+E             index.wait_for_completion(
+E           File "/usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py", line 381, in wait_for_completion
+E             status_response = self._client.pipelines.get_pipeline_status(
+E                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/resources/pipelines/client.py", line 365, in get_pipeline_status
+E             raise ApiError(status_code=_response.status_code, body=_response_json)
+E         llama_cloud.core.api_error.ApiError: status_code: 404, body: {'detail': 'Pipeline a9f2ffef-5257-49c8-b02b-1771a0ef52b0 not found'}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '/home/user/myproject/run_retrieval.py', '--query', 'How do I reset my password?'], ...i_error.ApiError: status_code: 404, body: {\'detail\': \'Pipeline a9f2ffef-5257-49c8-b02b-1771a0ef52b0 not found\'}\n').returncode
+
+tests/test_final_state.py:80: AssertionError
+___________ ERROR at setup of test_faq_pipeline_exists_on_llamacloud ___________
+
+cleaned_log = None, trial_id = 'composite_retriever_py__Z5tGTqF'
+
+    @pytest.fixture(scope="session")
+    def faq_run(cleaned_log, trial_id):
+        """Run the FAQ query and capture stdout."""
+        result = subprocess.run(
+            ["python3", SCRIPT_PATH, "--query", FAQ_QUERY],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
+>       assert result.returncode == 0, (
+            f"run_retrieval.py exited with non-zero for FAQ query.\n"
+            f"stdout=\n{result.stdout}\nstderr=\n{result.stderr}"
+        )
+E       AssertionError: run_retrieval.py exited with non-zero for FAQ query.
+E         stdout=
+E         Deleting pipeline: product-docs-composite_retriever_py__Z5tGTqF (35ced14c-99c3-4ee5-9727-9bd21b0aef6f)
+E         Creating/Loading product index: product-docs-composite_retriever_py__Z5tGTqF
+E         
+E         stderr=
+E         /usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py:548: DeprecationWarning: Call to deprecated class LlamaCloudIndex. (llama-index-indices-managed-llama-cloud has been moved to llama-cloud-services (https://github.com/run-llama/llama_cloud_services) as of llama-cloud-services v0.6.55, thus llama-index-indices-managed-llama-cloud package will be deprecated and no longer maintained. Check out the LlamaCloud documentation for more information: https://docs.cloud.llamaindex.ai) -- Deprecated since version 0.9.1.
+E           return cls(
+E         Traceback (most recent call last):
+E           File "/home/user/myproject/run_retrieval.py", line 124, in <module>
+E             if __name__ == "__main__":
+E                 ^^^^^^^^^^^^^^^
+E           File "/home/user/myproject/run_retrieval.py", line 62, in run_retrieval
+E             print(f"Creating/Loading product index: {product_index_name}")
+E                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py", line 670, in from_documents
+E             index.wait_for_completion(
+E           File "/usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py", line 381, in wait_for_completion
+E             status_response = self._client.pipelines.get_pipeline_status(
+E                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/resources/pipelines/client.py", line 365, in get_pipeline_status
+E             raise ApiError(status_code=_response.status_code, body=_response_json)
+E         llama_cloud.core.api_error.ApiError: status_code: 404, body: {'detail': 'Pipeline a9f2ffef-5257-49c8-b02b-1771a0ef52b0 not found'}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '/home/user/myproject/run_retrieval.py', '--query', 'How do I reset my password?'], ...i_error.ApiError: status_code: 404, body: {\'detail\': \'Pipeline a9f2ffef-5257-49c8-b02b-1771a0ef52b0 not found\'}\n').returncode
+
+tests/test_final_state.py:80: AssertionError
+_______ ERROR at setup of test_composite_retriever_exists_with_full_mode _______
+
+cleaned_log = None, trial_id = 'composite_retriever_py__Z5tGTqF'
+
+    @pytest.fixture(scope="session")
+    def faq_run(cleaned_log, trial_id):
+        """Run the FAQ query and capture stdout."""
+        result = subprocess.run(
+            ["python3", SCRIPT_PATH, "--query", FAQ_QUERY],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
+>       assert result.returncode == 0, (
+            f"run_retrieval.py exited with non-zero for FAQ query.\n"
+            f"stdout=\n{result.stdout}\nstderr=\n{result.stderr}"
+        )
+E       AssertionError: run_retrieval.py exited with non-zero for FAQ query.
+E         stdout=
+E         Deleting pipeline: product-docs-composite_retriever_py__Z5tGTqF (35ced14c-99c3-4ee5-9727-9bd21b0aef6f)
+E         Creating/Loading product index: product-docs-composite_retriever_py__Z5tGTqF
+E         
+E         stderr=
+E         /usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py:548: DeprecationWarning: Call to deprecated class LlamaCloudIndex. (llama-index-indices-managed-llama-cloud has been moved to llama-cloud-services (https://github.com/run-llama/llama_cloud_services) as of llama-cloud-services v0.6.55, thus llama-index-indices-managed-llama-cloud package will be deprecated and no longer maintained. Check out the LlamaCloud documentation for more information: https://docs.cloud.llamaindex.ai) -- Deprecated since version 0.9.1.
+E           return cls(
+E         Traceback (most recent call last):
+E           File "/home/user/myproject/run_retrieval.py", line 124, in <module>
+E             if __name__ == "__main__":
+E                 ^^^^^^^^^^^^^^^
+E           File "/home/user/myproject/run_retrieval.py", line 62, in run_retrieval
+E             print(f"Creating/Loading product index: {product_index_name}")
+E                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py", line 670, in from_documents
+E             index.wait_for_completion(
+E           File "/usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py", line 381, in wait_for_completion
+E             status_response = self._client.pipelines.get_pipeline_status(
+E                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/resources/pipelines/client.py", line 365, in get_pipeline_status
+E             raise ApiError(status_code=_response.status_code, body=_response_json)
+E         llama_cloud.core.api_error.ApiError: status_code: 404, body: {'detail': 'Pipeline a9f2ffef-5257-49c8-b02b-1771a0ef52b0 not found'}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '/home/user/myproject/run_retrieval.py', '--query', 'How do I reset my password?'], ...i_error.ApiError: status_code: 404, body: {\'detail\': \'Pipeline a9f2ffef-5257-49c8-b02b-1771a0ef52b0 not found\'}\n').returncode
+
+tests/test_final_state.py:80: AssertionError
+_____________ ERROR at setup of test_faq_run_log_contains_faq_hit ______________
+
+cleaned_log = None, trial_id = 'composite_retriever_py__Z5tGTqF'
+
+    @pytest.fixture(scope="session")
+    def faq_run(cleaned_log, trial_id):
+        """Run the FAQ query and capture stdout."""
+        result = subprocess.run(
+            ["python3", SCRIPT_PATH, "--query", FAQ_QUERY],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
+>       assert result.returncode == 0, (
+            f"run_retrieval.py exited with non-zero for FAQ query.\n"
+            f"stdout=\n{result.stdout}\nstderr=\n{result.stderr}"
+        )
+E       AssertionError: run_retrieval.py exited with non-zero for FAQ query.
+E         stdout=
+E         Deleting pipeline: product-docs-composite_retriever_py__Z5tGTqF (35ced14c-99c3-4ee5-9727-9bd21b0aef6f)
+E         Creating/Loading product index: product-docs-composite_retriever_py__Z5tGTqF
+E         
+E         stderr=
+E         /usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py:548: DeprecationWarning: Call to deprecated class LlamaCloudIndex. (llama-index-indices-managed-llama-cloud has been moved to llama-cloud-services (https://github.com/run-llama/llama_cloud_services) as of llama-cloud-services v0.6.55, thus llama-index-indices-managed-llama-cloud package will be deprecated and no longer maintained. Check out the LlamaCloud documentation for more information: https://docs.cloud.llamaindex.ai) -- Deprecated since version 0.9.1.
+E           return cls(
+E         Traceback (most recent call last):
+E           File "/home/user/myproject/run_retrieval.py", line 124, in <module>
+E             if __name__ == "__main__":
+E                 ^^^^^^^^^^^^^^^
+E           File "/home/user/myproject/run_retrieval.py", line 62, in run_retrieval
+E             print(f"Creating/Loading product index: {product_index_name}")
+E                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py", line 670, in from_documents
+E             index.wait_for_completion(
+E           File "/usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py", line 381, in wait_for_completion
+E             status_response = self._client.pipelines.get_pipeline_status(
+E                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/resources/pipelines/client.py", line 365, in get_pipeline_status
+E             raise ApiError(status_code=_response.status_code, body=_response_json)
+E         llama_cloud.core.api_error.ApiError: status_code: 404, body: {'detail': 'Pipeline a9f2ffef-5257-49c8-b02b-1771a0ef52b0 not found'}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '/home/user/myproject/run_retrieval.py', '--query', 'How do I reset my password?'], ...i_error.ApiError: status_code: 404, body: {\'detail\': \'Pipeline a9f2ffef-5257-49c8-b02b-1771a0ef52b0 not found\'}\n').returncode
+
+tests/test_final_state.py:80: AssertionError
+______________ ERROR at setup of test_faq_run_stdout_matches_log _______________
+
+cleaned_log = None, trial_id = 'composite_retriever_py__Z5tGTqF'
+
+    @pytest.fixture(scope="session")
+    def faq_run(cleaned_log, trial_id):
+        """Run the FAQ query and capture stdout."""
+        result = subprocess.run(
+            ["python3", SCRIPT_PATH, "--query", FAQ_QUERY],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
+>       assert result.returncode == 0, (
+            f"run_retrieval.py exited with non-zero for FAQ query.\n"
+            f"stdout=\n{result.stdout}\nstderr=\n{result.stderr}"
+        )
+E       AssertionError: run_retrieval.py exited with non-zero for FAQ query.
+E         stdout=
+E         Deleting pipeline: product-docs-composite_retriever_py__Z5tGTqF (35ced14c-99c3-4ee5-9727-9bd21b0aef6f)
+E         Creating/Loading product index: product-docs-composite_retriever_py__Z5tGTqF
+E         
+E         stderr=
+E         /usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py:548: DeprecationWarning: Call to deprecated class LlamaCloudIndex. (llama-index-indices-managed-llama-cloud has been moved to llama-cloud-services (https://github.com/run-llama/llama_cloud_services) as of llama-cloud-services v0.6.55, thus llama-index-indices-managed-llama-cloud package will be deprecated and no longer maintained. Check out the LlamaCloud documentation for more information: https://docs.cloud.llamaindex.ai) -- Deprecated since version 0.9.1.
+E           return cls(
+E         Traceback (most recent call last):
+E           File "/home/user/myproject/run_retrieval.py", line 124, in <module>
+E             if __name__ == "__main__":
+E                 ^^^^^^^^^^^^^^^
+E           File "/home/user/myproject/run_retrieval.py", line 62, in run_retrieval
+E             print(f"Creating/Loading product index: {product_index_name}")
+E                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py", line 670, in from_documents
+E             index.wait_for_completion(
+E           File "/usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py", line 381, in wait_for_completion
+E             status_response = self._client.pipelines.get_pipeline_status(
+E                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/resources/pipelines/client.py", line 365, in get_pipeline_status
+E             raise ApiError(status_code=_response.status_code, body=_response_json)
+E         llama_cloud.core.api_error.ApiError: status_code: 404, body: {'detail': 'Pipeline a9f2ffef-5257-49c8-b02b-1771a0ef52b0 not found'}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '/home/user/myproject/run_retrieval.py', '--query', 'How do I reset my password?'], ...i_error.ApiError: status_code: 404, body: {\'detail\': \'Pipeline a9f2ffef-5257-49c8-b02b-1771a0ef52b0 not found\'}\n').returncode
+
+tests/test_final_state.py:80: AssertionError
+_________ ERROR at setup of test_product_run_log_contains_product_hit __________
+
+cleaned_log = None, trial_id = 'composite_retriever_py__Z5tGTqF'
+
+    @pytest.fixture(scope="session")
+    def faq_run(cleaned_log, trial_id):
+        """Run the FAQ query and capture stdout."""
+        result = subprocess.run(
+            ["python3", SCRIPT_PATH, "--query", FAQ_QUERY],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
+>       assert result.returncode == 0, (
+            f"run_retrieval.py exited with non-zero for FAQ query.\n"
+            f"stdout=\n{result.stdout}\nstderr=\n{result.stderr}"
+        )
+E       AssertionError: run_retrieval.py exited with non-zero for FAQ query.
+E         stdout=
+E         Deleting pipeline: product-docs-composite_retriever_py__Z5tGTqF (35ced14c-99c3-4ee5-9727-9bd21b0aef6f)
+E         Creating/Loading product index: product-docs-composite_retriever_py__Z5tGTqF
+E         
+E         stderr=
+E         /usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py:548: DeprecationWarning: Call to deprecated class LlamaCloudIndex. (llama-index-indices-managed-llama-cloud has been moved to llama-cloud-services (https://github.com/run-llama/llama_cloud_services) as of llama-cloud-services v0.6.55, thus llama-index-indices-managed-llama-cloud package will be deprecated and no longer maintained. Check out the LlamaCloud documentation for more information: https://docs.cloud.llamaindex.ai) -- Deprecated since version 0.9.1.
+E           return cls(
+E         Traceback (most recent call last):
+E           File "/home/user/myproject/run_retrieval.py", line 124, in <module>
+E             if __name__ == "__main__":
+E                 ^^^^^^^^^^^^^^^
+E           File "/home/user/myproject/run_retrieval.py", line 62, in run_retrieval
+E             print(f"Creating/Loading product index: {product_index_name}")
+E                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py", line 670, in from_documents
+E             index.wait_for_completion(
+E           File "/usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py", line 381, in wait_for_completion
+E             status_response = self._client.pipelines.get_pipeline_status(
+E                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/resources/pipelines/client.py", line 365, in get_pipeline_status
+E             raise ApiError(status_code=_response.status_code, body=_response_json)
+E         llama_cloud.core.api_error.ApiError: status_code: 404, body: {'detail': 'Pipeline a9f2ffef-5257-49c8-b02b-1771a0ef52b0 not found'}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '/home/user/myproject/run_retrieval.py', '--query', 'How do I reset my password?'], ...i_error.ApiError: status_code: 404, body: {\'detail\': \'Pipeline a9f2ffef-5257-49c8-b02b-1771a0ef52b0 not found\'}\n').returncode
+
+tests/test_final_state.py:80: AssertionError
+____________ ERROR at setup of test_product_run_stdout_matches_log _____________
+
+cleaned_log = None, trial_id = 'composite_retriever_py__Z5tGTqF'
+
+    @pytest.fixture(scope="session")
+    def faq_run(cleaned_log, trial_id):
+        """Run the FAQ query and capture stdout."""
+        result = subprocess.run(
+            ["python3", SCRIPT_PATH, "--query", FAQ_QUERY],
+            cwd=PROJECT_DIR,
+            capture_output=True,
+            text=True,
+            timeout=600,
+        )
+>       assert result.returncode == 0, (
+            f"run_retrieval.py exited with non-zero for FAQ query.\n"
+            f"stdout=\n{result.stdout}\nstderr=\n{result.stderr}"
+        )
+E       AssertionError: run_retrieval.py exited with non-zero for FAQ query.
+E         stdout=
+E         Deleting pipeline: product-docs-composite_retriever_py__Z5tGTqF (35ced14c-99c3-4ee5-9727-9bd21b0aef6f)
+E         Creating/Loading product index: product-docs-composite_retriever_py__Z5tGTqF
+E         
+E         stderr=
+E         /usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py:548: DeprecationWarning: Call to deprecated class LlamaCloudIndex. (llama-index-indices-managed-llama-cloud has been moved to llama-cloud-services (https://github.com/run-llama/llama_cloud_services) as of llama-cloud-services v0.6.55, thus llama-index-indices-managed-llama-cloud package will be deprecated and no longer maintained. Check out the LlamaCloud documentation for more information: https://docs.cloud.llamaindex.ai) -- Deprecated since version 0.9.1.
+E           return cls(
+E         Traceback (most recent call last):
+E           File "/home/user/myproject/run_retrieval.py", line 124, in <module>
+E             if __name__ == "__main__":
+E                 ^^^^^^^^^^^^^^^
+E           File "/home/user/myproject/run_retrieval.py", line 62, in run_retrieval
+E             print(f"Creating/Loading product index: {product_index_name}")
+E                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py", line 670, in from_documents
+E             index.wait_for_completion(
+E           File "/usr/local/lib/python3.12/dist-packages/llama_index/indices/managed/llama_cloud/base.py", line 381, in wait_for_completion
+E             status_response = self._client.pipelines.get_pipeline_status(
+E                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           File "/usr/local/lib/python3.12/dist-packages/llama_cloud/resources/pipelines/client.py", line 365, in get_pipeline_status
+E             raise ApiError(status_code=_response.status_code, body=_response_json)
+E         llama_cloud.core.api_error.ApiError: status_code: 404, body: {'detail': 'Pipeline a9f2ffef-5257-49c8-b02b-1771a0ef52b0 not found'}
+E         
+E       assert 1 == 0
+E        +  where 1 = CompletedProcess(args=['python3', '/home/user/myproject/run_retrieval.py', '--query', 'How do I reset my password?'], ...i_error.ApiError: status_code: 404, body: {\'detail\': \'Pipeline a9f2ffef-5257-49c8-b02b-1771a0ef52b0 not found\'}\n').returncode
+
+tests/test_final_state.py:80: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_file_exists
+ERROR tests/test_final_state.py::test_product_pipeline_exists_on_llamacloud
+ERROR tests/test_final_state.py::test_faq_pipeline_exists_on_llamacloud - Ass...
+ERROR tests/test_final_state.py::test_composite_retriever_exists_with_full_mode
+ERROR tests/test_final_state.py::test_faq_run_log_contains_faq_hit - Assertio...
+ERROR tests/test_final_state.py::test_faq_run_stdout_matches_log - AssertionE...
+ERROR tests/test_final_state.py::test_product_run_log_contains_product_hit - ...
+ERROR tests/test_final_state.py::test_product_run_stdout_matches_log - Assert...
+========================= 1 passed, 7 errors in 27.26s =========================

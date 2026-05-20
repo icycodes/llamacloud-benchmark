@@ -1,0 +1,50 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 6 items
+
+tests/test_final_state.py .....F                                         [100%]
+
+=================================== FAILURES ===================================
+_________________ test_parse_job_completed_via_llamacloud_api __________________
+
+    def test_parse_job_completed_via_llamacloud_api():
+        """Confirm the parse job exists on LlamaCloud and has reached a successful terminal state."""
+        assert os.path.isfile(LOG_PATH), f"Cannot validate job; log file {LOG_PATH} missing."
+        content = _read_text(LOG_PATH)
+        match = JOB_ID_RE.search(content)
+        assert match, "Could not extract a Parse job ID from parse.log."
+        job_id = match.group(1)
+    
+        api_key = os.environ.get("LLAMA_CLOUD_API_KEY")
+        assert api_key, "LLAMA_CLOUD_API_KEY must be set in the verifier environment."
+    
+        base_url = os.environ.get("LLAMA_CLOUD_BASE_URL", "https://api.cloud.llamaindex.ai")
+        url = f"{base_url.rstrip('/')}/api/v2/parse/{job_id}"
+        response = requests.get(
+            url,
+            headers={
+                "Accept": "application/json",
+                "Authorization": f"Bearer {api_key}",
+            },
+            timeout=60,
+        )
+>       assert response.status_code == 200, (
+            f"Failed to retrieve parse job {job_id} from LlamaCloud: "
+            f"HTTP {response.status_code} body={response.text!r}"
+        )
+E       AssertionError: Failed to retrieve parse job c502567c-565a-46e0-a90d-6bf27182887b from LlamaCloud: HTTP 404 body='{"detail":"Parse job not found"}'
+E       assert 404 == 200
+E        +  where 404 = <Response [404]>.status_code
+
+tests/test_final_state.py:85: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_file_exists
+PASSED tests/test_final_state.py::test_output_markdown_exists_and_non_empty
+PASSED tests/test_final_state.py::test_output_markdown_contains_expected_content
+PASSED tests/test_final_state.py::test_parse_log_exists
+PASSED tests/test_final_state.py::test_parse_log_lines_present
+FAILED tests/test_final_state.py::test_parse_job_completed_via_llamacloud_api
+========================= 1 failed, 5 passed in 0.83s ==========================

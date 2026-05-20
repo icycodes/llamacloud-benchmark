@@ -1,0 +1,148 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 7 items
+
+tests/test_final_state.py .....FF                                        [100%]
+
+=================================== FAILURES ===================================
+___________________ test_managed_index_exists_in_llama_cloud ___________________
+
+    def test_managed_index_exists_in_llama_cloud():
+        """Connect to LlamaCloud and verify the managed index actually exists."""
+        api_key = os.environ.get("LLAMA_CLOUD_API_KEY")
+        assert api_key, (
+            "Verifier requires LLAMA_CLOUD_API_KEY to be set to query LlamaCloud."
+        )
+        try:
+            from llama_index.indices.managed.llama_cloud import LlamaCloudIndex
+        except ImportError as exc:  # pragma: no cover
+            pytest.fail(
+                "Verifier requires `llama-index-indices-managed-llama-cloud` to be "
+                f"installed. Import failed: {exc}"
+            )
+    
+        expected_name = _expected_index_name()
+        try:
+>           index = LlamaCloudIndex(
+                name=expected_name,
+                project_name="default",
+                api_key=api_key,
+            )
+
+tests/test_final_state.py:110: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+usr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/base.py:134: in __init__
+    self.project, self.pipeline = resolve_project_and_pipeline(
+usr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/api_utils.py:74: in resolve_project_and_pipeline
+    project = resolve_project(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <llama_cloud.LlamaCloud object at 0x788d51473bf0>
+project_name = 'default', project_id = None, organization_id = None
+
+    def resolve_project(
+        client: LlamaCloud,
+        project_name: Optional[str],
+        project_id: Optional[str],
+        organization_id: Optional[str],
+    ) -> Project:
+        project: Optional[Project] = None
+        if project_id is not None:
+            project = client.projects.get(project_id=project_id)
+        elif project_name is not None:
+            projects = client.projects.list(organization_id=organization_id)
+            project = next((p for p in projects if p.name == project_name), None)
+            if project is None:
+>               raise ValueError(f"Project with name '{project_name}' not found.")
+E               ValueError: Project with name 'default' not found.
+
+usr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/api_utils.py:59: ValueError
+
+During handling of the above exception, another exception occurred:
+
+    def test_managed_index_exists_in_llama_cloud():
+        """Connect to LlamaCloud and verify the managed index actually exists."""
+        api_key = os.environ.get("LLAMA_CLOUD_API_KEY")
+        assert api_key, (
+            "Verifier requires LLAMA_CLOUD_API_KEY to be set to query LlamaCloud."
+        )
+        try:
+            from llama_index.indices.managed.llama_cloud import LlamaCloudIndex
+        except ImportError as exc:  # pragma: no cover
+            pytest.fail(
+                "Verifier requires `llama-index-indices-managed-llama-cloud` to be "
+                f"installed. Import failed: {exc}"
+            )
+    
+        expected_name = _expected_index_name()
+        try:
+            index = LlamaCloudIndex(
+                name=expected_name,
+                project_name="default",
+                api_key=api_key,
+            )
+        except Exception as exc:
+>           pytest.fail(
+                f"Could not connect to LlamaCloud managed index `{expected_name}` "
+                f"in project `default`: {exc}"
+            )
+E           Failed: Could not connect to LlamaCloud managed index `harbor-managed-index-create_managed_index_py__aadtNim` in project `default`: Project with name 'default' not found.
+
+tests/test_final_state.py:116: Failed
+__________ test_managed_index_retrieves_cat_content_from_llama_cloud ___________
+
+    def test_managed_index_retrieves_cat_content_from_llama_cloud():
+        """Re-issue the retrieval against LlamaCloud to confirm ingestion worked."""
+        api_key = os.environ.get("LLAMA_CLOUD_API_KEY")
+        assert api_key, (
+            "Verifier requires LLAMA_CLOUD_API_KEY to be set to query LlamaCloud."
+        )
+        from llama_index.indices.managed.llama_cloud import LlamaCloudIndex
+    
+        expected_name = _expected_index_name()
+>       index = LlamaCloudIndex(
+            name=expected_name,
+            project_name="default",
+            api_key=api_key,
+        )
+
+tests/test_final_state.py:138: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+usr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/base.py:134: in __init__
+    self.project, self.pipeline = resolve_project_and_pipeline(
+usr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/api_utils.py:74: in resolve_project_and_pipeline
+    project = resolve_project(
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <llama_cloud.LlamaCloud object at 0x788d191bef90>
+project_name = 'default', project_id = None, organization_id = None
+
+    def resolve_project(
+        client: LlamaCloud,
+        project_name: Optional[str],
+        project_id: Optional[str],
+        organization_id: Optional[str],
+    ) -> Project:
+        project: Optional[Project] = None
+        if project_id is not None:
+            project = client.projects.get(project_id=project_id)
+        elif project_name is not None:
+            projects = client.projects.list(organization_id=organization_id)
+            project = next((p for p in projects if p.name == project_name), None)
+            if project is None:
+>               raise ValueError(f"Project with name '{project_name}' not found.")
+E               ValueError: Project with name 'default' not found.
+
+usr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/api_utils.py:59: ValueError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_log_file_exists_and_non_empty
+PASSED tests/test_final_state.py::test_log_contains_index_name
+PASSED tests/test_final_state.py::test_log_contains_retrieved_nodes_count
+PASSED tests/test_final_state.py::test_log_contains_node_text_lines_matching_count
+PASSED tests/test_final_state.py::test_log_node_text_mentions_cat
+FAILED tests/test_final_state.py::test_managed_index_exists_in_llama_cloud - ...
+FAILED tests/test_final_state.py::test_managed_index_retrieves_cat_content_from_llama_cloud
+========================= 2 failed, 5 passed in 2.97s ==========================

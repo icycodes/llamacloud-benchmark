@@ -1,0 +1,7 @@
+{
+    "library_name": "LlamaCloud",
+    "task_name": "create_managed_index_ts",
+    "complexity_level": "simple set of 2-5 commands",
+    "research_plan_path": "plan.md",
+    "output_dir": "tasks/"
+}

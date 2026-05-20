@@ -1,0 +1,94 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 7,
+            "passed": 5,
+            "failed": 2,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1779160608149,
+            "stop": 1779160611131
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_log_file_exists_and_non_empty",
+                "status": "passed",
+                "duration": 1,
+                "start": 1779160608181,
+                "stop": 1779160608182,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_index_name",
+                "status": "passed",
+                "duration": 1,
+                "start": 1779160608183,
+                "stop": 1779160608184,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_retrieved_nodes_count",
+                "status": "passed",
+                "duration": 2,
+                "start": 1779160608185,
+                "stop": 1779160608187,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_node_text_lines_matching_count",
+                "status": "passed",
+                "duration": 2,
+                "start": 1779160608187,
+                "stop": 1779160608189,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_log_node_text_mentions_cat",
+                "status": "passed",
+                "duration": 1,
+                "start": 1779160608189,
+                "stop": 1779160608190,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_managed_index_exists_in_llama_cloud",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 2269,
+                "start": 1779160608191,
+                "stop": 1779160610460,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_managed_index_exists_in_llama_cloud():\n        \"\"\"Connect to LlamaCloud and verify the managed index actually exists.\"\"\"\n        api_key = os.environ.get(\"LLAMA_CLOUD_API_KEY\")\n        assert api_key, (\n            \"Verifier requires LLAMA_CLOUD_API_KEY to be set to query LlamaCloud.\"\n        )\n        try:\n            from llama_index.indices.managed.llama_cloud import LlamaCloudIndex\n        except ImportError as exc:  # pragma: no cover\n            pytest.fail(\n                \"Verifier requires `llama-index-indices-managed-llama-cloud` to be \"\n                f\"installed. Import failed: {exc}\"\n            )\n    \n        expected_name = _expected_index_name()\n        try:\n>           index = LlamaCloudIndex(\n                name=expected_name,\n                project_name=\"default\",\n                api_key=api_key,\n            )\n\ntests/test_final_state.py:110: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nusr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/base.py:134: in __init__\n    self.project, self.pipeline = resolve_project_and_pipeline(\nusr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/api_utils.py:74: in resolve_project_and_pipeline\n    project = resolve_project(\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nclient = <llama_cloud.LlamaCloud object at 0x788d51473bf0>\nproject_name = 'default', project_id = None, organization_id = None\n\n    def resolve_project(\n        client: LlamaCloud,\n        project_name: Optional[str],\n        project_id: Optional[str],\n        organization_id: Optional[str],\n    ) -> Project:\n        project: Optional[Project] = None\n        if project_id is not None:\n            project = client.projects.get(project_id=project_id)\n        elif project_name is not None:\n            projects = client.projects.list(organization_id=organization_id)\n            project = next((p for p in projects if p.name == project_name), None)\n            if project is None:\n>               raise ValueError(f\"Project with name '{project_name}' not found.\")\nE               ValueError: Project with name 'default' not found.\n\nusr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/api_utils.py:59: ValueError\n\nDuring handling of the above exception, another exception occurred:\n\n    def test_managed_index_exists_in_llama_cloud():\n        \"\"\"Connect to LlamaCloud and verify the managed index actually exists.\"\"\"\n        api_key = os.environ.get(\"LLAMA_CLOUD_API_KEY\")\n        assert api_key, (\n            \"Verifier requires LLAMA_CLOUD_API_KEY to be set to query LlamaCloud.\"\n        )\n        try:\n            from llama_index.indices.managed.llama_cloud import LlamaCloudIndex\n        except ImportError as exc:  # pragma: no cover\n            pytest.fail(\n                \"Verifier requires `llama-index-indices-managed-llama-cloud` to be \"\n                f\"installed. Import failed: {exc}\"\n            )\n    \n        expected_name = _expected_index_name()\n        try:\n            index = LlamaCloudIndex(\n                name=expected_name,\n                project_name=\"default\",\n                api_key=api_key,\n            )\n        except Exception as exc:\n>           pytest.fail(\n                f\"Could not connect to LlamaCloud managed index `{expected_name}` \"\n                f\"in project `default`: {exc}\"\n            )\nE           Failed: Could not connect to LlamaCloud managed index `harbor-managed-index-create_managed_index_py__aadtNim` in project `default`: Project with name 'default' not found.\n\ntests/test_final_state.py:116: Failed",
+                "message": "The test failed in the call phase due to an exception"
+            },
+            {
+                "name": "test_final_state.py::test_managed_index_retrieves_cat_content_from_llama_cloud",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 671,
+                "start": 1779160610460,
+                "stop": 1779160611131,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_managed_index_retrieves_cat_content_from_llama_cloud():\n        \"\"\"Re-issue the retrieval against LlamaCloud to confirm ingestion worked.\"\"\"\n        api_key = os.environ.get(\"LLAMA_CLOUD_API_KEY\")\n        assert api_key, (\n            \"Verifier requires LLAMA_CLOUD_API_KEY to be set to query LlamaCloud.\"\n        )\n        from llama_index.indices.managed.llama_cloud import LlamaCloudIndex\n    \n        expected_name = _expected_index_name()\n>       index = LlamaCloudIndex(\n            name=expected_name,\n            project_name=\"default\",\n            api_key=api_key,\n        )\n\ntests/test_final_state.py:138: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \nusr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/base.py:134: in __init__\n    self.project, self.pipeline = resolve_project_and_pipeline(\nusr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/api_utils.py:74: in resolve_project_and_pipeline\n    project = resolve_project(\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nclient = <llama_cloud.LlamaCloud object at 0x788d191bef90>\nproject_name = 'default', project_id = None, organization_id = None\n\n    def resolve_project(\n        client: LlamaCloud,\n        project_name: Optional[str],\n        project_id: Optional[str],\n        organization_id: Optional[str],\n    ) -> Project:\n        project: Optional[Project] = None\n        if project_id is not None:\n            project = client.projects.get(project_id=project_id)\n        elif project_name is not None:\n            projects = client.projects.list(organization_id=organization_id)\n            project = next((p for p in projects if p.name == project_name), None)\n            if project is None:\n>               raise ValueError(f\"Project with name '{project_name}' not found.\")\nE               ValueError: Project with name 'default' not found.\n\nusr/local/lib/python3.12/dist-packages/llama_cloud/lib/index/api_utils.py:59: ValueError",
+                "message": "The test failed in the call phase"
+            }
+        ]
+    }
+}

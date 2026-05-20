@@ -1,0 +1,73 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 5,
+            "passed": 4,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1779161236547,
+            "stop": 1779161251088
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_extract_script_exists",
+                "status": "passed",
+                "duration": 7487,
+                "start": 1779161236563,
+                "stop": 1779161244050,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_cli_runs_successfully",
+                "status": "passed",
+                "duration": 1,
+                "start": 1779161244050,
+                "stop": 1779161244051,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_result_json_has_expected_content",
+                "status": "passed",
+                "duration": 0,
+                "start": 1779161244051,
+                "stop": 1779161244051,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_extraction_agent_named_with_trial_id",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 375,
+                "start": 1779161244052,
+                "stop": 1779161244427,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "cli_first_run = CompletedProcess(args=['/usr/bin/python3', '/home/user/myproject/extract.py', '--input', '/home/user/myproject/sample_...les: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:02<00:00,  2.16s/it]\\nExtracting files: 100%|\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588\u2588| 1/1 [00:02<00:00,  2.16s/it]\\n')\n\n    def test_extraction_agent_named_with_trial_id(cli_first_run):\n        trial_id = _read_trial_id()\n        assert trial_id, \"Trial id read from /logs/artifacts/trial_id must not be empty.\"\n    \n>       from llama_cloud import LlamaCloud\nE       ImportError: cannot import name 'LlamaCloud' from 'llama_cloud' (/usr/local/lib/python3.12/dist-packages/llama_cloud/__init__.py)\n\ntests/test_final_state.py:122: ImportError",
+                "message": "The test failed in the call phase"
+            },
+            {
+                "name": "test_final_state.py::test_cli_is_idempotent",
+                "status": "passed",
+                "duration": 6661,
+                "start": 1779161244427,
+                "stop": 1779161251088,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

@@ -1,0 +1,29 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 5 items
+
+tests/test_final_state.py ...F.                                          [100%]
+
+=================================== FAILURES ===================================
+__________________ test_extraction_agent_named_with_trial_id ___________________
+
+cli_first_run = CompletedProcess(args=['/usr/bin/python3', '/home/user/myproject/extract.py', '--input', '/home/user/myproject/sample_...les: 100%|██████████| 1/1 [00:02<00:00,  2.16s/it]\nExtracting files: 100%|██████████| 1/1 [00:02<00:00,  2.16s/it]\n')
+
+    def test_extraction_agent_named_with_trial_id(cli_first_run):
+        trial_id = _read_trial_id()
+        assert trial_id, "Trial id read from /logs/artifacts/trial_id must not be empty."
+    
+>       from llama_cloud import LlamaCloud
+E       ImportError: cannot import name 'LlamaCloud' from 'llama_cloud' (/usr/local/lib/python3.12/dist-packages/llama_cloud/__init__.py)
+
+tests/test_final_state.py:122: ImportError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_extract_script_exists
+PASSED tests/test_final_state.py::test_cli_runs_successfully
+PASSED tests/test_final_state.py::test_result_json_has_expected_content
+PASSED tests/test_final_state.py::test_cli_is_idempotent
+FAILED tests/test_final_state.py::test_extraction_agent_named_with_trial_id
+========================= 1 failed, 4 passed in 14.54s =========================
