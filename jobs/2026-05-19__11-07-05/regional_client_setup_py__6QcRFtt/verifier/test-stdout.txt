@@ -1,0 +1,17 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 6 items
+
+tests/test_final_state.py ......                                         [100%]
+
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_file_exists
+PASSED tests/test_final_state.py::test_us_region_output
+PASSED tests/test_final_state.py::test_eu_region_output
+PASSED tests/test_final_state.py::test_region_argument_case_insensitive
+PASSED tests/test_final_state.py::test_unsupported_region_exits_non_zero
+PASSED tests/test_final_state.py::test_eu_url_matches_sdk_constant
+============================== 6 passed in 10.13s ==============================

@@ -1,0 +1,139 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 10,
+            "passed": 2,
+            "failed": 8,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1779160846456,
+            "stop": 1779160849564
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_log_contains_trial_id",
+                "status": "passed",
+                "duration": 1,
+                "start": 1779160846544,
+                "stop": 1779160846545,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_pipeline_ids",
+                "status": "passed",
+                "duration": 0,
+                "start": 1779160846546,
+                "stop": 1779160846546,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_retriever_id",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 28,
+                "start": 1779160846546,
+                "stop": 1779160846574,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "log_text = 'Trial ID: composite_retriever_ts__CvE736o\\nPolicies Pipeline ID: 7a8b978d-02be-4f7c-be81-e0be7dab5a6b\\nFAQ Pipeline ID: 7a8b978d-02be-4f7c-be81-e0be7dab5a6b\\n'\n\n    def test_log_contains_retriever_id(log_text):\n>       assert re.search(\n            r\"^Composite Retriever ID:\\s*[A-Za-z0-9\\-]+\\s*$\", log_text, re.MULTILINE\n        ), \"Log file must contain a 'Composite Retriever ID: <id>' line.\"\nE       AssertionError: Log file must contain a 'Composite Retriever ID: <id>' line.\nE       assert None\nE        +  where None = <function search at 0x720b242a7ba0>('^Composite Retriever ID:\\\\s*[A-Za-z0-9\\\\-]+\\\\s*$', 'Trial ID: composite_retriever_ts__CvE736o\\nPolicies Pipeline ID: 7a8b978d-02be-4f7c-be81-e0be7dab5a6b\\nFAQ Pipeline ID: 7a8b978d-02be-4f7c-be81-e0be7dab5a6b\\n', re.MULTILINE)\nE        +    where <function search at 0x720b242a7ba0> = re.search\nE        +    and   re.MULTILINE = re.MULTILINE\n\ntests/test_final_state.py:103: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_query",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 9,
+                "start": 1779160846575,
+                "stop": 1779160846584,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "log_text = 'Trial ID: composite_retriever_ts__CvE736o\\nPolicies Pipeline ID: 7a8b978d-02be-4f7c-be81-e0be7dab5a6b\\nFAQ Pipeline ID: 7a8b978d-02be-4f7c-be81-e0be7dab5a6b\\n'\n\n    def test_log_contains_query(log_text):\n        match = re.search(r\"^Query:\\s*(.+?)\\s*$\", log_text, re.MULTILINE)\n>       assert match, \"Log file must contain a 'Query: <query>' line.\"\nE       AssertionError: Log file must contain a 'Query: <query>' line.\nE       assert None\n\ntests/test_final_state.py:110: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_result_count",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 7,
+                "start": 1779160846584,
+                "stop": 1779160846591,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "log_text = 'Trial ID: composite_retriever_ts__CvE736o\\nPolicies Pipeline ID: 7a8b978d-02be-4f7c-be81-e0be7dab5a6b\\nFAQ Pipeline ID: 7a8b978d-02be-4f7c-be81-e0be7dab5a6b\\n'\n\n    def test_log_contains_result_count(log_text):\n        match = re.search(r\"^Result Count:\\s*(\\d+)\\s*$\", log_text, re.MULTILINE)\n>       assert match, \"Log file must contain a 'Result Count: <n>' line.\"\nE       AssertionError: Log file must contain a 'Result Count: <n>' line.\nE       assert None\n\ntests/test_final_state.py:116: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_node_score_lines",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 5,
+                "start": 1779160846591,
+                "stop": 1779160846596,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "log_text = 'Trial ID: composite_retriever_ts__CvE736o\\nPolicies Pipeline ID: 7a8b978d-02be-4f7c-be81-e0be7dab5a6b\\nFAQ Pipeline ID: 7a8b978d-02be-4f7c-be81-e0be7dab5a6b\\n'\n\n    def test_log_contains_node_score_lines(log_text):\n        matches = re.findall(\n            r\"^Node Score:\\s*[-+0-9.eE]+\\s*\\|\\s*Text:\\s*.+$\", log_text, re.MULTILINE\n        )\n>       assert len(matches) >= 1, (\n            \"Log file must contain at least one 'Node Score: <score> | Text: <text>' line.\"\n        )\nE       AssertionError: Log file must contain at least one 'Node Score: <score> | Text: <text>' line.\nE       assert 0 >= 1\nE        +  where 0 = len([])\n\ntests/test_final_state.py:125: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_pipelines_exist_in_llama_cloud",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 813,
+                "start": 1779160846597,
+                "stop": 1779160847410,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "expected_names = {'faq': 'faq-composite_retriever_ts__CvE736o', 'policies': 'policies-composite_retriever_ts__CvE736o', 'retriever': 'composite-retriever-composite_retriever_ts__CvE736o'}\n\n    def test_pipelines_exist_in_llama_cloud(expected_names):\n        pipelines = _list_pipelines()\n        names = {p.get(\"name\") for p in pipelines}\n>       assert expected_names[\"policies\"] in names, (\n            f\"Expected LlamaCloud pipeline '{expected_names['policies']}' was not found. \"\n            f\"Existing names sample: {list(names)[:20]}\"\n        )\nE       AssertionError: Expected LlamaCloud pipeline 'policies-composite_retriever_ts__CvE736o' was not found. Existing names sample: ['faq-composite_retriever_ts__Lz32jxt', 'product-docs-composite_retriever_py__Z5tGTqF', 'product-docs-composite_retriever_py__MtCrM8m', 'policies-composite_retriever_ts__Lz32jxt']\nE       assert 'policies-composite_retriever_ts__CvE736o' in {'faq-composite_retriever_ts__Lz32jxt', 'policies-composite_retriever_ts__Lz32jxt', 'product-docs-composite_retriever_py__MtCrM8m', 'product-docs-composite_retriever_py__Z5tGTqF'}\n\ntests/test_final_state.py:133: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_pipeline_ids_match_log",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 831,
+                "start": 1779160847410,
+                "stop": 1779160848241,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "log_text = 'Trial ID: composite_retriever_ts__CvE736o\\nPolicies Pipeline ID: 7a8b978d-02be-4f7c-be81-e0be7dab5a6b\\nFAQ Pipeline ID: 7a8b978d-02be-4f7c-be81-e0be7dab5a6b\\n'\nexpected_names = {'faq': 'faq-composite_retriever_ts__CvE736o', 'policies': 'policies-composite_retriever_ts__CvE736o', 'retriever': 'composite-retriever-composite_retriever_ts__CvE736o'}\n\n    def test_pipeline_ids_match_log(log_text, expected_names):\n        pipelines = _list_pipelines()\n        by_name = {p.get(\"name\"): p.get(\"id\") for p in pipelines}\n    \n        policies_log_match = re.search(\n            r\"^Policies Pipeline ID:\\s*([A-Za-z0-9\\-]+)\\s*$\", log_text, re.MULTILINE\n        )\n        faq_log_match = re.search(\n            r\"^FAQ Pipeline ID:\\s*([A-Za-z0-9\\-]+)\\s*$\", log_text, re.MULTILINE\n        )\n        assert policies_log_match and faq_log_match, (\n            \"Log file must contain both 'Policies Pipeline ID' and 'FAQ Pipeline ID' lines.\"\n        )\n    \n        policies_logged_id = policies_log_match.group(1)\n        faq_logged_id = faq_log_match.group(1)\n    \n>       assert by_name.get(expected_names[\"policies\"]) == policies_logged_id, (\n            f\"Policies pipeline ID in log ({policies_logged_id}) does not match the LlamaCloud \"\n            f\"pipeline ID for '{expected_names['policies']}' ({by_name.get(expected_names['policies'])}).\"\n        )\nE       AssertionError: Policies pipeline ID in log (7a8b978d-02be-4f7c-be81-e0be7dab5a6b) does not match the LlamaCloud pipeline ID for 'policies-composite_retriever_ts__CvE736o' (None).\nE       assert None == '7a8b978d-02be-4f7c-be81-e0be7dab5a6b'\nE        +  where None = <built-in method get of dict object at 0x720b22d1b400>('policies-composite_retriever_ts__CvE736o')\nE        +    where <built-in method get of dict object at 0x720b22d1b400> = {'faq-composite_retriever_ts__Lz32jxt': '40e0c062-2355-49d5-9cea-809be3392f06', 'policies-composite_retriever_ts__Lz32...d-02be-4f7c-be81-e0be7dab5a6b', 'product-docs-composite_retriever_py__Z5tGTqF': '01bf56a0-e5a4-4e1f-8db4-1d0704aafca6'}.get\n\ntests/test_final_state.py:160: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_retriever_exists_and_references_both_pipelines",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 674,
+                "start": 1779160848242,
+                "stop": 1779160848916,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "log_text = 'Trial ID: composite_retriever_ts__CvE736o\\nPolicies Pipeline ID: 7a8b978d-02be-4f7c-be81-e0be7dab5a6b\\nFAQ Pipeline ID: 7a8b978d-02be-4f7c-be81-e0be7dab5a6b\\n'\nexpected_names = {'faq': 'faq-composite_retriever_ts__CvE736o', 'policies': 'policies-composite_retriever_ts__CvE736o', 'retriever': 'composite-retriever-composite_retriever_ts__CvE736o'}\n\n    def test_retriever_exists_and_references_both_pipelines(log_text, expected_names):\n        retrievers = _list_retrievers()\n        matching = [r for r in retrievers if r.get(\"name\") == expected_names[\"retriever\"]]\n>       assert matching, (\n            f\"Expected LlamaCloud retriever '{expected_names['retriever']}' was not found.\"\n        )\nE       AssertionError: Expected LlamaCloud retriever 'composite-retriever-composite_retriever_ts__CvE736o' was not found.\nE       assert []\n\ntests/test_final_state.py:173: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            },
+            {
+                "name": "test_final_state.py::test_retriever_returns_nodes_on_search",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 646,
+                "start": 1779160848917,
+                "stop": 1779160849563,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "expected_names = {'faq': 'faq-composite_retriever_ts__CvE736o', 'policies': 'policies-composite_retriever_ts__CvE736o', 'retriever': 'composite-retriever-composite_retriever_ts__CvE736o'}\n\n    def test_retriever_returns_nodes_on_search(expected_names):\n        retrievers = _list_retrievers()\n        matching = [r for r in retrievers if r.get(\"name\") == expected_names[\"retriever\"]]\n>       assert matching, (\n            f\"Expected LlamaCloud retriever '{expected_names['retriever']}' was not found.\"\n        )\nE       AssertionError: Expected LlamaCloud retriever 'composite-retriever-composite_retriever_ts__CvE736o' was not found.\nE       assert []\n\ntests/test_final_state.py:206: AssertionError",
+                "message": "The test failed in the call phase due to an assertion error"
+            }
+        ]
+    }
+}

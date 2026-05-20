@@ -1,0 +1,101 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 10 items
+
+tests/test_final_state.py ...F..F..F                                     [100%]
+
+=================================== FAILURES ===================================
+_______________ test_index_contains_seeded_files_after_first_run _______________
+
+first_run_result = CompletedProcess(args=['/usr/bin/python3', '/home/user/myproject/sync.py', '--folder', '/home/user/myproject/data', '-...s the same functionality with improved performance and support.\n  from llama_cloud_services import LlamaCloudIndex\n')
+
+    def test_index_contains_seeded_files_after_first_run(first_run_result):
+        assert first_run_result.returncode == 0, (
+            "Skipping cloud-side check because the first sync run did not "
+            "succeed."
+        )
+>       names = _list_pipeline_file_names()
+
+tests/test_final_state.py:107: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _list_pipeline_file_names() -> list:
+        from llama_cloud_services import LlamaCloudIndex
+    
+        index = LlamaCloudIndex(
+            name=_index_name(),
+            project_name=PROJECT_NAME,
+        )
+        pipeline_id = index.pipeline.id
+        client = index._client
+>       files = list(client.pipelines.list_pipeline_files(pipeline_id=pipeline_id))
+E       AttributeError: 'PipelinesClient' object has no attribute 'list_pipeline_files'. Did you mean: 'list_pipeline_documents'?
+
+tests/test_final_state.py:62: AttributeError
+__________ test_index_has_no_duplicate_seeded_files_after_second_run ___________
+
+second_run_result = CompletedProcess(args=['/usr/bin/python3', '/home/user/myproject/sync.py', '--folder', '/home/user/myproject/data', '-...s the same functionality with improved performance and support.\n  from llama_cloud_services import LlamaCloudIndex\n')
+
+    def test_index_has_no_duplicate_seeded_files_after_second_run(second_run_result):
+>       names = _list_pipeline_file_names()
+
+tests/test_final_state.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _list_pipeline_file_names() -> list:
+        from llama_cloud_services import LlamaCloudIndex
+    
+        index = LlamaCloudIndex(
+            name=_index_name(),
+            project_name=PROJECT_NAME,
+        )
+        pipeline_id = index.pipeline.id
+        client = index._client
+>       files = list(client.pipelines.list_pipeline_files(pipeline_id=pipeline_id))
+E       AttributeError: 'PipelinesClient' object has no attribute 'list_pipeline_files'. Did you mean: 'list_pipeline_documents'?
+
+tests/test_final_state.py:62: AttributeError
+_____________ test_index_contains_all_three_files_after_third_run ______________
+
+third_run_result = CompletedProcess(args=['/usr/bin/python3', '/home/user/myproject/sync.py', '--folder', '/home/user/myproject/data', '-...s the same functionality with improved performance and support.\n  from llama_cloud_services import LlamaCloudIndex\n')
+
+    def test_index_contains_all_three_files_after_third_run(third_run_result):
+>       names = _list_pipeline_file_names()
+
+tests/test_final_state.py:181: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    def _list_pipeline_file_names() -> list:
+        from llama_cloud_services import LlamaCloudIndex
+    
+        index = LlamaCloudIndex(
+            name=_index_name(),
+            project_name=PROJECT_NAME,
+        )
+        pipeline_id = index.pipeline.id
+        client = index._client
+>       files = list(client.pipelines.list_pipeline_files(pipeline_id=pipeline_id))
+E       AttributeError: 'PipelinesClient' object has no attribute 'list_pipeline_files'. Did you mean: 'list_pipeline_documents'?
+
+tests/test_final_state.py:62: AttributeError
+=============================== warnings summary ===============================
+test_final_state.py::test_index_contains_seeded_files_after_first_run
+  /tests/test_final_state.py:54: DeprecationWarning: This package (llama-cloud-services) is deprecated and will be maintained until May 1, 2026. Please migrate to the new package: pip install llama-cloud>=1.0 (https://github.com/run-llama/llama-cloud-py). The new package provides the same functionality with improved performance and support.
+    from llama_cloud_services import LlamaCloudIndex
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_sync_script_exists
+PASSED tests/test_final_state.py::test_first_run_exits_successfully
+PASSED tests/test_final_state.py::test_first_run_reports_two_new_files
+PASSED tests/test_final_state.py::test_second_run_exits_successfully
+PASSED tests/test_final_state.py::test_second_run_reports_zero_new_files
+PASSED tests/test_final_state.py::test_third_run_exits_successfully
+PASSED tests/test_final_state.py::test_third_run_reports_only_gamma_uploaded
+FAILED tests/test_final_state.py::test_index_contains_seeded_files_after_first_run
+FAILED tests/test_final_state.py::test_index_has_no_duplicate_seeded_files_after_second_run
+FAILED tests/test_final_state.py::test_index_contains_all_three_files_after_third_run
+=================== 3 failed, 7 passed, 1 warning in 39.32s ====================

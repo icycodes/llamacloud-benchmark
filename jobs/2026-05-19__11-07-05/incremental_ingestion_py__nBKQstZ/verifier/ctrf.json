@@ -1,0 +1,124 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 10,
+            "passed": 7,
+            "failed": 3,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1779161120518,
+            "stop": 1779161159836
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_sync_script_exists",
+                "status": "passed",
+                "duration": 21976,
+                "start": 1779161120533,
+                "stop": 1779161142509,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_first_run_exits_successfully",
+                "status": "passed",
+                "duration": 2,
+                "start": 1779161142510,
+                "stop": 1779161142512,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_first_run_reports_two_new_files",
+                "status": "passed",
+                "duration": 2,
+                "start": 1779161142512,
+                "stop": 1779161142514,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_index_contains_seeded_files_after_first_run",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 2522,
+                "start": 1779161142514,
+                "stop": 1779161145036,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "first_run_result = CompletedProcess(args=['/usr/bin/python3', '/home/user/myproject/sync.py', '--folder', '/home/user/myproject/data', '-...s the same functionality with improved performance and support.\\n  from llama_cloud_services import LlamaCloudIndex\\n')\n\n    def test_index_contains_seeded_files_after_first_run(first_run_result):\n        assert first_run_result.returncode == 0, (\n            \"Skipping cloud-side check because the first sync run did not \"\n            \"succeed.\"\n        )\n>       names = _list_pipeline_file_names()\n\ntests/test_final_state.py:107: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\n    def _list_pipeline_file_names() -> list:\n        from llama_cloud_services import LlamaCloudIndex\n    \n        index = LlamaCloudIndex(\n            name=_index_name(),\n            project_name=PROJECT_NAME,\n        )\n        pipeline_id = index.pipeline.id\n        client = index._client\n>       files = list(client.pipelines.list_pipeline_files(pipeline_id=pipeline_id))\nE       AttributeError: 'PipelinesClient' object has no attribute 'list_pipeline_files'. Did you mean: 'list_pipeline_documents'?\n\ntests/test_final_state.py:62: AttributeError",
+                "message": "The test failed in the call phase"
+            },
+            {
+                "name": "test_final_state.py::test_second_run_exits_successfully",
+                "status": "passed",
+                "duration": 4212,
+                "start": 1779161145037,
+                "stop": 1779161149249,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_second_run_reports_zero_new_files",
+                "status": "passed",
+                "duration": 1,
+                "start": 1779161149250,
+                "stop": 1779161149251,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_index_has_no_duplicate_seeded_files_after_second_run",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 907,
+                "start": 1779161149252,
+                "stop": 1779161150159,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "second_run_result = CompletedProcess(args=['/usr/bin/python3', '/home/user/myproject/sync.py', '--folder', '/home/user/myproject/data', '-...s the same functionality with improved performance and support.\\n  from llama_cloud_services import LlamaCloudIndex\\n')\n\n    def test_index_has_no_duplicate_seeded_files_after_second_run(second_run_result):\n>       names = _list_pipeline_file_names()\n\ntests/test_final_state.py:142: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\n    def _list_pipeline_file_names() -> list:\n        from llama_cloud_services import LlamaCloudIndex\n    \n        index = LlamaCloudIndex(\n            name=_index_name(),\n            project_name=PROJECT_NAME,\n        )\n        pipeline_id = index.pipeline.id\n        client = index._client\n>       files = list(client.pipelines.list_pipeline_files(pipeline_id=pipeline_id))\nE       AttributeError: 'PipelinesClient' object has no attribute 'list_pipeline_files'. Did you mean: 'list_pipeline_documents'?\n\ntests/test_final_state.py:62: AttributeError",
+                "message": "The test failed in the call phase"
+            },
+            {
+                "name": "test_final_state.py::test_third_run_exits_successfully",
+                "status": "passed",
+                "duration": 8652,
+                "start": 1779161150159,
+                "stop": 1779161158811,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_third_run_reports_only_gamma_uploaded",
+                "status": "passed",
+                "duration": 1,
+                "start": 1779161158811,
+                "stop": 1779161158812,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_index_contains_all_three_files_after_third_run",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 1024,
+                "start": 1779161158812,
+                "stop": 1779161159836,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "third_run_result = CompletedProcess(args=['/usr/bin/python3', '/home/user/myproject/sync.py', '--folder', '/home/user/myproject/data', '-...s the same functionality with improved performance and support.\\n  from llama_cloud_services import LlamaCloudIndex\\n')\n\n    def test_index_contains_all_three_files_after_third_run(third_run_result):\n>       names = _list_pipeline_file_names()\n\ntests/test_final_state.py:181: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\n    def _list_pipeline_file_names() -> list:\n        from llama_cloud_services import LlamaCloudIndex\n    \n        index = LlamaCloudIndex(\n            name=_index_name(),\n            project_name=PROJECT_NAME,\n        )\n        pipeline_id = index.pipeline.id\n        client = index._client\n>       files = list(client.pipelines.list_pipeline_files(pipeline_id=pipeline_id))\nE       AttributeError: 'PipelinesClient' object has no attribute 'list_pipeline_files'. Did you mean: 'list_pipeline_documents'?\n\ntests/test_final_state.py:62: AttributeError",
+                "message": "The test failed in the call phase"
+            }
+        ]
+    }
+}

@@ -1,0 +1,98 @@
+Skipping image OS validation for hb__extract_structured_data_py: docker inspect returned 1
+Running command: apt-get update && apt-get install -y curl ripgrep
+Command outputs captured
+Running command: set -euo pipefail; curl -fsSL https://getpochi.com/install.sh | bash -x -s -- pochi-v0.6.8 && mkdir -p /logs/agent/pochi && ~/.pochi/bin/pochi --version
+Command outputs captured
+Running command: ln -sf ~/.pochi/bin/pochi /usr/local/bin/pochi
+Command outputs captured
+Running command: echo extract_structured_data_py__QRG3E9o > /logs/artifacts/trial_id
+Command outputs captured
+Running command: mkdir -p ~/.pochi && cat << 'EOF' | sed -e "s/OPENAI_API_KEY/${OPENAI_API_KEY}/g" -e "s/DEEPINFRA_API_KEY/${DEEPINFRA_API_KEY}/g" -e "s/ANTHROPIC_API_KEY/${ANTHROPIC_API_KEY}/g" > ~/.pochi/config.jsonc
+{
+  "providers": {
+    "deepinfra": {
+      "kind": "openai",
+      "baseURL": "https://api.deepinfra.com/v1/openai",
+      "apiKey": "DEEPINFRA_API_KEY",
+      "models": {
+        "zai-org/GLM-4.7-Flash": {
+          "name": "glm-4.7-flash"
+        },
+        "moonshotai/Kimi-K2.6": {
+          "name": "kimi-K2.6"
+        },
+        "deepseek-ai/DeepSeek-V4-Pro": {
+          "name": "DeepSeek-V4-Pro"
+        }
+      }
+    },
+    "anthropic": {
+      "kind": "openai",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": "ANTHROPIC_API_KEY",
+      "models": {
+        "claude-opus-4-6": {
+          "name": "claude-opus-4-6"
+        }
+      }
+    },
+    "openai": {
+      "kind": "openai",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": "OPENAI_API_KEY",
+      "models": {
+        "gpt-5.4": {
+          "name": "gpt-5.4"
+        }
+      }
+    }
+  }
+}
+EOF
+Command outputs captured
+Running command: export PATH="$HOME/.pochi/bin:$PATH"; pochi --model google/gemini-3-flash --max-steps 200 --max-retries 10 --blobs-dir /logs/agent/pochi/blobs --experimental-stream-trajectory /logs/agent/pochi/trajectory.jsonl > >(tee /logs/agent/pochi/stdout.txt) 2> >(tee /logs/agent/pochi/stderr.txt >&2) <<'EOF'
+# Extract Structured Resume Data with LlamaExtract (Python)
+
+## Background
+LlamaCloud's LlamaExtract service turns unstructured documents (PDFs, text files, etc.) into JSON that conforms to a user-defined schema. In this task you will build a small, rerunnable command-line tool that uses the LlamaExtract Python SDK (`llama-cloud-services`) to extract structured information from a candidate's resume and write the result to a JSON file.
+
+## Requirements
+- Build a Python CLI at `/home/user/myproject/extract.py` that:
+  - Accepts the path to a resume file as `--input` and the path to a JSON output file as `--output`.
+  - Reads the `LLAMA_CLOUD_API_KEY` from the environment (it will already be exported).
+  - Defines a Pydantic schema named `Resume` with the fields `name: str`, `email: str`, and `skills: list[str]`.
+  - Uses `LlamaExtract` (from `llama_cloud_services`) to create or reuse an extraction agent and run extraction on the input file.
+  - Writes the extracted data as a JSON object to the `--output` path with the keys `name`, `email`, and `skills`.
+  - Exits with status code `0` on success and prints `Extraction completed: <output_path>` to stdout when finished.
+
+## Implementation Hints
+- Use the legacy Python SDK package `llama-cloud-services` (`pip install llama-cloud-services`). It exposes `LlamaExtract` and accepts a Pydantic model as `data_schema` when creating an agent.
+- To avoid collisions when this task runs concurrently across trials, name the extraction agent using the `trial_id` read from `/logs/artifacts/trial_id` (for example, `resume-parser-${trial_id}`). If an agent with that name already exists, reuse it instead of failing.
+- The `LlamaExtract` client picks up `LLAMA_CLOUD_API_KEY` from the environment automatically.
+- `agent.extract(<path>)` returns a result whose `.data` attribute is a dict that matches the schema; serialize it with `json.dump`.
+- Make the script idempotent: it should succeed when run multiple times on the same input.
+
+## Acceptance Criteria
+- Project path: /home/user/myproject
+- Command: `python3 /home/user/myproject/extract.py --input <input_path> --output <output_path>`
+- Input arguments:
+  - `--input <input_path>`: Path to an existing resume file (plain text or PDF).
+  - `--output <output_path>`: Path where the extracted JSON will be written.
+- The command must exit with status `0` and print a line in the format `Extraction completed: <output_path>` to stdout.
+- The output file must be a valid JSON object containing exactly the keys `name`, `email`, and `skills` with the shape:
+
+  ```json
+  {
+    "name": string,
+    "email": string,
+    "skills": [string, ...]
+  }
+  ```
+
+- The extraction agent created (or reused) on LlamaCloud must be named `resume-parser-${trial_id}` where `trial_id` is read from `/logs/artifacts/trial_id`.
+
+
+EOF
+Command outputs captured
+Running command: rm -f ~/.pochi/config.jsonc
+Command outputs captured

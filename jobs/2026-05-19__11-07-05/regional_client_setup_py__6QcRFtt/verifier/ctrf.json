@@ -1,0 +1,79 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 6,
+            "passed": 6,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1779160545873,
+            "stop": 1779160556008
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_file_exists",
+                "status": "passed",
+                "duration": 1,
+                "start": 1779160545890,
+                "stop": 1779160545891,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_us_region_output",
+                "status": "passed",
+                "duration": 1648,
+                "start": 1779160545891,
+                "stop": 1779160547539,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_eu_region_output",
+                "status": "passed",
+                "duration": 1726,
+                "start": 1779160547540,
+                "stop": 1779160549266,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_region_argument_case_insensitive",
+                "status": "passed",
+                "duration": 1675,
+                "start": 1779160549266,
+                "stop": 1779160550941,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_unsupported_region_exits_non_zero",
+                "status": "passed",
+                "duration": 1871,
+                "start": 1779160550941,
+                "stop": 1779160552812,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_eu_url_matches_sdk_constant",
+                "status": "passed",
+                "duration": 3194,
+                "start": 1779160552813,
+                "stop": 1779160556007,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

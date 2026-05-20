@@ -1,0 +1,7 @@
+{
+  "library_name": "LlamaCloud",
+  "task_name": "create_managed_index_py",
+  "complexity_level": "multi-step sequential command set",
+  "research_plan_path": "plan.md",
+  "output_dir": "tasks/"
+}
