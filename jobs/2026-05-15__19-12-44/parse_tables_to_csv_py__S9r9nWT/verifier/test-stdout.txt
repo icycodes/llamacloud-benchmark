@@ -1,0 +1,140 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 7 items
+
+tests/test_final_state.py FFEEEEE                                        [100%]
+
+==================================== ERRORS ====================================
+_______________ ERROR at setup of test_script_runs_successfully ________________
+
+    @pytest.fixture(scope="module")
+    def run_extract_tables():
+        """Run the executor's script and yield the resulting CompletedProcess."""
+        # Cleanup any pre-existing artifacts so we verify newly produced output.
+        if os.path.isdir(TABLES_DIR):
+            shutil.rmtree(TABLES_DIR)
+        if os.path.isfile(LOG_PATH):
+            os.remove(LOG_PATH)
+    
+>       assert os.path.isfile(SCRIPT_PATH), (
+            f"Expected the executor to create the script {SCRIPT_PATH}."
+        )
+E       AssertionError: Expected the executor to create the script /home/user/tables_task/extract_tables.py.
+E       assert False
+E        +  where False = <function isfile at 0x77d647a7c220>('/home/user/tables_task/extract_tables.py')
+E        +    where <function isfile at 0x77d647a7c220> = <module 'posixpath' (frozen)>.isfile
+E        +      where <module 'posixpath' (frozen)> = os.path
+
+tests/test_final_state.py:47: AssertionError
+___________ ERROR at setup of test_csv_directory_contains_two_tables ___________
+
+    @pytest.fixture(scope="module")
+    def run_extract_tables():
+        """Run the executor's script and yield the resulting CompletedProcess."""
+        # Cleanup any pre-existing artifacts so we verify newly produced output.
+        if os.path.isdir(TABLES_DIR):
+            shutil.rmtree(TABLES_DIR)
+        if os.path.isfile(LOG_PATH):
+            os.remove(LOG_PATH)
+    
+>       assert os.path.isfile(SCRIPT_PATH), (
+            f"Expected the executor to create the script {SCRIPT_PATH}."
+        )
+E       AssertionError: Expected the executor to create the script /home/user/tables_task/extract_tables.py.
+E       assert False
+E        +  where False = <function isfile at 0x77d647a7c220>('/home/user/tables_task/extract_tables.py')
+E        +    where <function isfile at 0x77d647a7c220> = <module 'posixpath' (frozen)>.isfile
+E        +      where <module 'posixpath' (frozen)> = os.path
+
+tests/test_final_state.py:47: AssertionError
+______ ERROR at setup of test_first_csv_contains_department_revenue_table ______
+
+    @pytest.fixture(scope="module")
+    def run_extract_tables():
+        """Run the executor's script and yield the resulting CompletedProcess."""
+        # Cleanup any pre-existing artifacts so we verify newly produced output.
+        if os.path.isdir(TABLES_DIR):
+            shutil.rmtree(TABLES_DIR)
+        if os.path.isfile(LOG_PATH):
+            os.remove(LOG_PATH)
+    
+>       assert os.path.isfile(SCRIPT_PATH), (
+            f"Expected the executor to create the script {SCRIPT_PATH}."
+        )
+E       AssertionError: Expected the executor to create the script /home/user/tables_task/extract_tables.py.
+E       assert False
+E        +  where False = <function isfile at 0x77d647a7c220>('/home/user/tables_task/extract_tables.py')
+E        +    where <function isfile at 0x77d647a7c220> = <module 'posixpath' (frozen)>.isfile
+E        +      where <module 'posixpath' (frozen)> = os.path
+
+tests/test_final_state.py:47: AssertionError
+____ ERROR at setup of test_second_csv_contains_top_selling_products_table _____
+
+    @pytest.fixture(scope="module")
+    def run_extract_tables():
+        """Run the executor's script and yield the resulting CompletedProcess."""
+        # Cleanup any pre-existing artifacts so we verify newly produced output.
+        if os.path.isdir(TABLES_DIR):
+            shutil.rmtree(TABLES_DIR)
+        if os.path.isfile(LOG_PATH):
+            os.remove(LOG_PATH)
+    
+>       assert os.path.isfile(SCRIPT_PATH), (
+            f"Expected the executor to create the script {SCRIPT_PATH}."
+        )
+E       AssertionError: Expected the executor to create the script /home/user/tables_task/extract_tables.py.
+E       assert False
+E        +  where False = <function isfile at 0x77d647a7c220>('/home/user/tables_task/extract_tables.py')
+E        +    where <function isfile at 0x77d647a7c220> = <module 'posixpath' (frozen)>.isfile
+E        +      where <module 'posixpath' (frozen)> = os.path
+
+tests/test_final_state.py:47: AssertionError
+______________ ERROR at setup of test_log_contains_expected_lines ______________
+
+    @pytest.fixture(scope="module")
+    def run_extract_tables():
+        """Run the executor's script and yield the resulting CompletedProcess."""
+        # Cleanup any pre-existing artifacts so we verify newly produced output.
+        if os.path.isdir(TABLES_DIR):
+            shutil.rmtree(TABLES_DIR)
+        if os.path.isfile(LOG_PATH):
+            os.remove(LOG_PATH)
+    
+>       assert os.path.isfile(SCRIPT_PATH), (
+            f"Expected the executor to create the script {SCRIPT_PATH}."
+        )
+E       AssertionError: Expected the executor to create the script /home/user/tables_task/extract_tables.py.
+E       assert False
+E        +  where False = <function isfile at 0x77d647a7c220>('/home/user/tables_task/extract_tables.py')
+E        +    where <function isfile at 0x77d647a7c220> = <module 'posixpath' (frozen)>.isfile
+E        +      where <module 'posixpath' (frozen)> = os.path
+
+tests/test_final_state.py:47: AssertionError
+=================================== FAILURES ===================================
+_______________________ test_script_uses_llama_cloud_sdk _______________________
+
+    def test_script_uses_llama_cloud_sdk():
+        """The script must import the official llama_cloud SDK (v2 API)."""
+>       with open(SCRIPT_PATH, "r", encoding="utf-8") as handle:
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/user/tables_task/extract_tables.py'
+
+tests/test_final_state.py:63: FileNotFoundError
+_____________________ test_script_configures_items_expand ______________________
+
+    def test_script_configures_items_expand():
+        """The script must request the items tree via expand=['items']."""
+>       with open(SCRIPT_PATH, "r", encoding="utf-8") as handle:
+E       FileNotFoundError: [Errno 2] No such file or directory: '/home/user/tables_task/extract_tables.py'
+
+tests/test_final_state.py:73: FileNotFoundError
+=========================== short test summary info ============================
+ERROR tests/test_final_state.py::test_script_runs_successfully - AssertionErr...
+ERROR tests/test_final_state.py::test_csv_directory_contains_two_tables - Ass...
+ERROR tests/test_final_state.py::test_first_csv_contains_department_revenue_table
+ERROR tests/test_final_state.py::test_second_csv_contains_top_selling_products_table
+ERROR tests/test_final_state.py::test_log_contains_expected_lines - Assertion...
+FAILED tests/test_final_state.py::test_script_uses_llama_cloud_sdk - FileNotF...
+FAILED tests/test_final_state.py::test_script_configures_items_expand - FileN...
+========================= 2 failed, 5 errors in 0.06s ==========================

@@ -1,0 +1,7 @@
+{
+    "library_name": "LlamaCloud",
+    "task_name": "parse_target_pages_py",
+    "complexity_level": "simple set of 2-5 commands",
+    "deep_research_path": "plan.md",
+    "output_dir": "tasks/"
+}

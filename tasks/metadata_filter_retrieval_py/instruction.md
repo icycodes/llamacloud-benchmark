@@ -1,0 +1,49 @@
+# Retrieve from a LlamaCloud Managed Index Using Metadata Filters (Python)
+
+## Background
+LlamaCloud managed indices store the metadata attached to every ingested document and let you constrain retrieval to a subset of those documents at query time via LlamaIndex's `MetadataFilters` API. This is critical for multi-tenant RAG pipelines and for any application that wants to keep its documents in a single managed index but answer questions against only one slice of them (for example, only the documents whose `category` is `finance`).
+
+In this task you must build a small Python program that creates a brand-new LlamaCloud managed index whose documents have explicit `category` metadata, and then performs **two** retrievals against that managed index: one filtered by `category == "finance"` and one filtered by `category == "sports"`. The retrieved context must reflect the filter so that a downstream verifier can confirm the filtering actually took effect.
+
+The task workspace `/home/user/metadata_filter_task` already contains three small text corpora under `/home/user/metadata_filter_task/data`, each in its own subdirectory named after its category:
+- `/home/user/metadata_filter_task/data/finance/finance.txt` — a fact about a corporate quarterly revenue figure.
+- `/home/user/metadata_filter_task/data/sports/sports.txt` — a fact about a tennis championship winner.
+- `/home/user/metadata_filter_task/data/geography/geography.txt` — a fact about a fictional mountain.
+
+Each seeded file contains a single deterministic distinctive phrase that does not appear in any of the other files, so that the verifier can tell exactly which document the retriever returned.
+
+## Requirements
+- Read the current `trial_id` from `/logs/artifacts/trial_id`.
+- Build a Python script `filter_retrieve.py` in `/home/user/metadata_filter_task` that:
+  - Authenticates against LlamaCloud using the `LLAMA_CLOUD_API_KEY` environment variable.
+  - Constructs `llama_index.core.Document` objects for **every** seeded file. Each `Document` must include a `category` metadata field whose value is the name of the parent subdirectory (i.e. `finance`, `sports`, or `geography`). The text content of each `Document` must be the contents of the corresponding seed file.
+  - Creates a brand-new LlamaCloud managed index whose name is `harbor-metadata-filter-index-${trial_id}` (the literal base name `harbor-metadata-filter-index-` followed by the value read from `/logs/artifacts/trial_id`) inside the `Default` project, populated with **all** of the constructed documents at once. The index must use the managed embeddings provided by LlamaCloud (no separate OpenAI key is required).
+  - Performs **two** retrievals against the **same** managed index using `index.as_retriever(filters=MetadataFilters(...), similarity_top_k=5)`:
+    1. A retrieval with a metadata filter requiring `category == "finance"` for the query `What were the company quarterly results?`.
+    2. A retrieval with a metadata filter requiring `category == "sports"` for the query `Who won the tennis championship?`.
+  - Writes a log file `/home/user/metadata_filter_task/output.log` summarizing the workflow so the verifier can inspect both retrievals (see Acceptance Criteria for the exact lines and sections that must appear).
+- The script must run end-to-end with `python3 filter_retrieve.py` and exit with status code `0`.
+
+## Implementation Hints
+- The managed-index integration is `llama_index.indices.managed.llama_cloud.LlamaCloudIndex` (already pre-installed). `LlamaCloudIndex.from_documents(documents, name=..., project_name="Default")` will create the managed pipeline and ingest the documents synchronously; passing `verbose=True` is helpful while debugging.
+- Construct each `Document` directly so you can assign the `metadata` dict explicitly, e.g. `Document(text=open(path).read(), metadata={"category": "finance"})`. The category value must be a plain string equal to the parent directory name.
+- The metadata filtering primitives live in `llama_index.core.vector_stores`: `MetadataFilter`, `MetadataFilters`, and `FilterOperator`. Build a filters object with a single equality filter and pass it as the `filters=` argument of `index.as_retriever(...)`.
+- `retriever.retrieve("<query>")` returns a list of `NodeWithScore` items whose `.get_content()` (or `.text`) attribute holds the retrieved text. Print and log the joined content so the verifier can search it.
+- The point of the metadata filter is that retrieval results must be restricted to documents whose `category` metadata matches the filter value. The retriever output for the `category == "finance"` filter must NOT contain text that only exists in the sports or geography seed files (and vice versa for the sports filter).
+- Read `trial_id` from `/logs/artifacts/trial_id` and append it to the index name so concurrent runs do not collide.
+
+## Acceptance Criteria
+- Project path: `/home/user/metadata_filter_task`
+- Script path: `/home/user/metadata_filter_task/filter_retrieve.py`
+- Log file: `/home/user/metadata_filter_task/output.log`
+- Command: `python3 /home/user/metadata_filter_task/filter_retrieve.py`
+  - The command must exit with status code `0`.
+- The created LlamaCloud managed index name must be `harbor-metadata-filter-index-${trial_id}` where `trial_id` is the value read from `/logs/artifacts/trial_id`, and it must live in the LlamaCloud `Default` project.
+- The script source must reference both `MetadataFilters` and `MetadataFilter` (so the verifier can confirm that the LlamaIndex metadata-filtering API was actually used).
+- The log file must:
+  - Be a non-empty UTF-8 text file.
+  - Contain a line of the form `Index name: harbor-metadata-filter-index-<trial_id>` so the verifier can confirm the resource name.
+  - Contain a line of the form `Document count: <N>` where `<N>` is the integer total count of documents that were ingested into the managed index (must be `3`).
+  - Contain a section that prints the retrieved context returned for the `category == "finance"` filtered retrieval. The section must be introduced by a line equal to `=== finance retrieval ===` so the verifier can locate it. The retrieved context in that section must include a distinctive phrase from the seeded `finance/finance.txt` file and must NOT include any of the distinctive phrases from the sports or geography seed files.
+  - Contain a section that prints the retrieved context returned for the `category == "sports"` filtered retrieval. The section must be introduced by a line equal to `=== sports retrieval ===` so the verifier can locate it. The retrieved context in that section must include a distinctive phrase from the seeded `sports/sports.txt` file and must NOT include any of the distinctive phrases from the finance or geography seed files.
+

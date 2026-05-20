@@ -1,0 +1,37 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 8 items
+
+tests/test_final_state.py .......F                                       [100%]
+
+=================================== FAILURES ===================================
+_____________________ test_output_contains_markdown_table ______________________
+
+parsed_output = '# Quarterly Revenue Report\n\nTotal revenue for Q3 was $1,234,567 across all business units. The breakdown by departm...,000</td>\n    </tr>\n    <tr>\n        <td>Operations</td>\n        <td>134,567</td>\n    </tr>\n  </tbody>\n</table>'
+
+    def test_output_contains_markdown_table(parsed_output):
+        """Markdown tables use '|' separators; require at least two lines containing '|'."""
+        lines_with_pipe = [ln for ln in parsed_output.splitlines() if "|" in ln]
+>       assert len(lines_with_pipe) >= 2, (
+            "Output markdown does not appear to contain a markdown-formatted table "
+            f"(found {len(lines_with_pipe)} lines containing '|'). "
+            f"First 800 chars: {parsed_output[:800]!r}"
+        )
+E       AssertionError: Output markdown does not appear to contain a markdown-formatted table (found 0 lines containing '|'). First 800 chars: '# Quarterly Revenue Report\n\nTotal revenue for Q3 was $1,234,567 across all business units. The breakdown by department is shown below.\n\n\n<table>\n  <thead>\n    <tr>\n        <th>Department</th>\n        <th>Revenue (USD)</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n        <td>Engineering</td>\n        <td>500,000</td>\n    </tr>\n    <tr>\n        <td>Marketing</td>\n        <td>200,000</td>\n    </tr>\n    <tr>\n        <td>Sales</td>\n        <td>400,000</td>\n    </tr>\n    <tr>\n        <td>Operations</td>\n        <td>134,567</td>\n    </tr>\n  </tbody>\n</table>'
+E       assert 0 >= 2
+E        +  where 0 = len([])
+
+tests/test_final_state.py:86: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_parse_script_uses_llama_cloud_sdk
+PASSED tests/test_final_state.py::test_output_contains_expected_keyword[Quarterly Revenue Report]
+PASSED tests/test_final_state.py::test_output_contains_expected_keyword[Total revenue for Q3 was $1,234,567]
+PASSED tests/test_final_state.py::test_output_contains_expected_keyword[Engineering]
+PASSED tests/test_final_state.py::test_output_contains_expected_keyword[Marketing]
+PASSED tests/test_final_state.py::test_output_contains_expected_keyword[Sales]
+PASSED tests/test_final_state.py::test_output_contains_expected_keyword[Operations]
+FAILED tests/test_final_state.py::test_output_contains_markdown_table - Asser...
+========================= 1 failed, 7 passed in 3.31s ==========================

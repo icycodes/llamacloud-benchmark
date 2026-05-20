@@ -1,0 +1,34 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 5 items
+
+tests/test_final_state.py ....F                                          [100%]
+
+=================================== FAILURES ===================================
+_______________________ test_llama_cloud_pipeline_exists _______________________
+
+expected_index_name = 'harbor-incremental-index-incremental_ingestion_py__3CTFMCT'
+script_output = 'Index name: harbor-incremental-index-incremental_ingestion_py__3CTFMCT\nInserted documents: 2\n\nRetrieved Context:\n...ed around glowing-blue rice.\nStreet vendors in Pochi City sell this dish wrapped in palm leaves for easy transport.\n'
+
+    def test_llama_cloud_pipeline_exists(expected_index_name: str, script_output: str):
+        """Use the LlamaCloud SDK to verify the managed index actually exists on the platform."""
+        # Touch the fixture so the script has already run before we query the API.
+        assert script_output
+    
+        token = os.environ.get("LLAMA_CLOUD_API_KEY")
+        assert token, "LLAMA_CLOUD_API_KEY is not set in the verifier environment."
+    
+>       from llama_cloud.client import LlamaCloud
+E       ModuleNotFoundError: No module named 'llama_cloud.client'
+
+tests/test_final_state.py:138: ModuleNotFoundError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_log_contains_index_name_line
+PASSED tests/test_final_state.py::test_log_reports_inserted_documents_count
+PASSED tests/test_final_state.py::test_log_contains_retrieved_aurora_phrase
+PASSED tests/test_final_state.py::test_log_contains_retrieved_flying_car_phrase
+FAILED tests/test_final_state.py::test_llama_cloud_pipeline_exists - ModuleNo...
+=================== 1 failed, 4 passed in 149.03s (0:02:29) ====================

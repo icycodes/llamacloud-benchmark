@@ -1,0 +1,124 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 11,
+            "passed": 11,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778844805650,
+            "stop": 1778844818722
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_uses_llama_cloud_and_pydantic",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844805674,
+                "stop": 1778844805675,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_extract_script_runs_successfully",
+                "status": "passed",
+                "duration": 13030,
+                "start": 1778844805675,
+                "stop": 1778844818705,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_has_required_top_level_keys",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844818706,
+                "stop": 1778844818707,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_invoice_number",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844818708,
+                "stop": 1778844818709,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_customer_name",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844818710,
+                "stop": 1778844818711,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_customer_email",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844818712,
+                "stop": 1778844818713,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_total_amount",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844818714,
+                "stop": 1778844818715,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_line_items_count_and_keys",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844818716,
+                "stop": 1778844818717,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_line_item_names_present",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844818717,
+                "stop": 1778844818718,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_json_widget_a_row_values",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844818718,
+                "stop": 1778844818719,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_log_lines",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778844818720,
+                "stop": 1778844818722,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}

@@ -1,0 +1,64 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 4,
+            "passed": 3,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778845326467,
+            "stop": 1778845331648
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_build_script_uses_llama_cloud_services",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778845326475,
+                "stop": 1778845326475,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_index_name_line",
+                "status": "passed",
+                "duration": 4833,
+                "start": 1778845326475,
+                "stop": 1778845331308,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_retrieved_capital",
+                "status": "passed",
+                "duration": 2,
+                "start": 1778845331308,
+                "stop": 1778845331310,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_llama_cloud_pipeline_exists",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 338,
+                "start": 1778845331310,
+                "stop": 1778845331648,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "expected_index_name = 'harbor-managed-index-ts-managed_index_query_ts__vyEmTqM'\nscript_output = 'Index name: harbor-managed-index-ts-managed_index_query_ts__vyEmTqM\\n\\nRetrieved context:\\nAtlantis Fact Sheet\\n\\nThe... famous for its silver phoenix mascot.\\nThe country celebrates Founding Day every spring with parades and fireworks.\\n'\n\n    def test_llama_cloud_pipeline_exists(expected_index_name: str, script_output: str):\n        \"\"\"Use the LlamaCloud Python SDK to verify the managed index actually exists on the platform.\"\"\"\n        # Touch the fixture so the script has already run before we query the API.\n        assert script_output\n    \n        token = os.environ.get(\"LLAMA_CLOUD_API_KEY\")\n        assert token, \"LLAMA_CLOUD_API_KEY is not set in the verifier environment.\"\n    \n>       from llama_cloud.client import LlamaCloud\nE       ModuleNotFoundError: No module named 'llama_cloud.client'\n\ntests/test_final_state.py:126: ModuleNotFoundError",
+                "message": "The test failed in the call phase"
+            }
+        ]
+    }
+}

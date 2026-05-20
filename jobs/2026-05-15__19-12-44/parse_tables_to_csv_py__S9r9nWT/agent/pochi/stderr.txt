@@ -1,0 +1,60 @@
+[37m2026-05-15 11:21:44.794[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37mnative:1[39m[0m[0m[1m[37m	Pochi[39m[22m[0m[0m	pochi v0.6.8
+[37m2026-05-15 11:21:45.302[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:519633[39m[0m[0m[1m[37m	loadAgents[39m[22m[0m[0m	Loaded 6 custom agents (6 valid, 0 invalid)
+[37m2026-05-15 11:21:45.303[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:519634[39m[0m[0m[1m[37m	loadSkills[39m[22m[0m[0m	Loaded 2 skills (2 valid, 0 invalid)
+[37m2026-05-15 11:21:45.379[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m$bunfs/root/pochi:444677[39m[0m[0m[1m[37m	PochiVendor[39m[22m[0m[0m	JWT is expiring or missing, fetching a new one
+66433 |   UnknownError2 = class UnknownError2 extends exports_Schema2.TaggedError()("LiveStore.UnknownError", {
+66434 |     cause: exports_Schema2.Defect,
+66435 |     note: exports_Schema2.optional(exports_Schema2.String),
+66436 |     payload: exports_Schema2.optional(exports_Schema2.Any)
+66437 |   }) {
+66438 |     static mapToUnknownError = (effect4) => effect4.pipe(exports_Effect2.mapError((cause3) => exports_Schema2.is(UnknownError2)(cause3) ? cause3 : new UnknownError2({ cause: cause3 })), exports_Effect2.catchAllDefect((cause3) => new UnknownError2({ cause: cause3 })));
+                                                                                                                                                                                                                                                              ^
+(FiberFailure) LiveStore.UnknownError: { "cause": LiveStore.SqliteError: { "query": {"sql":"create table if not exists \"__livestore_schema_event_defs\" (\"eventName\" text primary key   , \"schemaHash\" integer   not null , \"updatedAt\" text   not null ) strict","bindValues":{}}, "code": undefined, "cause": RuntimeError: Unreachable code should not be executed (evaluating 'func(...cArgs)'), "note": undefined } (cause: RuntimeError: Unreachable code should not be executed (evaluating 'func(...cArgs)')), "note": undefined, "payload": undefined }
+ effect/Runtime/FiberFailure: Symbol(effect/Runtime/FiberFailure),
+ effect/Runtime/FiberFailure/Cause: {
+  _tag: "Fail",
+  error: LiveStore.UnknownError: { "cause": LiveStore.SqliteError: { "query": {"sql":"create table if not exists \"__livestore_schema_event_defs\" (\"eventName\" text primary key   , \"schemaHash\" integer   not null , \"updatedAt\" text   not null ) strict","bindValues":{}}, "code": undefined, "cause": RuntimeError: Unreachable code should not be executed (evaluating 'func(...cArgs)'), "note": undefined } (cause: RuntimeError: Unreachable code should not be executed (evaluating 'func(...cArgs)')), "note": undefined, "payload": undefined }
+    at <anonymous> (/$bunfs/root/pochi:66438:247) {
+  [cause]: LiveStore.SqliteError: { "query": {"sql":"create table if not exists \"__livestore_schema_event_defs\" (\"eventName\" text primary key   , \"schemaHash\" integer   not null , \"updatedAt\" text   not null ) strict","bindValues":{}}, "code": undefined, "cause": RuntimeError: Unreachable code should not be executed (evaluating 'func(...cArgs)'), "note": undefined }
+      at dbExecute (/$bunfs/root/pochi:70741:26)
+      at <anonymous> (/$bunfs/root/pochi:70856:14)
+      at @livestore/common:migrateTable (/$bunfs/root/pochi:70868:33)
+      at @livestore/common:leader-thread:recreateDb (/$bunfs/root/pochi:478481:57)
+      at @livestore/common:leader-thread:boot (/$bunfs/root/pochi:478570:33)
+      at @livestore/common:leader-thread (/$bunfs/root/pochi:478570:105)
+      at @livestore/adapter-node:adapter (/$bunfs/root/pochi:485055:33)
+      at createStore:makeAdapter (/$bunfs/root/pochi:460255:102)
+      at createStore (/$bunfs/root/pochi:460285:35)
+      at createStore (/$bunfs/root/pochi:460216:33) {
+    [cause]: RuntimeError: Unreachable code should not be executed (evaluating 'func(...cArgs)')
+        at unknown
+        at unknown
+        at unknown
+        at unknown
+        at unknown
+        at unknown
+        at unknown
+        at ccall (/$bunfs/root/pochi:481812:19)
+        at <anonymous> (/$bunfs/root/pochi:483106:20)
+        at execute (/$bunfs/root/pochi:484058:29)
+        at dbExecute (/$bunfs/root/pochi:70738:17)
+        at <anonymous> (/$bunfs/root/pochi:70856:14)
+  }
+},
+  [Symbol(effect/Cause)]: [Object ...],
+  [Symbol(effect/Hash)]: [Function],
+  [Symbol(effect/Equal)]: [Function],
+  pipe: [Function: pipe],
+  toJSON: [Function: toJSON],
+  toString: [Function: toString],
+  [Symbol(nodejs.util.inspect.custom)]: [Function],
+},
+
+      at /$bunfs/root/pochi:66438:247
+      at @livestore/adapter-node:adapter (/$bunfs/root/pochi:485055:33)
+      at createStore:makeAdapter (/$bunfs/root/pochi:460255:102)
+      at createStore (/$bunfs/root/pochi:460285:35)
+      at createStore (/$bunfs/root/pochi:460216:33)
+[37m2026-05-15 11:21:48.566[39m[0m[0m	[32m[1mDEBUG[22m[39m[0m[0m	[37m[39m[0m[0m[1m[37m	Pochi[39m[22m[0m[0m	Process exiting with code 0
+
+Bun v1.3.4 (Linux x64)

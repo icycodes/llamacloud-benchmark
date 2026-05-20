@@ -1,0 +1,99 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 7,
+            "passed": 0,
+            "failed": 7,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778844109850,
+            "stop": 1778844109910
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_uses_llama_cloud_sdk",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 13,
+                "start": 1778844109873,
+                "stop": 1778844109886,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_script_uses_llama_cloud_sdk():\n        \"\"\"The script must import the official llama_cloud SDK (v2 API).\"\"\"\n>       with open(SCRIPT_PATH, \"r\", encoding=\"utf-8\") as handle:\nE       FileNotFoundError: [Errno 2] No such file or directory: '/home/user/tables_task/extract_tables.py'\n\ntests/test_final_state.py:63: FileNotFoundError",
+                "message": "The test failed in the call phase"
+            },
+            {
+                "name": "test_final_state.py::test_script_configures_items_expand",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 4,
+                "start": 1778844109886,
+                "stop": 1778844109890,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "def test_script_configures_items_expand():\n        \"\"\"The script must request the items tree via expand=['items'].\"\"\"\n>       with open(SCRIPT_PATH, \"r\", encoding=\"utf-8\") as handle:\nE       FileNotFoundError: [Errno 2] No such file or directory: '/home/user/tables_task/extract_tables.py'\n\ntests/test_final_state.py:73: FileNotFoundError",
+                "message": "The test failed in the call phase"
+            },
+            {
+                "name": "test_final_state.py::test_script_runs_successfully",
+                "status": "failed",
+                "duration": 4,
+                "start": 1778844109890,
+                "stop": 1778844109894,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "@pytest.fixture(scope=\"module\")\n    def run_extract_tables():\n        \"\"\"Run the executor's script and yield the resulting CompletedProcess.\"\"\"\n        # Cleanup any pre-existing artifacts so we verify newly produced output.\n        if os.path.isdir(TABLES_DIR):\n            shutil.rmtree(TABLES_DIR)\n        if os.path.isfile(LOG_PATH):\n            os.remove(LOG_PATH)\n    \n>       assert os.path.isfile(SCRIPT_PATH), (\n            f\"Expected the executor to create the script {SCRIPT_PATH}.\"\n        )\nE       AssertionError: Expected the executor to create the script /home/user/tables_task/extract_tables.py.\nE       assert False\nE        +  where False = <function isfile at 0x77d647a7c220>('/home/user/tables_task/extract_tables.py')\nE        +    where <function isfile at 0x77d647a7c220> = <module 'posixpath' (frozen)>.isfile\nE        +      where <module 'posixpath' (frozen)> = os.path\n\ntests/test_final_state.py:47: AssertionError"
+            },
+            {
+                "name": "test_final_state.py::test_csv_directory_contains_two_tables",
+                "status": "failed",
+                "duration": 3,
+                "start": 1778844109895,
+                "stop": 1778844109898,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "@pytest.fixture(scope=\"module\")\n    def run_extract_tables():\n        \"\"\"Run the executor's script and yield the resulting CompletedProcess.\"\"\"\n        # Cleanup any pre-existing artifacts so we verify newly produced output.\n        if os.path.isdir(TABLES_DIR):\n            shutil.rmtree(TABLES_DIR)\n        if os.path.isfile(LOG_PATH):\n            os.remove(LOG_PATH)\n    \n>       assert os.path.isfile(SCRIPT_PATH), (\n            f\"Expected the executor to create the script {SCRIPT_PATH}.\"\n        )\nE       AssertionError: Expected the executor to create the script /home/user/tables_task/extract_tables.py.\nE       assert False\nE        +  where False = <function isfile at 0x77d647a7c220>('/home/user/tables_task/extract_tables.py')\nE        +    where <function isfile at 0x77d647a7c220> = <module 'posixpath' (frozen)>.isfile\nE        +      where <module 'posixpath' (frozen)> = os.path\n\ntests/test_final_state.py:47: AssertionError"
+            },
+            {
+                "name": "test_final_state.py::test_first_csv_contains_department_revenue_table",
+                "status": "failed",
+                "duration": 4,
+                "start": 1778844109898,
+                "stop": 1778844109902,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "@pytest.fixture(scope=\"module\")\n    def run_extract_tables():\n        \"\"\"Run the executor's script and yield the resulting CompletedProcess.\"\"\"\n        # Cleanup any pre-existing artifacts so we verify newly produced output.\n        if os.path.isdir(TABLES_DIR):\n            shutil.rmtree(TABLES_DIR)\n        if os.path.isfile(LOG_PATH):\n            os.remove(LOG_PATH)\n    \n>       assert os.path.isfile(SCRIPT_PATH), (\n            f\"Expected the executor to create the script {SCRIPT_PATH}.\"\n        )\nE       AssertionError: Expected the executor to create the script /home/user/tables_task/extract_tables.py.\nE       assert False\nE        +  where False = <function isfile at 0x77d647a7c220>('/home/user/tables_task/extract_tables.py')\nE        +    where <function isfile at 0x77d647a7c220> = <module 'posixpath' (frozen)>.isfile\nE        +      where <module 'posixpath' (frozen)> = os.path\n\ntests/test_final_state.py:47: AssertionError"
+            },
+            {
+                "name": "test_final_state.py::test_second_csv_contains_top_selling_products_table",
+                "status": "failed",
+                "duration": 4,
+                "start": 1778844109902,
+                "stop": 1778844109906,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "@pytest.fixture(scope=\"module\")\n    def run_extract_tables():\n        \"\"\"Run the executor's script and yield the resulting CompletedProcess.\"\"\"\n        # Cleanup any pre-existing artifacts so we verify newly produced output.\n        if os.path.isdir(TABLES_DIR):\n            shutil.rmtree(TABLES_DIR)\n        if os.path.isfile(LOG_PATH):\n            os.remove(LOG_PATH)\n    \n>       assert os.path.isfile(SCRIPT_PATH), (\n            f\"Expected the executor to create the script {SCRIPT_PATH}.\"\n        )\nE       AssertionError: Expected the executor to create the script /home/user/tables_task/extract_tables.py.\nE       assert False\nE        +  where False = <function isfile at 0x77d647a7c220>('/home/user/tables_task/extract_tables.py')\nE        +    where <function isfile at 0x77d647a7c220> = <module 'posixpath' (frozen)>.isfile\nE        +      where <module 'posixpath' (frozen)> = os.path\n\ntests/test_final_state.py:47: AssertionError"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_expected_lines",
+                "status": "failed",
+                "duration": 4,
+                "start": 1778844109906,
+                "stop": 1778844109910,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "@pytest.fixture(scope=\"module\")\n    def run_extract_tables():\n        \"\"\"Run the executor's script and yield the resulting CompletedProcess.\"\"\"\n        # Cleanup any pre-existing artifacts so we verify newly produced output.\n        if os.path.isdir(TABLES_DIR):\n            shutil.rmtree(TABLES_DIR)\n        if os.path.isfile(LOG_PATH):\n            os.remove(LOG_PATH)\n    \n>       assert os.path.isfile(SCRIPT_PATH), (\n            f\"Expected the executor to create the script {SCRIPT_PATH}.\"\n        )\nE       AssertionError: Expected the executor to create the script /home/user/tables_task/extract_tables.py.\nE       assert False\nE        +  where False = <function isfile at 0x77d647a7c220>('/home/user/tables_task/extract_tables.py')\nE        +    where <function isfile at 0x77d647a7c220> = <module 'posixpath' (frozen)>.isfile\nE        +      where <module 'posixpath' (frozen)> = os.path\n\ntests/test_final_state.py:47: AssertionError"
+            }
+        ]
+    }
+}

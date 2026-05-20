@@ -1,0 +1,42 @@
+============================= test session starts ==============================
+platform linux -- Python 3.12.3, pytest-7.4.4, pluggy-1.4.0
+rootdir: /tests
+plugins: anyio-4.13.0, json-ctrf-0.5.0
+collected 13 items
+
+tests/test_final_state.py ............E                                  [100%]
+
+==================================== ERRORS ====================================
+__________ ERROR at setup of test_parse_job_completed_on_llama_cloud ___________
+
+log_text = 'Trial id: parse_with_custom_prompt_py__Nh7Upet\nCustom prompt: Extract ONLY the line items (item name and price) and ...or tax. The output should contain ONLY the line items and the Total.\nParse job id: pjb-dl94a8w1oot1kg1rki6pgp8fzozp\n'
+
+    @pytest.fixture(scope="module")
+    def parse_job_id(log_text: str) -> str:
+        pattern = re.compile(r"^Parse job id:\s*([0-9a-fA-F-]+)\s*$", re.MULTILINE)
+        match = pattern.search(log_text)
+>       assert match is not None, (
+            f"Expected a 'Parse job id: <job_id>' line in {OUTPUT_LOG}.\n"
+            f"Log content (first 500 chars): {log_text[:500]!r}"
+        )
+E       AssertionError: Expected a 'Parse job id: <job_id>' line in /home/user/prompted_parse_task/output.log.
+E         Log content (first 500 chars): 'Trial id: parse_with_custom_prompt_py__Nh7Upet\nCustom prompt: Extract ONLY the line items (item name and price) and the final Total from this receipt. DO NOT include any other information such as the merchant header, address, phone number, promotional text, survey codes, subtotal, or tax. The output should contain ONLY the line items and the Total.\nParse job id: pjb-dl94a8w1oot1kg1rki6pgp8fzozp\n'
+E       assert None is not None
+
+tests/test_final_state.py:173: AssertionError
+==================================== PASSES ====================================
+=========================== short test summary info ============================
+PASSED tests/test_final_state.py::test_script_exists
+PASSED tests/test_final_state.py::test_script_uses_llama_cloud_sdk
+PASSED tests/test_final_state.py::test_script_wires_custom_prompt
+PASSED tests/test_final_state.py::test_markdown_contains_line_item[Big Mac Meal]
+PASSED tests/test_final_state.py::test_markdown_contains_line_item[Snack Oreo McFlurry]
+PASSED tests/test_final_state.py::test_markdown_contains_line_item[Happy Meal 6 Pc]
+PASSED tests/test_final_state.py::test_markdown_contains_line_item_price[8.99]
+PASSED tests/test_final_state.py::test_markdown_contains_line_item_price[2.69]
+PASSED tests/test_final_state.py::test_markdown_contains_line_item_price[4.89]
+PASSED tests/test_final_state.py::test_markdown_contains_final_total
+PASSED tests/test_final_state.py::test_log_contains_trial_id_line
+PASSED tests/test_final_state.py::test_log_contains_custom_prompt_line
+ERROR tests/test_final_state.py::test_parse_job_completed_on_llama_cloud - As...
+========================= 12 passed, 1 error in 3.98s ==========================

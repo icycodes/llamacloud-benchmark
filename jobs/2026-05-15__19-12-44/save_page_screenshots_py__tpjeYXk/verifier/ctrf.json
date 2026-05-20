@@ -1,0 +1,172 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 14,
+            "passed": 13,
+            "failed": 1,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778844610070,
+            "stop": 1778844619911
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_uses_llama_cloud_sdk",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844610089,
+                "stop": 1778844610090,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_configures_screenshot_output",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844610090,
+                "stop": 1778844610091,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_script_requests_images_content_metadata",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778844610091,
+                "stop": 1778844610091,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_screenshot_directory_exists",
+                "status": "passed",
+                "duration": 9494,
+                "start": 1778844610091,
+                "stop": 1778844619585,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_screenshot_directory_contains_only_expected_files",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778844619586,
+                "stop": 1778844619586,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_screenshot_file_is_valid_png",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778844619587,
+                "stop": 1778844619587,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::filename::['page_01.png', 'page_02.png', 'page_03.png']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_screenshot_file_is_valid_png",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844619587,
+                "stop": 1778844619588,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::filename::['page_01.png', 'page_02.png', 'page_03.png']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_screenshot_file_is_valid_png",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778844619589,
+                "stop": 1778844619589,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::filename::['page_01.png', 'page_02.png', 'page_03.png']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_trial_id",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844619589,
+                "stop": 1778844619590,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_log_contains_screenshot_count",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844619590,
+                "stop": 1778844619591,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_log_reports_each_saved_file",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778844619591,
+                "stop": 1778844619591,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::filename::['page_01.png', 'page_02.png', 'page_03.png']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_log_reports_each_saved_file",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778844619592,
+                "stop": 1778844619592,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::filename::['page_01.png', 'page_02.png', 'page_03.png']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_log_reports_each_saved_file",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844619592,
+                "stop": 1778844619593,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::filename::['page_01.png', 'page_02.png', 'page_03.png']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_parse_job_completed_on_llama_cloud",
+                "status": "failed",
+                "raw_status": "call_failed",
+                "duration": 318,
+                "start": 1778844619593,
+                "stop": 1778844619911,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "trace": "script_run = ('Trial id: save_page_screenshots_py__tpjeYXk\\nParse job id: pjb-xa9cnfbxpjky7ujq8h3tx2lwk8tn\\nScreenshot count: 3\\nSaved: page_01.png\\nSaved: page_02.png\\nSaved: page_03.png\\n', 'pjb-xa9cnfbxpjky7ujq8h3tx2lwk8tn')\n\n    def test_parse_job_completed_on_llama_cloud(script_run):\n        \"\"\"Use the LlamaCloud Python SDK to confirm the parse job referenced in the log.\"\"\"\n        _, job_id = script_run\n    \n        token = os.environ.get(\"LLAMA_CLOUD_API_KEY\")\n        assert token, \"LLAMA_CLOUD_API_KEY is not set in the verifier environment.\"\n    \n        from llama_cloud import LlamaCloud\n    \n>       client = LlamaCloud(token=token)\nE       TypeError: LlamaCloud.__init__() got an unexpected keyword argument 'token'\n\ntests/test_final_state.py:179: TypeError",
+                "message": "The test failed in the call phase"
+            }
+        ]
+    }
+}

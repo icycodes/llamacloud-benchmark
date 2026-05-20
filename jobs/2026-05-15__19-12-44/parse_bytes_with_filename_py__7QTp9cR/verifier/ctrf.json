@@ -1,0 +1,106 @@
+{
+    "results": {
+        "tool": {
+            "name": "pytest",
+            "version": "7.4.4"
+        },
+        "summary": {
+            "tests": 8,
+            "passed": 8,
+            "failed": 0,
+            "skipped": 0,
+            "pending": 0,
+            "other": 0,
+            "start": 1778844548439,
+            "stop": 1778844557237
+        },
+        "environment": {
+            "buildName": "Pytest JSON CTRF Report",
+            "buildNumber": "000",
+            "buildUrl": "https://ctrf.io"
+        },
+        "tests": [
+            {
+                "name": "test_final_state.py::test_script_uses_required_api_patterns",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844548459,
+                "stop": 1778844548460,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_output_directory_exists",
+                "status": "passed",
+                "duration": 8772,
+                "start": 1778844548460,
+                "stop": 1778844557232,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_markdown_output_exists_and_contains_headline",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844557232,
+                "stop": 1778844557233,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::entry::[{'file_name': 'alpha_report.pdf', 'output': 'output/alpha_report.md', 'headline': 'Alpha Status Report'}, {'file_name': 'beta_invoice.pdf', 'output': 'output/beta_invoice.md', 'headline': 'Beta Invoice 0001'}, {'file_name': 'gamma_memo.pdf', 'output': 'output/gamma_memo.md', 'headline': 'Gamma Internal Memo'}]::ids_['alpha_report.pdf', 'beta_invoice.pdf', 'gamma_memo.pdf']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_markdown_output_exists_and_contains_headline",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844557233,
+                "stop": 1778844557234,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::entry::[{'file_name': 'alpha_report.pdf', 'output': 'output/alpha_report.md', 'headline': 'Alpha Status Report'}, {'file_name': 'beta_invoice.pdf', 'output': 'output/beta_invoice.md', 'headline': 'Beta Invoice 0001'}, {'file_name': 'gamma_memo.pdf', 'output': 'output/gamma_memo.md', 'headline': 'Gamma Internal Memo'}]::ids_['alpha_report.pdf', 'beta_invoice.pdf', 'gamma_memo.pdf']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_markdown_output_exists_and_contains_headline",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844557234,
+                "stop": 1778844557235,
+                "retries": 0,
+                "file_path": "test_final_state.py",
+                "tags": [
+                    "parametrize::entry::[{'file_name': 'alpha_report.pdf', 'output': 'output/alpha_report.md', 'headline': 'Alpha Status Report'}, {'file_name': 'beta_invoice.pdf', 'output': 'output/beta_invoice.md', 'headline': 'Beta Invoice 0001'}, {'file_name': 'gamma_memo.pdf', 'output': 'output/gamma_memo.md', 'headline': 'Gamma Internal Memo'}]::ids_['alpha_report.pdf', 'beta_invoice.pdf', 'gamma_memo.pdf']"
+                ]
+            },
+            {
+                "name": "test_final_state.py::test_manifest_exists_and_is_valid_json",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778844557235,
+                "stop": 1778844557235,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_manifest_entries_have_correct_shape_and_order",
+                "status": "passed",
+                "duration": 0,
+                "start": 1778844557236,
+                "stop": 1778844557236,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            },
+            {
+                "name": "test_final_state.py::test_manifest_char_counts_match_files",
+                "status": "passed",
+                "duration": 1,
+                "start": 1778844557236,
+                "stop": 1778844557237,
+                "retries": 0,
+                "file_path": "test_final_state.py"
+            }
+        ]
+    }
+}
